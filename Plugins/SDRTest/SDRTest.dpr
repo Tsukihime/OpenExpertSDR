@@ -18,7 +18,8 @@ exports
   setVhfOsc,
   setUhfOsc,
   setCalGen,
-  setXvAnt;
+  setXvAnt,
+  showPluginGui;
 
 begin
 

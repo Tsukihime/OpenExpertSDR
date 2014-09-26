@@ -3071,6 +3071,7 @@ void ExpertSDR_vA2_1::readSettings()
 
         int SDRPluginIndex = settings.value("SDRPluginIndex", 0).toInt();
         pOpt->ui.cbSdrType->setCurrentIndex(SDRPluginIndex);
+        pOpt->onSdrTypeChanged(SDRPluginIndex);
 
 		tmpIValue = settings.value("Audio_Driver", 0).toInt();
 		if(tmpIValue < 0 || tmpIValue > 1)

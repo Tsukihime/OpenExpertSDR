@@ -41,6 +41,7 @@ SdrPlugin::SdrPlugin(Options *pOpt, StreamCallback *pCallBack, StreamCallback *p
     connect(pOpt, SIGNAL(driverChanged(int)), this, SLOT(onPaDriverChanged(int)));
     connect(pUi->tbSDR, SIGNAL(currentChanged(int)), this, SLOT(onSdrTypeChanged(int)));
     connect(pOpt, SIGNAL(SdrPluginChanged(QString)), this, SLOT(onSdrPluginChanged(QString)));
+    connect(pUi->pbPluginConfig, SIGNAL(clicked()), this, SLOT(onSdrShowConfig()));
 
     Sun2CalibrateFreq = 1.0;
 }
@@ -84,6 +85,12 @@ void SdrPlugin::onSdrPluginChanged(QString path)
     connect(pSDRhw, SIGNAL(DashChanged(bool)), this, SIGNAL(DashChanged(bool)));
     connect(pSDRhw, SIGNAL(DotChanged(bool)), this, SIGNAL(DotChanged(bool)));
     connect(pSDRhw, SIGNAL(AdcChanged(int, int)), this, SIGNAL(AdcChanged(int, int)));
+}
+
+void SdrPlugin::onSdrShowConfig()
+{
+    if(pSDRhw)
+        pSDRhw->showPluginGui();
 }
 
 void SdrPlugin::onS2ChangeBuffers(int NumBuffers)

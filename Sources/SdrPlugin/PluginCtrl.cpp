@@ -55,6 +55,7 @@ pluginCtrl::pluginCtrl(QString libpath)
     _setUhfOsc = (PluginFunc_setUhfOsc)pPlugLib->resolve("setUhfOsc");
     _setCalGen = (PluginFunc_setCalGen)pPlugLib->resolve("setCalGen");
     _setXvAnt = (PluginFunc_setXvAnt)pPlugLib->resolve("setXvAnt");
+    _showPluginGui = (PluginFunc_showPluginGui)pPlugLib->resolve("showPluginGui");
 
     pluginLoaded = true;
 }
@@ -181,6 +182,12 @@ QString pluginCtrl::getInfo()
 bool pluginCtrl::isLoaded()
 {
     return pluginLoaded;
+}
+
+void pluginCtrl::showPluginGui()
+{
+    if(_showPluginGui && pluginLoaded)
+        _showPluginGui();
 }
 
 void pluginCtrl::SdrStateChanged(QObject *PlugCtrl, StateChgReason reason, bool arg1, int arg2, int arg3)

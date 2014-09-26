@@ -83,6 +83,7 @@ class SdrPlugin : public QWidget
 
     public slots:
         void onSdrPluginChanged(QString path);
+        void onSdrShowConfig();
 
 	private slots:
 		void onPaDriverChanged(int Index);

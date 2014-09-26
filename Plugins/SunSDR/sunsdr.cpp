@@ -118,3 +118,8 @@ EXPORT void setXvAnt(int Mode)
 {
     pSunSDR->setXvAnt(Mode);
 }
+
+EXPORT void showPluginGui()
+{
+    // no gui in this plugin
+}

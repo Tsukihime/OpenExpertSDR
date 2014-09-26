@@ -36,6 +36,7 @@ procedure setVhfOsc(Freq: Cardinal); cdecl;
 procedure setUhfOsc(Freq: Cardinal); cdecl;
 procedure setCalGen(Mode: bool); cdecl;
 procedure setXvAnt(Mode: integer); cdecl;
+procedure showPluginGui(); cdecl;
 
 implementation
 
@@ -163,6 +164,13 @@ end;
 procedure setXvAnt(Mode: integer); cdecl;
 begin
   console_log('setXvAnt(' + inttostr(Mode) + ')');
+end;
+
+procedure showPluginGui(); cdecl;
+begin
+  if (LOGFrm <> nil) then
+    LOGFrm.Show;
+  console_log('showPluginGui()');
 end;
 
 end.

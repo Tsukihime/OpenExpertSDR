@@ -824,9 +824,9 @@ border: 1px solid #00B000;
         <widget class="QComboBox" name="cbSdrType">
          <property name="geometry">
           <rect>
-           <x>70</x>
+           <x>65</x>
            <y>10</y>
-           <width>131</width>
+           <width>120</width>
            <height>22</height>
           </rect>
          </property>
@@ -1172,6 +1172,19 @@ border: 1px solid #00B000;
           </widget>
          </widget>
          <widget class="QWidget" name="page_16"/>
+        </widget>
+        <widget class="QPushButton" name="pbPluginConfig">
+         <property name="geometry">
+          <rect>
+           <x>190</x>
+           <y>11</y>
+           <width>41</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Config</string>
+         </property>
         </widget>
        </widget>
        <widget class="QWidget" name="tab_2">

@@ -35,6 +35,7 @@ enum StateChgReason {
 
 typedef __cdecl void (*CallbackFunc_SdrStateChanged)(QObject *PlugCtrl, StateChgReason reason, bool arg1, int arg2, int arg3);
 typedef __cdecl void (*PluginFunc_getInfo)(char*);
+typedef __cdecl void (*PluginFunc_showPluginGui)();
 
 typedef __cdecl void (*PluginFunc_init)(QObject *handle, CallbackFunc_SdrStateChanged func);
 typedef __cdecl void (*PluginFunc_deinit)();
@@ -79,6 +80,7 @@ public:
     static bool getInfo(QString libpath, QString &PlugName);
     QString getInfo();
     bool isLoaded();
+    void showPluginGui();
 
 private:
     QString InfoStr;
@@ -86,6 +88,7 @@ private:
     bool pluginLoaded;
 
     PluginFunc_getInfo _getInfo;
+    PluginFunc_showPluginGui _showPluginGui;
 
     PluginFunc_init _init;
     PluginFunc_deinit _deinit;
