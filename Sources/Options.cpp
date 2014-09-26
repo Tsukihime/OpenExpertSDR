@@ -22,10 +22,13 @@
  */
 
 #include "Options.h"
+#include "SdrPlugin/PluginCtrl.h"
 
 Options::Options(QWidget *parent) : QWidget(parent)
 {
 	ui.setupUi(this);
+
+    SetupPluginList();
 
 	ui.sbPaTxDelayValue->setVisible(false);
 	ui.sbVoiceRepeatTime->setVisible(false);
@@ -208,6 +211,7 @@ Options::Options(QWidget *parent) : QWidget(parent)
 	connect(ui.sbPaVacLattency, SIGNAL(valueChanged(int)), this, SLOT(soundVacChanged(int)));
 	connect(ui.chbVacEnable, SIGNAL(stateChanged(int)), this, SLOT(soundChanged(int)));
 	connect(ui.cbSdrType, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSdrType(int)));
+	connect(ui.cbSdrType, SIGNAL(currentIndexChanged(int)), this, SLOT(onSdrTypeChanged(int)));	
 	onEnableXvtrx(false);
 	connect(ui.chbXvtrxEnable, SIGNAL(clicked(bool)), this, SLOT(onEnableXvtrx(bool)));
 	connect(ui.pbWavePath, SIGNAL(clicked()), this, SLOT(openWaveDir()));
@@ -274,6 +278,21 @@ QString Options::getWaveFilesDirLocation()
 QString Options::getWaveFilesDirLocationDefault()
 {
 	return (pathDefaultWaveIQDefault);
+}
+
+void Options::SetupPluginList()
+{
+    QString plugin_dir = QDir::currentPath() + "/device";
+    QDir plug_dir(plugin_dir, "*.dll", QDir::Name, QDir::Files | QDir::Hidden | QDir::System);
+
+    for(int i = 0; i < plug_dir.count(); i++)
+    {
+        QString libpath = plugin_dir + "/" + plug_dir[i];
+		QString InfoStr = "";
+
+		if(pluginCtrl::getInfo(libpath, InfoStr))
+			ui.cbSdrType->addItem(InfoStr, libpath);
+    }
 }
 
 void Options::StartProgs()
@@ -1050,7 +1069,7 @@ void Options::OnAddKeyCts(bool stat)
 void Options::OnSdrType(int Type)
 {
 	ui.cbSdrType->setCurrentIndex(Type);
-	ui.swSdrType->setCurrentIndex(Type);
+	//ui.swSdrType->setCurrentIndex(Type);
 }
 
 void Options::openWaveDir()
@@ -1075,4 +1094,10 @@ void Options::openWaveDir()
 void Options::viewLocationLogFile()
 {
 	QDesktopServices::openUrl(QUrl::fromLocalFile(QDir::homePath() + "/Application Data/Expert Electronics/ExpertSDR"));
+}
+
+void Options::onSdrTypeChanged(int index)
+{
+    QString path = ui.cbSdrType->itemData(index).toString();
+    emit SdrPluginChanged(path);
 }

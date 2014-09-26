@@ -2693,7 +2693,7 @@ void Panarama::DrawFilter()
 
     bool right_end = (filter_centerX + (pixelsWide + padding)*ScaleWindowX) > 1;
     bool left_end = (filter_centerX - (pixelsWide + padding)*ScaleWindowX) < -1;
-    bool text_left = ((vfo_ab && (TxVfo != 0)) || right_end) && !left_end;
+    bool text_left = ((vfo_ab && ((TxVfo != 0) || IsFilter2)) || right_end) && !left_end;
 
     if(text_left) {
         shift = -(pixelsWide + padding)*ScaleWindowX;

@@ -93,6 +93,9 @@ class Options : public QWidget
 		QString getWaveFilesDirLocation();
 		QString getWaveFilesDirLocationDefault();
 
+    private:
+        void SetupPluginList();
+
 	private slots:
 		void ChangePage(QListWidgetItem *current, QListWidgetItem *previous);
 
@@ -146,6 +149,7 @@ class Options : public QWidget
         void OnSdrType(int Type);
         void SetWindowType(int type);
         void onEnableXvtrx(bool stat);
+        void onSdrTypeChanged(int index);
 
 	signals:
 		void SoundCardOptChanged();
@@ -179,6 +183,7 @@ class Options : public QWidget
         void DotChanged(bool);
         void XvtrxEnable(bool);
 		void wavePathChanged(QString path);
+        void SdrPluginChanged(QString);
 
 };
 

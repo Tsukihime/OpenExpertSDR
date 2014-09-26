@@ -52,7 +52,6 @@ HEADERS += CalibrateSC/Calibrator/CalibrProc.h \
     Options.h \
     SMeter.h \
     SdrPlugin/SdrPlugin.h \
-    SdrPlugin/SunSDR/sunCtrl.h \
     WdgAddStation.h \
     WdgGraph.h \
     WdgMem.h \
@@ -61,7 +60,8 @@ HEADERS += CalibrateSC/Calibrator/CalibrProc.h \
     Resampler.h \
     Timer/Timer.h \
     RingResampler/RingResampler.h \
-    RingResampler/RingBuffer.h
+    RingResampler/RingBuffer.h \
+    SdrPlugin/PluginCtrl.h
 SOURCES += CalibrateSC/Calibrator/CalibrProc.cpp \
     CalibrateSC/Calibrator/Calibrator.cpp \
     Wav/fileList.cpp \
@@ -102,7 +102,6 @@ SOURCES += CalibrateSC/Calibrator/CalibrProc.cpp \
     Options.cpp \
     SMeter.cpp \
     SdrPlugin/SdrPlugin.cpp \
-    SdrPlugin/SunSDR/sunCtrl.cpp \
     WdgAddStation.cpp \
     WdgGraph.cpp \
     WdgMem.cpp \
@@ -112,7 +111,8 @@ SOURCES += CalibrateSC/Calibrator/CalibrProc.cpp \
     Resampler.cpp \
     Timer/Timer.cpp \
     RingResampler/RingResampler.cpp \
-    RingResampler/RingBuffer.cpp
+    RingResampler/RingBuffer.cpp \
+    SdrPlugin/PluginCtrl.cpp
 RESOURCES += images.qrc
 FORMS += CalibrateSC/Calibrator/Calibrator.ui \
     Wav/fileList.ui \

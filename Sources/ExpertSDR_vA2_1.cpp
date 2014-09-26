@@ -1942,6 +1942,7 @@ retry:
 	settings.endGroup();
 	settings.beginGroup("OptionsWindow");
 		settings.setValue("Position", pOpt->pos());
+        settings.setValue("SDRPluginIndex", pOpt->ui.cbSdrType->currentIndex());
 		settings.setValue("Audio_Driver", pOpt->ui.cbPaDriver->currentIndex());
 		settings.setValue("Audio_Input", pOpt->ui.cbPaIn->currentIndex());
 		settings.setValue("Audio_Output", pOpt->ui.cbPaOut->currentIndex());
@@ -3067,6 +3068,10 @@ void ExpertSDR_vA2_1::readSettings()
 
 	settings.beginGroup("OptionsWindow");
 		pOpt->move(settings.value("Position", QPoint(200, 200)).toPoint());
+
+        int SDRPluginIndex = settings.value("SDRPluginIndex", 0).toInt();
+        pOpt->ui.cbSdrType->setCurrentIndex(SDRPluginIndex);
+
 		tmpIValue = settings.value("Audio_Driver", 0).toInt();
 		if(tmpIValue < 0 || tmpIValue > 1)
 		{
@@ -4521,7 +4526,7 @@ void ExpertSDR_vA2_1::OnOptChangeWindow(int Window)
 
 void ExpertSDR_vA2_1::OnStart(bool Start)
 {
-	if(pOpt->ui.cbSdrType->currentIndex() == 0)
+    if(/*pOpt->ui.cbSdrType->currentIndex() == 0*/ true)
 	{
 		if(Start)
 		{
@@ -4529,6 +4534,11 @@ void ExpertSDR_vA2_1::OnStart(bool Start)
 				return;
 			isStarted = true;
 			pOpt->ui.cbSdrType->setEnabled(false);
+
+            int plugidx = pOpt->ui.cbSdrType->currentIndex();
+            QString plugpath = pOpt->ui.cbSdrType->itemData(plugidx).toString();
+            pSdrCtrl->onSdrPluginChanged(plugpath);
+
 			OnLock(ui.pbLock->isChecked());
 			if(pMem->isWavPlay())
 			{
@@ -4562,6 +4572,9 @@ void ExpertSDR_vA2_1::OnStart(bool Start)
 			pDsp->SetAudioSize(pOpt->ui.cbPaBufferSize->currentText().toInt());
 			pDsp->SetRxOsc((float)(-pGraph->pGl->GetFilter()));
 			pDsp->SetTxLevelerTop(3.162278);
+
+            SetVhfOsc(pOpt->ui.sbVhfOsc->value());
+            SetUhfOsc(pOpt->ui.sbUhfOsc->value());
 
 			pSdrCtrl->SetSdrType((SDR_DEVICE)pOpt->ui.cbSdrType->currentIndex());
 			pSdrCtrl->setMute(ui.pbMute->isChecked());

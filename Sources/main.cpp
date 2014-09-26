@@ -49,9 +49,9 @@ int main(int argc, char *argv[])
 	QPixmap pixmap(":images/splash.png");
 	QSplashScreen splash(pixmap);
 	splash.show();
-	ExpertSDR_vA2_1 *pw = new ExpertSDR_vA2_1;
-	pw->show();
+	ExpertSDR_vA2_1 pw;
+	pw.show();
 
-	splash.finish(pw);
+	splash.finish(&pw);
 	return a.exec();
 }

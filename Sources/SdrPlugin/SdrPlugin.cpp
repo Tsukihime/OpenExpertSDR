@@ -23,36 +23,36 @@
 
 #include "SdrPlugin.h"
 
-
 SdrPlugin::SdrPlugin(Options *pOpt, StreamCallback *pCallBack, StreamCallback *pCallBack4, void *UsrData, QWidget *parent) : QWidget(parent)
 {
-	CalibrateFreq = 1.0;
-	FreqDDS = 1800000;
-	isStarted = false;
-	pUi = &pOpt->ui;
-	AudioCallBack = pCallBack;
-	AudioCallBack4 = pCallBack4;
-	SdrType = SUNSDR;
-	pAudio = new pa19(UsrData);
-	pSunSDR = new sunCtrl;
-	pAudio->open();
-	pUi->cbPaDriver->addItems(pAudio->driverName());
-	pUi->cbPaIn->addItems(pAudio->inDevName(0));
-	pUi->cbPaOut->addItems(pAudio->outDevName(0));
-	connect(pOpt, SIGNAL(driverChanged(int)), this, SLOT(onPaDriverChanged(int)));
-	connect(pUi->tbSDR, SIGNAL(currentChanged(int)), this, SLOT(onSdrTypeChanged(int)));
-	connect(pSunSDR, SIGNAL(PttChanged(bool)),  this, SIGNAL(PttChanged(bool)));
-	connect(pSunSDR, SIGNAL(DashChanged(bool)), this, SIGNAL(DashChanged(bool)));
-	connect(pSunSDR, SIGNAL(DotChanged(bool)),  this, SIGNAL(DotChanged(bool)));
-	connect(pSunSDR, SIGNAL(AdcChanged(int, int)),  this, SIGNAL(AdcChanged(int, int)));
+    CalibrateFreq = 1.0;
+    FreqDDS = 1800000;
+    isStarted = false;
+    pUi = &pOpt->ui;
+    AudioCallBack = pCallBack;
+    AudioCallBack4 = pCallBack4;
+    SdrType = SUNSDR;
+    pAudio = new pa19(UsrData);
+    pSDRhw = NULL;
+    pAudio->open();
+    pUi->cbPaDriver->addItems(pAudio->driverName());
+    pUi->cbPaIn->addItems(pAudio->inDevName(0));
+    pUi->cbPaOut->addItems(pAudio->outDevName(0));
+    connect(pOpt, SIGNAL(driverChanged(int)), this, SLOT(onPaDriverChanged(int)));
+    connect(pUi->tbSDR, SIGNAL(currentChanged(int)), this, SLOT(onSdrTypeChanged(int)));
+    connect(pOpt, SIGNAL(SdrPluginChanged(QString)), this, SLOT(onSdrPluginChanged(QString)));
 
-	Sun2CalibrateFreq = 1.0;
+    Sun2CalibrateFreq = 1.0;
 }
 
 SdrPlugin::~SdrPlugin()
 {
-	delete pSunSDR;
-	delete pAudio;
+    if(pSDRhw != NULL)
+    {
+        pSDRhw->deinit();
+        delete pSDRhw;
+    }
+    delete pAudio;
 }
 
 void SdrPlugin::onPaDriverChanged(int Index)
@@ -68,6 +68,24 @@ void SdrPlugin::onSdrTypeChanged(int Index)
 	SdrType = (SDR_DEVICE)Index;
 }
 
+void SdrPlugin::onSdrPluginChanged(QString path)
+{
+    if(pSDRhw != NULL)
+    {
+        pSDRhw->close();
+        pSDRhw->deinit();
+        delete pSDRhw;
+    }
+
+    pSDRhw = new pluginCtrl(path);
+    pSDRhw->init();
+
+    connect(pSDRhw, SIGNAL(PttChanged(bool)), this, SIGNAL(PttChanged(bool)));
+    connect(pSDRhw, SIGNAL(DashChanged(bool)), this, SIGNAL(DashChanged(bool)));
+    connect(pSDRhw, SIGNAL(DotChanged(bool)), this, SIGNAL(DotChanged(bool)));
+    connect(pSDRhw, SIGNAL(AdcChanged(int, int)), this, SIGNAL(AdcChanged(int, int)));
+}
+
 void SdrPlugin::onS2ChangeBuffers(int NumBuffers)
 {
 	QString s;
@@ -81,18 +99,22 @@ void SdrPlugin::SetSdrType(SDR_DEVICE Type)
 
 void SdrPlugin::SetPreamp(int Preamp)
 {
-	pSunSDR->setPreamp(Preamp);
+    if(pSDRhw)
+        pSDRhw->setPreamp(Preamp);
 }
 
 void SdrPlugin::SetExtCtrl(DWORD ExtData)
 {
-	pSunSDR->setExtCtrl((BYTE)ExtData);
+    if(pSDRhw)
+        pSDRhw->setExtCtrl((BYTE)ExtData);
 }
 
 void SdrPlugin::SetDdsFreq(float Freq)
 {
 	FreqDDS = Freq*CalibrateFreq;
-	pSunSDR->setDdsFreq(FreqDDS);
+
+    if(pSDRhw)
+        pSDRhw->setDdsFreq(FreqDDS);
 }
 
 float SdrPlugin::GetDdsFreq()
@@ -102,7 +124,8 @@ float SdrPlugin::GetDdsFreq()
 
 void SdrPlugin::SetTrxMode(bool Mode)
 {
-	pSunSDR->setTrxMode(Mode);
+    if(pSDRhw)
+        pSDRhw->setTrxMode(Mode);
 }
 
 void SdrPlugin::Close()
@@ -114,6 +137,9 @@ int SdrPlugin::Start()
 {
 	if(isStarted)
 		return -4;
+
+    if(pSDRhw == NULL)
+        return -1;
 
 	OptPlug.cbPaDriverIndex = pUi->cbPaDriver->currentIndex();
 	OptPlug.cbPaOutIndex = pUi->cbPaOut->currentIndex();
@@ -134,11 +160,11 @@ int SdrPlugin::Start()
 		if(pAudio->start(AudioCallBack4)!=0)
 			return -1;
 	}
-	pSunSDR->open(0, OptPlug.sbDdsMul);
-	if(pSunSDR->isOpen()==0)
-		emit sunsdrConnectInfo("SunSDR is not connected.");
+    pSDRhw->open(0, OptPlug.sbDdsMul);
+    if(pSDRhw->isOpen()==0)
+		emit sunsdrConnectInfo("SDR device is not connected.");
 	else
-		emit sunsdrConnectInfo("SunSDR is connected.");
+		emit sunsdrConnectInfo("SDR device is connected.");
 	return 0;
 
 	pUi->tbSDR->setEnabled(false);
@@ -149,7 +175,8 @@ int SdrPlugin::Start()
 void SdrPlugin::Stop()
 {
 	pAudio->stop();
-	pSunSDR->close();
+    if(pSDRhw)
+        pSDRhw->close();
 	pUi->tbSDR->setEnabled(true);
 	isStarted = false;
 }
@@ -166,26 +193,30 @@ void SdrPlugin::SetDdsCalibrate(double val)
 
 void SdrPlugin::setCalGen(bool Mode)
 {
-	pSunSDR->setCalGen(Mode);
+    if(pSDRhw)
+        pSDRhw->setCalGen(Mode);
 }
 
 void SdrPlugin::setVhfOsc(quint32 freq)
 {
-	pSunSDR->setVhfOsc(freq);
+    if(pSDRhw)
+        pSDRhw->setVhfOsc(freq);
 }
 
 void SdrPlugin::setUhfOsc(quint32 freq)
 {
-	pSunSDR->setUhfOsc(freq);
+    if(pSDRhw)
+        pSDRhw->setUhfOsc(freq);
 }
 
 void SdrPlugin::setMute(bool status)
 {
-	pSunSDR->setMute(status);
+    if(pSDRhw)
+        pSDRhw->setMute(status);
 }
 
 void SdrPlugin::setXvAnt(int Mode)
 {
-	pSunSDR->setXvAnt(Mode);
+    if(pSDRhw)
+        pSDRhw->setXvAnt(Mode);
 }
-

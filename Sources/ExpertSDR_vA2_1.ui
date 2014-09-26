@@ -231,6 +231,72 @@ QSpinBox::down-arrow:disabled,
 QSpinBox::down-arrow:off { /* off state when value in min */
 image: url(:/images/down_arrow_disabled.png);
 }
+/***pbVoicePlay*********************************/
+QPushButton#pbVoicePlay {
+border: 1px solid #000000;
+border-radius: 0px;
+background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #333333,  stop: 1 #2e2e2e);
+color: #EBEBEB;
+image: url(://images/play_unpress.png);
+}
+QPushButton#pbVoicePlay:hover {
+background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #c2c2c2, stop:0.5 #959595, stop:0.55 #959595, stop: 1 #707070);
+image: url(://images/play_unpress.png);
+}
+QPushButton#pbVoicePlay:disabled {
+color: #787878;
+image: url(://images/play_disable.png);
+}
+QPushButton#pbVoicePlay:pressed {
+background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #325C32, stop:0.45 #366436, stop:0.5 #366436, stop: 1 #4A944A);
+image: url(://images/play_press.png);
+}
+QPushButton#pbVoicePlay:pressed:hover {
+background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #325C32, stop:0.45 #366436, stop:0.5 #366436, stop: 1 #4A944A);
+image: url(://images/play_press.png);
+}
+QPushButton#pbVoicePlay::checked {
+background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #325C32, stop:0.45 #366436, stop:0.55 #366436, stop: 1 #4e9d4e);
+image: url(://images/play_press.png);
+}
+/***pbVoiceRec**********************************/
+QPushButton#pbVoiceRec {
+border: 1px solid #000000;
+border-radius: 0px;
+background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #333333,  stop: 1 #2e2e2e);
+color: #EBEBEB;
+image: url(://images/rec_unpress.png);
+}
+QPushButton#pbVoiceRec:hover {
+background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #c2c2c2, stop:0.5 #959595, stop:0.55 #959595, stop: 1 #707070);
+image: url(://images/rec_unpress.png);
+}
+QPushButton#pbVoiceRec:disabled {
+color: #787878;
+image: url(://images/rec_disable.png);
+}
+QPushButton#pbVoiceRec:pressed {
+background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #325C32, stop:0.45 #366436, stop:0.5 #366436, stop: 1 #4A944A);
+image: url(://images/rec_press.png);
+}
+QPushButton#pbVoiceRec:pressed:hover {
+background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #325C32, stop:0.45 #366436, stop:0.5 #366436, stop: 1 #4A944A);
+image: url(://images/rec_press.png);
+}
+QPushButton#pbVoiceRec::checked {
+background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #325C32, stop:0.45 #366436, stop:0.55 #366436, stop: 1 #4e9d4e);
+image: url(://images/rec_press.png);
+}
 /***********************************************/
 </string>
   </property>
@@ -856,7 +922,7 @@ p, li { white-space: pre-wrap; }
                <height>21</height>
               </size>
              </property>
-             <property name="text">
+             <property name="toolTip">
               <string>PLAY</string>
              </property>
              <property name="checkable">
@@ -881,7 +947,7 @@ p, li { white-space: pre-wrap; }
                <height>21</height>
               </size>
              </property>
-             <property name="text">
+             <property name="toolTip">
               <string>REC</string>
              </property>
              <property name="checkable">

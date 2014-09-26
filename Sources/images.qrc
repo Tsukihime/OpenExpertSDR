@@ -66,5 +66,11 @@
         <file>images/checkbutton_unchacked_green.png</file>
         <file>images/checkbutton_unchacked_red.png</file>
         <file>images/font/DS-DIGI.TTF</file>
+        <file>images/play_disable.png</file>
+        <file>images/play_press.png</file>
+        <file>images/play_unpress.png</file>
+        <file>images/rec_disable.png</file>
+        <file>images/rec_press.png</file>
+        <file>images/rec_unpress.png</file>
     </qresource>
 </RCC>

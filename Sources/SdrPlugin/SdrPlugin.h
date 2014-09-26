@@ -30,7 +30,7 @@
 #include "../Options.h"
 #include "../Defines.h"
 #include "PortAudio/pa19.h"
-#include "SunSDR/sunCtrl.h"
+#include "PluginCtrl.h"
 
 typedef enum
 {
@@ -70,7 +70,6 @@ class SdrPlugin : public QWidget
         void setMute(bool status);
         void setXvAnt(int Mode);
 
-
 	private:
 		Ui::OptionsClass *pUi;
 		bool isStarted;
@@ -80,7 +79,10 @@ class SdrPlugin : public QWidget
 
     public:
 		pa19 *pAudio;
-		sunCtrl   *pSunSDR;
+        pluginCtrl   *pSDRhw;
+
+    public slots:
+        void onSdrPluginChanged(QString path);
 
 	private slots:
 		void onPaDriverChanged(int Index);
