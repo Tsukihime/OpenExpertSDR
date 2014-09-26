@@ -36,6 +36,7 @@ static const int StepGridHz[STEP_GRID_SIZE] = {1, 5, 10, 25, 50, 100, 250, 500, 
 #define STEP_FREQ_PIX_WIDTH 70
 #define STEP_GRID_DDS_SIZE 21
 static const int StepGridDDSHz[STEP_GRID_DDS_SIZE] = {1, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 15000, 25000, 50000, 100000, 250000, 500000, 1000000, 5000000, 10000000};
+static const int StepDDSHz[19] = {1, 5, 10, 25, 50, 100, 250, 500, 1000, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000, 5000000, 10000000};
 
 #define BAND_SIZE 13
 static const QString BandStr[BAND_SIZE] =   {"160M",  "80M",  "60M",  "40M",  "30M",   "20M",   "17M",   "15M",   "12M",   "10M",   "6M",     "2M",    "0.7M"};

@@ -292,7 +292,12 @@ Panarama::Panarama(QWidget *pOpt, QWidget *parent)
 	fontBand.setFamily("Calibri");
 	fontBand.setPointSize(12);
 	fontBand.setWeight(QFont::Bold);
-	fontBand.setStyleStrategy(QFont::PreferQuality);
+    fontBand.setStyleStrategy(QFont::PreferQuality);
+    fontInfo = font();
+    fontInfo.setFamily("Calibri");
+    fontInfo.setPointSize(11);
+    fontInfo.setWeight(10);
+    fontInfo.setStyleStrategy(QFont::StyleStrategy(QFont::PreferQuality | QFont::OpenGLCompatible));
 	SetPowerComp(pPanOpt->ui.cbPowerChange->currentIndex());
 	SetStepDbm();
 	SetStepGrid();
@@ -1799,7 +1804,16 @@ void Panarama::wheelEvent(QWheelEvent *event)
 		if(LastPosObject == GRID || LastPosObject == WATERFALL)
 		{
 			if(!LockGrid)
-				emit ChangeStepDDS(1);
+            {
+                if(pPanOpt->ui.chbWheelChangeFilter->isChecked())
+                {
+                    SetFilter(GetFilter() + StepDDSHz[numStepGridDDS]);
+                }
+                else
+                {
+                    emit ChangeStepDDS(1);
+                }
+            }
 		}
 		else if(LastPosObject == MAIN_FILTER || LastPosObject == BAND_FILTER)
 		{
@@ -1849,7 +1863,16 @@ void Panarama::wheelEvent(QWheelEvent *event)
 		if(LastPosObject == GRID || LastPosObject == WATERFALL)
 		{
 			if(!LockGrid)
-				emit ChangeStepDDS(-1);
+            {
+                if(pPanOpt->ui.chbWheelChangeFilter->isChecked())
+                {
+                    SetFilter(GetFilter() - StepDDSHz[numStepGridDDS]);
+                }
+                else
+                {
+                    emit ChangeStepDDS(-1);
+                }
+            }
 		}
 		else if(LastPosObject == MAIN_FILTER || LastPosObject == BAND_FILTER)
 		{
@@ -2205,7 +2228,7 @@ void Panarama::DrawRule()
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
 	glColor4d(1.0, 1.0, 1.0, 1.0);
-	renderText(1.0-ox30, posRule - oy10-oy5, -1.0, "MHz");
+    renderText(1.0-ox30, posRule - oy10-oy5, -1.0, "Hz");
 }
 
 void Panarama::DrawGrid()
@@ -2260,7 +2283,7 @@ void Panarama::DrawGrid()
 	glEnable(GL_POINT_SMOOTH);
 	for(GLdouble i = BeginGrid - 1.0; i < (EndX - 2*ox30/(sScaleRuleX + dScaleRuleX)); i += GridStep)
 	{
-		StrNum = QString("%1").arg(Num, 0, 'f', PrecisionNum);
+        StrNum = freqToStr(qRound(Num*1000000));
 		OffsetNum = fm.width(StrNum)/(double)width()/(sScaleRuleX + dScaleRuleX);
 
 		renderText(i - OffsetNum -(sPosZoomPan + dPosZoomPan), posRule -oy10-oy5, 0.02, StrNum);
@@ -2277,6 +2300,10 @@ void Panarama::DrawGrid()
 
 void Panarama::DrawFilter()
 {
+    double vfob = ((sFilter2+dFilter2)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
+    double vfoa = ((sFilter+dFilter)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
+    bool vfo_ab = vfoa < vfob;
+
 	int r,g,b,a;
 	float tmpS = sScaleRuleX + dScaleRuleX;
 	float tmp2 = sFilter+ dFilter-sPosZoomPan - dPosZoomPan;
@@ -2452,7 +2479,7 @@ void Panarama::DrawFilter()
 		QFont fnt = font();
 		fnt.setPointSize(10);
 		fnt.setWeight(QFont::Bold);
-		QFontMetrics fm(this->font());
+        QFontMetrics fm(fontInfo);
 		int pixelsWide = fm.width("TX");
 		float tmpxx = tmpPosX1 + (BandTxHigh*2.0/SampleRate - BandTxLow*2.0/SampleRate)/2.0;
 		if(Mode == CWL || Mode == CWU)
@@ -2462,14 +2489,28 @@ void Panarama::DrawFilter()
 		glPopMatrix();
 		double Num = ((sFilter2+dFilter2)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
 		QString str;
-		str = QString("%1").arg(Num/1000000.0, 0, 'f', 3);
-		pixelsWide = fm.width(str + " MHz");
-		int pixH = fm.height();
-		float dX = ((sFilter2+ dFilter2) - (sPosZoomPan + dPosZoomPan))*(tmpS) + (sPosZoomPan + dPosZoomPan) - (pixelsWide*ScaleWindowX/2.0);
+        str = "B: " + freqToStr(Num) + " Hz";
+        pixelsWide = fm.width(str);
+        int pixH = fm.height();
+
+        int padding = 7;
+        GLdouble filter_centerX = ((sFilter2+ dFilter2) - (sPosZoomPan + dPosZoomPan))*(tmpS) + (sPosZoomPan + dPosZoomPan);
+        GLdouble shift = 0;
+
+        bool right_end = (filter_centerX + (pixelsWide + padding)*ScaleWindowX) > 1;
+        bool left_end = (filter_centerX - (pixelsWide + padding)*ScaleWindowX) < -1;
+        bool text_left = (!vfo_ab || right_end) && !left_end;
+
+        if(text_left) {
+            shift = -(pixelsWide + padding)*ScaleWindowX;
+        } else {
+            shift = padding*ScaleWindowX;
+        }
+
 		if(!IsFilter2)
-			DrawInfo(dX, 1.0 - pixH*ScaleWindowY/2.0, str + " MHz", Qt::red);
+            DrawInfo(filter_centerX + shift, 1.0 - pixH*ScaleWindowY/2.0, str, Qt::red);
 		else
-			DrawInfo(dX, 1.0 - pixH*ScaleWindowY/2.0, str + " MHz", ColorFilter2);
+            DrawInfo(filter_centerX + shift, 1.0 - pixH*ScaleWindowY/2.0, str, ColorFilter2);
 	}
 	if(IsFilter2)
 	{
@@ -2525,13 +2566,56 @@ void Panarama::DrawFilter()
 		glEnd();
 		glPopMatrix();
 		double Num = ((sFilter2+dFilter2)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
-		QString str;
-		str = QString("%1").arg(Num/1000000.0, 0, 'f', 3);
-		QFontMetrics fm(this->font());
-		int pixelsWide = fm.width(str + " MHz");
-		int pixH = fm.height();
-		float dX = ((sFilter2+ dFilter2) - (sPosZoomPan + dPosZoomPan))*(tmpS) + (sPosZoomPan + dPosZoomPan) - (pixelsWide*ScaleWindowX/2.0);
-		DrawInfo(dX, 1.0 - pixH*ScaleWindowY/2.0, str + " MHz", ColorFilter2);
+        QString str;
+        str = "B: " + freqToStr(Num) + " Hz";
+        QFontMetrics fm(fontInfo);
+        int pixelsWide = fm.width(str);
+        int pixH = fm.height();
+
+        int padding = 7;
+        GLdouble filter_centerX = ((sFilter2+ dFilter2) - (sPosZoomPan + dPosZoomPan))*(tmpS) + (sPosZoomPan + dPosZoomPan);
+        GLdouble shift = 0;
+
+        bool right_end = (filter_centerX + (pixelsWide + padding)*ScaleWindowX) > 1;
+        bool left_end = (filter_centerX - (pixelsWide + padding)*ScaleWindowX) < -1;
+        bool text_left = (!vfo_ab || right_end) && !left_end;
+
+        if(text_left) {
+            shift = -(pixelsWide + padding)*ScaleWindowX;
+        } else {
+            shift = padding*ScaleWindowX;
+        }
+
+        GLdouble text_height = pixH*ScaleWindowY;
+        GLdouble y_pos = 1.0 - text_height/2;
+
+        DrawInfo(filter_centerX + shift, y_pos, str, ColorFilter2);
+
+        QString StrNum;
+        if(
+                    (ActionObject == PRESS_LEFT_CF2) ||
+                    (ActionObject == PRESS_LEFT_BF_LEFT) ||
+                    (ActionObject == PRESS_LEFT_BF_RIGHT) ||
+                    (LastPosObject == BAND_FILTER2) ||
+                    (LastPosObject == LEFT_BAND2) ||
+                    (LastPosObject == RIGHT_BAND2)
+        )
+        {
+            if(IsVisibleInfo && IsWindow)
+            {
+                Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0);
+                StrNum = freqToStr(Num);
+                DrawInfo(filter_centerX + shift, y_pos - text_height*2, "L: "+StrNum+" Hz", Qt::white);
+
+                Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0);
+                StrNum = freqToStr(Num);
+                DrawInfo(filter_centerX + shift, y_pos - text_height*3, "H: "+StrNum+" Hz", Qt::white);
+
+                Num = ((sFilter2 + dFilter2)*SampleRate/2.0);
+                StrNum = freqToStr(Num);
+                DrawInfo(filter_centerX + shift, y_pos - text_height*4, "F: "+StrNum+" Hz", Qt::white);
+            }
+        }
 	}
 	glPushMatrix();
 	glTranslated(sPosZoomPan + dPosZoomPan, posRule, 0.0);
@@ -2598,11 +2682,55 @@ void Panarama::DrawFilter()
 	glEnd();
 	double Num = ((sFilter+dFilter)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
 	QString str;
-	str = QString("%1").arg(Num/1000000.0, 0, 'f', 3);
-	QFontMetrics fm(this->font());
-	int pixelsWide = fm.width(str + " MHz");
-	int pixH = fm.height();
-	DrawInfo(((sFilter+ dFilter) - (sPosZoomPan + dPosZoomPan))*(tmpS) + (sPosZoomPan + dPosZoomPan) - (pixelsWide*ScaleWindowX/2.0), 1.0 - pixH*ScaleWindowY/2, str + " MHz", QColor(255,167,108,255));
+    str = "A: " + freqToStr(Num) + " Hz";
+    QFontMetrics fm(fontInfo);
+    int pixelsWide = fm.width(str);
+    int pixH = fm.height();
+
+    int padding = 7;
+    GLdouble filter_centerX = ((sFilter+ dFilter) - (sPosZoomPan + dPosZoomPan))*(tmpS) + (sPosZoomPan + dPosZoomPan);
+    GLdouble shift = 0;
+
+    bool right_end = (filter_centerX + (pixelsWide + padding)*ScaleWindowX) > 1;
+    bool left_end = (filter_centerX - (pixelsWide + padding)*ScaleWindowX) < -1;
+    bool text_left = ((vfo_ab && (TxVfo != 0)) || right_end) && !left_end;
+
+    if(text_left) {
+        shift = -(pixelsWide + padding)*ScaleWindowX;
+    } else {
+        shift = padding*ScaleWindowX;
+    }
+
+    GLdouble text_height = pixH*ScaleWindowY;
+    GLdouble y_pos = 1.0 - text_height/2;
+
+    DrawInfo(filter_centerX + shift, y_pos, str, QColor(255,255,255,255));
+
+    QString StrNum;
+    if(
+                (ActionObject == PRESS_LEFT_CF) ||
+                (ActionObject == PRESS_LEFT_BF_LEFT) ||
+                (ActionObject == PRESS_LEFT_BF_RIGHT) ||
+                (LastPosObject == BAND_FILTER) ||
+                (LastPosObject == LEFT_BAND) ||
+                (LastPosObject == RIGHT_BAND)
+    )
+    {
+        if(IsVisibleInfo && IsWindow)
+        {
+            Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0);
+            StrNum = freqToStr(Num);
+            DrawInfo(filter_centerX + shift, y_pos - text_height*2, "L: "+StrNum+" Hz", Qt::white);
+
+            Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0);
+            StrNum = freqToStr(Num);
+            DrawInfo(filter_centerX + shift, y_pos - text_height*3, "H: "+StrNum+" Hz", Qt::white);
+
+            Num = ((sFilter + dFilter)*SampleRate/2.0);
+            StrNum = freqToStr(Num);
+            DrawInfo(filter_centerX + shift, y_pos - text_height*4, "F: "+StrNum+" Hz", Qt::white);
+        }
+    }
 }
 
 void Panarama::DrawSpectr()
@@ -2862,13 +2990,12 @@ void Panarama::DrawCursor()
 				if(IsWindow)
 				{
 					Num = ((MovePosX - sPosZoomPan - dPosZoomPan)*SampleRate/2.0)/(sScaleRuleX + dScaleRuleX) - (sDDSFreq + dDDSFreq - sPosZoomPan - dPosZoomPan)*SampleRate/2.0 + SampleRate/2.0;
-					Num /= 1000000;
-					StrNum = QString("%1").arg(Num, 0, 'f', 6);
+                    StrNum = freqToStr(Num);
 
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "Freq: "+StrNum+" MHz", Qt::white);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "VFO: "+StrNum+" Hz", Qt::white);
 					Num = (MovePosY-(posRule))*(sLenDbmY+dLenDbmY)/(1.0 - (posRule)) + (sOffsetDbm+dOffsetDbm);
-					StrNum = QString("%1").arg(Num, 0, 'f', 1);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 15*ScaleWindowY, "Db: "+StrNum, Qt::white);
+                    StrNum = QString("%1").arg(Num, 0, 'f', 1);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 15*ScaleWindowY, StrNum + " dBm", Qt::white);
 				}
 			}
 			glColor4d(1.0, 1.0, 1.0, 0.3);
@@ -2909,9 +3036,9 @@ void Panarama::DrawCursor()
 			{
 				if(!IsWindow)
 				{
-					Num = ((sFilter + dFilter)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "Fiter: "+StrNum+" kHz", Qt::white);
+                    Num = ((sFilter + dFilter)*SampleRate/2.0);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "Fiter: "+StrNum+" Hz", Qt::white);
 				}
 			}
 
@@ -2927,9 +3054,9 @@ void Panarama::DrawCursor()
 			{
 				if(!IsWindow)
 				{
-					Num = ((sFilter2 + dFilter2)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "Fiter: "+StrNum+" kHz", ColorFilter2);
+                    Num = ((sFilter2 + dFilter2)*SampleRate/2.0);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "Fiter: "+StrNum+" Hz", ColorFilter2);
 				}
 			}
 			setCursor(Qt::SplitHCursor);
@@ -2940,23 +3067,6 @@ void Panarama::DrawCursor()
 				TimerDrawFilterEdges.start(PAN_UPDATE);
 				IsDrawFilterEdges = true;
 			}
-			if(IsVisibleInfo)
-			{
-				if(IsWindow)
-				{
-					Num = ((sFilter + dFilter)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "Fiter: "+StrNum+" kHz", Qt::white);
-
-					Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "High: "+StrNum+" kHz", Qt::white);
-
-					Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - oy30, "Low: "+StrNum+" kHz", Qt::white);
-				}
-			}
 			setCursor(Qt::SplitHCursor);
 			break;
 		case BAND_FILTER2:
@@ -2965,107 +3075,24 @@ void Panarama::DrawCursor()
 				TimerDrawFilterEdges2.start(PAN_UPDATE);
 				IsDrawFilterEdges2 = true;
 			}
-			if(IsVisibleInfo)
-			{
-				if(IsWindow)
-				{
-					Num = ((sFilter2 + dFilter2)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "Fiter: "+StrNum+" kHz", Qt::white);
-
-					Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "High: "+StrNum+" kHz", Qt::white);
-
-					Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - oy30, "Low: "+StrNum+" kHz", Qt::white);
-				}
-			}
 			setCursor(Qt::SplitHCursor);
 			break;
 		case LEFT_BAND:
-			setCursor(Qt::SizeHorCursor);
-			if(!TimerDrawFilterEdges.isActive())
-			{
-				TimerDrawFilterEdges.start(PAN_UPDATE);
-				IsDrawFilterEdges = true;
-			}
-			if(IsVisibleInfo)
-			{
-				if(IsWindow)
-				{
-					Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "High: "+StrNum+" kHz", Qt::white);
-
-					Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "Low: "+StrNum+" kHz", Qt::white);
-				}
-			}
+        case RIGHT_BAND:
+            setCursor(Qt::SizeHorCursor);
+            if(!TimerDrawFilterEdges.isActive())
+            {
+                TimerDrawFilterEdges.start(PAN_UPDATE);
+                IsDrawFilterEdges = true;
+            }
 			break;
 		case LEFT_BAND2:
-			setCursor(Qt::SizeHorCursor);
-			if(!TimerDrawFilterEdges2.isActive())
-			{
-				TimerDrawFilterEdges2.start(PAN_UPDATE);
-				IsDrawFilterEdges2 = true;
-			}
-			if(IsVisibleInfo)
-			{
-				if(IsWindow)
-				{
-					Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "High: "+StrNum+" kHz", Qt::white);
-
-					Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "Low: "+StrNum+" kHz", Qt::white);
-				}
-			}
-			break;
-		case RIGHT_BAND:
-			setCursor(Qt::SizeHorCursor);
-			if(!TimerDrawFilterEdges.isActive())
-			{
-				TimerDrawFilterEdges.start(PAN_UPDATE);
-				IsDrawFilterEdges = true;
-			}
-			if(IsVisibleInfo)
-			{
-				if(IsWindow)
-				{
-					Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "High: "+StrNum+" kHz", Qt::white);
-
-					Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "Low: "+StrNum+" kHz", Qt::white);
-				}
-			}
-			break;
 		case RIGHT_BAND2:
 			setCursor(Qt::SizeHorCursor);
 			if(!TimerDrawFilterEdges2.isActive())
 			{
 				TimerDrawFilterEdges2.start(PAN_UPDATE);
 				IsDrawFilterEdges2 = true;
-			}
-			if(IsVisibleInfo)
-			{
-				if(IsWindow)
-				{
-					Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "High: "+StrNum+" kHz", Qt::white);
-
-					Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "Low: "+StrNum+" kHz", Qt::white);
-				}
 			}
 			break;
 		case WATERFALL:
@@ -3075,9 +3102,8 @@ void Panarama::DrawCursor()
 				if(IsWindow)
 				{
 					Num = ((MovePosX - sPosZoomPan - dPosZoomPan)*SampleRate/2.0)/(sScaleRuleX + dScaleRuleX) - (sDDSFreq + dDDSFreq - sPosZoomPan - dPosZoomPan)*SampleRate/2.0 + SampleRate/2.0;
-					Num /= 1000000;
-					StrNum = QString("%1").arg(Num, 0, 'f', 6);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "Freq: "+StrNum+" MHz", Qt::white);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "VFO: "+StrNum+" Hz", Qt::white);
 				}
 			}
 
@@ -3139,14 +3165,13 @@ void Panarama::DrawCursor()
 				if(IsWindow)
 				{
 					Num = ((MovePosX - sPosZoomPan - dPosZoomPan)*SampleRate/2.0)/(sScaleRuleX + dScaleRuleX) - (sDDSFreq + dDDSFreq - sPosZoomPan - dPosZoomPan)*SampleRate/2.0 + SampleRate/2.0;
-					Num /= 1000000;
-					StrNum = QString("%1").arg(Num, 0, 'f', 6);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "Freq: "+StrNum+" MHz", Qt::white);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "VFO: "+StrNum+" Hz", Qt::white);
 					if(MovePosY > (posRule))
 					{
 						Num = (MovePosY-(posRule))*(sLenDbmY+dLenDbmY)/(1.0 - (posRule)) + (sOffsetDbm+dOffsetDbm);
 						StrNum = QString("%1").arg(Num, 0, 'f', 1);
-						DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 15*ScaleWindowY, "Db: "+StrNum, Qt::white);
+                        DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 15*ScaleWindowY, StrNum + " dBm", Qt::white);
 					}
 				}
 			}
@@ -3184,14 +3209,13 @@ void Panarama::DrawCursor()
 				if(IsWindow)
 				{
 					Num = ((MovePosX - sPosZoomPan - dPosZoomPan)*SampleRate/2.0)/(sScaleRuleX + dScaleRuleX) - (sDDSFreq + dDDSFreq - sPosZoomPan - dPosZoomPan)*SampleRate/2.0 + SampleRate/2.0;
-					Num /= 1000000;
-					StrNum = QString("%1").arg(Num, 0, 'f', 6);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "Freq: "+StrNum+" MHz", Qt::white);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "VFO: "+StrNum+" Hz", Qt::white);
 					if(MovePosY > (posRule))
 					{
 						Num = (MovePosY-(posRule))*(sLenDbmY+dLenDbmY)/(1.0 - (posRule)) + (sOffsetDbm+dOffsetDbm);
 						StrNum = QString("%1").arg(Num, 0, 'f', 1);
-						DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 15*ScaleWindowY, "Db: "+StrNum, Qt::white);
+                        DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 15*ScaleWindowY, StrNum + " dBm", Qt::white);
 					}
 				}
 			}
@@ -3222,27 +3246,7 @@ void Panarama::DrawCursor()
 			glEnd();
 			break;
 		case PRESS_LEFT_CF:
-			if(IsVisibleInfo)
-			{
-				if(IsWindow)
-				{
-					Num = ((sFilter + dFilter)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "Fiter: "+StrNum+" kHz", Qt::white);
-				}
-			}
-			setCursor(Qt::SplitHCursor);
-			break;
 		case PRESS_LEFT_CF2:
-			if(IsVisibleInfo)
-			{
-				if(IsWindow)
-				{
-					Num = ((sFilter2 + dFilter2)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "Fiter2: "+StrNum+" kHz", Qt::white);
-				}
-			}
 			setCursor(Qt::SplitHCursor);
 			break;
 		case PRESS_RIGHT_CF:
@@ -3250,9 +3254,9 @@ void Panarama::DrawCursor()
 			{
 				if(IsWindow)
 				{
-					Num = ((sFilter + dFilter)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "Fiter: "+StrNum+" kHz", Qt::white);
+                    Num = ((sFilter + dFilter)*SampleRate/2.0);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "Fiter: "+StrNum+" Hz", Qt::white);
 				}
 			}
 
@@ -3263,52 +3267,16 @@ void Panarama::DrawCursor()
 			{
 				if(IsWindow)
 				{
-					Num = ((sFilter2 + dFilter2)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "Fiter2: "+StrNum+" kHz", Qt::white);
+                    Num = ((sFilter2 + dFilter2)*SampleRate/2.0);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "Fiter2: "+StrNum+" Hz", Qt::white);
 				}
 			}
 
 			setCursor(Qt::SplitHCursor);
 			break;
 		case PRESS_LEFT_BF:
-			if(IsVisibleInfo)
-			{
-				if(IsWindow)
-				{
-					Num = ((sFilter + dFilter)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "Fiter: "+StrNum+" kHz", Qt::white);
-
-					Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "High: "+StrNum+" kHz", Qt::white);
-
-					Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - oy30, "Low: "+StrNum+" kHz", Qt::white);
-				}
-			}
-			setCursor(Qt::SplitHCursor);
-			break;
 		case PRESS_LEFT_BF2:
-			if(IsVisibleInfo)
-			{
-				if(IsWindow)
-				{
-					Num = ((sFilter2 + dFilter2)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "Fiter2: "+StrNum+" kHz", Qt::white);
-
-					Num = ((sBandPassHigh2 + dBandPassHigh2)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "High: "+StrNum+" kHz", Qt::white);
-
-					Num = ((sBandPassLow2 + dBandPassLow2)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - oy30, "Low: "+StrNum+" kHz", Qt::white);
-				}
-			}
 			setCursor(Qt::SplitHCursor);
 			break;
 		case PRESS_RIGHT_BF:
@@ -3316,17 +3284,17 @@ void Panarama::DrawCursor()
 			{
 				if(IsWindow)
 				{
-					Num = ((sFilter + dFilter)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "Fiter: "+StrNum+" kHz", Qt::white);
+                    Num = ((sFilter + dFilter)*SampleRate/2.0);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "Fiter: "+StrNum+" Hz", Qt::white);
 
-					Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "High: "+StrNum+" kHz", Qt::white);
+                    Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "High: "+StrNum+" Hz", Qt::white);
 
-					Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - oy30, "Low: "+StrNum+" kHz", Qt::white);
+                    Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - oy30, "Low: "+StrNum+" Hz", Qt::white);
 				}
 			}
 			setCursor(Qt::SplitHCursor);
@@ -3336,66 +3304,38 @@ void Panarama::DrawCursor()
 			{
 				if(IsWindow)
 				{
-					Num = ((sFilter2 + dFilter2)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "Fiter2: "+StrNum+" kHz", Qt::white);
+                    Num = ((sFilter2 + dFilter2)*SampleRate/2.0);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "Fiter2: "+StrNum+" Hz", Qt::white);
 
-					Num = ((sBandPassHigh2 + dBandPassHigh2)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "High: "+StrNum+" kHz", Qt::white);
+                    Num = ((sBandPassHigh2 + dBandPassHigh2)*SampleRate/2.0);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "High: "+StrNum+" Hz", Qt::white);
 
-					Num = ((sBandPassLow2 + dBandPassLow2)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - oy30, "Low: "+StrNum+" kHz", Qt::white);
+                    Num = ((sBandPassLow2 + dBandPassLow2)*SampleRate/2.0);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - oy30, "Low: "+StrNum+" Hz", Qt::white);
 				}
 			}
 			setCursor(Qt::SplitHCursor);
 			break;
 		case PRESS_LEFT_BF_LEFT:
-			setCursor(Qt::SizeHorCursor);
-			if(IsVisibleInfo)
-			{
-				if(IsWindow)
-				{
-					Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "High: "+StrNum+" kHz", Qt::white);
-
-					Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "Low: "+StrNum+" kHz", Qt::white);
-				}
-			}
-			break;
+        case PRESS_LEFT_BF_RIGHT:
+            setCursor(Qt::SizeHorCursor);
+            break;
 		case PRESS_LEFT_BF_LEFT2:
 			setCursor(Qt::SizeHorCursor);
 			if(IsVisibleInfo)
 			{
 				if(IsWindow)
 				{
-					Num = ((sBandPassHigh2 + dBandPassHigh2)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "High: "+StrNum+" kHz", Qt::white);
+                    Num = ((sBandPassHigh2 + dBandPassHigh2)*SampleRate/2.0);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "High: "+StrNum+" Hz", Qt::white);
 
-					Num = ((sBandPassLow2 + dBandPassLow2)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "Low: "+StrNum+" kHz", Qt::white);
-				}
-			}
-			break;
-		case PRESS_LEFT_BF_RIGHT:
-			setCursor(Qt::SizeHorCursor);
-			if(IsVisibleInfo)
-			{
-				if(IsWindow)
-				{
-					Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "High: "+StrNum+" kHz", Qt::white);
-
-					Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "Low: "+StrNum+" kHz", Qt::white);
+                    Num = ((sBandPassLow2 + dBandPassLow2)*SampleRate/2.0);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "Low: "+StrNum+" Hz", Qt::white);
 				}
 			}
 			break;
@@ -3405,13 +3345,13 @@ void Panarama::DrawCursor()
 			{
 				if(IsWindow)
 				{
-					Num = ((sBandPassHigh2 + dBandPassHigh2)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "High: "+StrNum+" kHz", Qt::white);
+                    Num = ((sBandPassHigh2 + dBandPassHigh2)*SampleRate/2.0);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 1.5*oy10, "High: "+StrNum+" Hz", Qt::white);
 
-					Num = ((sBandPassLow2 + dBandPassLow2)*SampleRate/2.0)/1000.0;
-					StrNum = QString("%1").arg(Num, 0, 'f', 3);
-					DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "Low: "+StrNum+" kHz", Qt::white);
+                    Num = ((sBandPassLow2 + dBandPassLow2)*SampleRate/2.0);
+                    StrNum = freqToStr(Num);
+                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 1.5*oy10, "Low: "+StrNum+" Hz", Qt::white);
 				}
 			}
 			break;
@@ -3651,41 +3591,9 @@ void Panarama::DrawInfo(GLdouble X, GLdouble Y, QString Str, QColor color)
 	int r,g,b,a;
 	color.getRgb(&r,&g,&b,&a);
 	glPushMatrix();
-	glTranslated(X, Y,0.0);
-	glEnable(GL_POLYGON_SMOOTH);
-	QFontMetrics fm(this->font());
-	int pixelsWide = fm.width(Str);
-	GLdouble Len = pixelsWide*ScaleWindowX;
-	GLdouble R = 8.0;
-	glBegin(GL_POLYGON);
-		for(double i = PI/2.0; i <= 3*PI/2.0; i += 5*PI/180)
-		{
-			GLdouble Tmp = 0.1+(((qSin(i)+1.0)/2.0)*0.2);
-			glColor4f(Tmp, Tmp, Tmp, 0.8);
-			glVertex3d(R*qCos(i)*ScaleWindowX, R*qSin(i)*ScaleWindowY, -0.7);
-		}
-	glEnd();
-	glBegin(GL_QUADS);
-		glColor4f(0.3, 0.3, 0.3, 0.8);
-		glVertex3d(0.0, R*ScaleWindowY, -0.7);
-		glColor4f(0.1, 0.1, 0.1, 0.8);
-		glVertex3d(0.0,-R*ScaleWindowY, -0.7);
-		glVertex3d(Len,-R*ScaleWindowY, -0.7);
-		glColor4f(0.3, 0.3, 0.3, 0.8);
-		glVertex3d(Len, R*ScaleWindowY, -0.7);
-	glEnd();
-
-	glBegin(GL_POLYGON);
-		for(double i = -PI/2.0; i <= PI/2.0; i += 5*PI/180)
-		{
-			GLdouble Tmp = 0.1+(((qSin(i)+1.0)/2.0)*0.2);
-			glColor4f(Tmp, Tmp, Tmp, 0.8);
-			glVertex3d(Len+R*qCos(i)*ScaleWindowX, R*qSin(i)*ScaleWindowY, -0.7);
-		}
-	glEnd();
-	glDisable(GL_POLYGON_SMOOTH);
+	glTranslated(X, Y,0.0);  
 	qglColor(color);
-	renderText(0, -4*ScaleWindowY, -0.75, Str);
+    renderText(0, -4*ScaleWindowY, -0.75, Str, fontInfo);
 	glPopMatrix();
 }
 
@@ -5739,6 +5647,27 @@ void Panarama::updateDbmState()
 	}
 }
 
+QString Panarama::freqToStr(double freq)
+{
+    bool addminus = freq < 0;
+    if (addminus)
+        freq *= -1;
+    QString str = QString::number(qint64(freq));
+    int pass = (str.length() - 1) / 3;
+    if (pass > 3)
+        pass = 3;
+    int start_len = str.length();
+    for(int i = 1; i <= pass; i++)
+    {
+       str.insert(start_len - i * 3, " ");
+    }
+
+    if (addminus)
+        str = "-" + str;
+
+    return str;
+}
+
 void Panarama::readSettings(QSettings *pSettings)
 {
 	float tmp = 0;
@@ -5810,3 +5739,4 @@ void Panarama::writeSettings(QSettings *pSettings)
 		pSettings->setValue("posRule", sPosRule);
 	pSettings->endGroup();
 }
+

@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * This file is part of ExpertSDR
  *
  * ExpertSDR is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@
 #include <math.h>
 #include <QtCore>
 #include <QtGlobal>
+#include <QFontDatabase>
 
 int crBand = 0;
 int crMode = 0;
@@ -943,6 +944,13 @@ ExpertSDR_vA2_1::ExpertSDR_vA2_1(QWidget *parent) : QWidget(parent)
 	pAgStep = new QActionGroup(this);
 	pCalibrator = new Calibrator;
 
+    QString qmenu_style = "QMenu {border: 1px solid #000000; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #333333,  stop: 1 #2e2e2e); color: #EBEBEB;}\n"
+                          "QMenu::item:selected {background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #325C32, stop:0.45 #366436, stop:0.55 #366436, stop: 1 #4e9d4e);}";
+
+    pMenuPreamp->setStyleSheet(qmenu_style);
+    pMenuAgc->setStyleSheet(qmenu_style);
+    pMenuStep->setStyleSheet(qmenu_style);
+
 	pDg0 = new Didgit(ui.pbDg0);
 	pDg1 = new Didgit(ui.pbDg1);
 	pDg2 = new Didgit(ui.pbDg2);
@@ -956,6 +964,7 @@ ExpertSDR_vA2_1::ExpertSDR_vA2_1(QWidget *parent) : QWidget(parent)
 	pPaVac = new pa19(this);
 	pVac = new Vac;
 	pMenuFreqUpDown = new QMenu;
+    pMenuFreqUpDown->setStyleSheet(qmenu_style);
 	pFupDownAct = new QActionGroup(this);
 	pMnFudTimer = new QTimer;
 	pSdrCtrl = new SdrPlugin(pOpt, DspCallBack, audioCallBack4, this);
@@ -1074,16 +1083,18 @@ ExpertSDR_vA2_1::ExpertSDR_vA2_1(QWidget *parent) : QWidget(parent)
 	ui.pbAgc->setMenu(pMenuAgc);
 	ui.pbStep->setMenu(pMenuStep);
 
-	pDg0->SetFontType("MS Shell Dlg 2", 18);
-	pDg1->SetFontType("MS Shell Dlg 2", 18);
-	pDg2->SetFontType("MS Shell Dlg 2", 18);
-	pDg3->SetFontType("MS Shell Dlg 2", 28);
-	pDg4->SetFontType("MS Shell Dlg 2", 28);
-	pDg5->SetFontType("MS Shell Dlg 2", 28);
-	pDg6->SetFontType("MS Shell Dlg 2", 28);
-	pDg7->SetFontType("MS Shell Dlg 2", 28);
-	pDg8->SetFontType("MS Shell Dlg 2", 28);
-	pDg9->SetFontType("MS Shell Dlg 2", 28);
+    QFontDatabase::addApplicationFont(":/images/font/DS-DIGI.TTF");
+
+    pDg0->SetFontType("DS-Digital", 24);
+    pDg1->SetFontType("DS-Digital", 24);
+    pDg2->SetFontType("DS-Digital", 24);
+    pDg3->SetFontType("DS-Digital", 36);
+    pDg4->SetFontType("DS-Digital", 36);
+    pDg5->SetFontType("DS-Digital", 36);
+    pDg6->SetFontType("DS-Digital", 36);
+    pDg7->SetFontType("DS-Digital", 36);
+    pDg8->SetFontType("DS-Digital", 36);
+    pDg9->SetFontType("DS-Digital", 36);
 
 	if(!pDsp->isLoad)
 	{
@@ -1198,7 +1209,7 @@ ExpertSDR_vA2_1::ExpertSDR_vA2_1(QWidget *parent) : QWidget(parent)
 	connect(ui.pbBin, SIGNAL(clicked(bool)), this, SLOT(OnBin(bool)));
 	connect(ui.pbStart, SIGNAL(clicked(bool)), this, SLOT(OnStart(bool)));
 	connect(ui.pbMox, SIGNAL(clicked(bool)), this, SLOT(OnMox(bool)));
-	connect(pSdrCtrl, SIGNAL(PttChanged(bool)), this, SLOT(OnMox(bool)));	// todo òåëåãðàô
+	connect(pSdrCtrl, SIGNAL(PttChanged(bool)), this, SLOT(OnMox(bool)));	// todo Ñ‚ÐµÐ»ÐµÐ³Ñ€Ð°Ñ„
 	connect(pPanel, SIGNAL(KeyPtt(bool)),  pSdrCtrl, SIGNAL(PttChanged(bool)));
 	connect(pCatManager, SIGNAL(PttChanged(bool)),  pSdrCtrl, SIGNAL(PttChanged(bool)));
 	connect(pOpt, SIGNAL(PttChanged(bool)),  pSdrCtrl, SIGNAL(PttChanged(bool)), Qt::QueuedConnection);
@@ -3643,7 +3654,7 @@ void ExpertSDR_vA2_1::OnLpanel(bool Status)
 {
 	if(Status)
 	{
-		ui.WdgLpanel->setFixedHeight(52);
+        ui.WdgLpanel->setFixedHeight(55);
 		ui.WdgMainGraph->resize(ui.WdgMainGraph->width(), height()-172);
 		ui.WdgMainGraph->update();
 		pGraph->resize(Splitter->widget(0)->width(), height() - 172);
@@ -3784,6 +3795,7 @@ void ExpertSDR_vA2_1::OnStepChanged(int val)
 {
 	pMenuStep->actions().at(val)->setChecked(true);
 	ui.pbStep->setText(pAgStep->checkedAction()->iconText() + "    ");
+    pGraph->pGl->SetStepDDS(val);
 }
 
 void ExpertSDR_vA2_1::OnChangeBand(int Mode)

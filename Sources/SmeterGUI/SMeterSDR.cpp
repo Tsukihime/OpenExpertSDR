@@ -653,6 +653,65 @@ float SMeterSDR::getDbmMax()
 	return val;
 }
 
+QString SMeterSDR::dBmToText()
+{
+    QString strV;
+    if(dBmValDraw <= -127+3)
+        strV = "S0";
+    else if(dBmValDraw <= -121+3)
+        strV = "S1";
+    else if(dBmValDraw <= -115+3)
+        strV = "S2";
+    else if(dBmValDraw <= -109+3)
+        strV = "S3";
+    else if(dBmValDraw <= -103+3)
+        strV = "S4";
+    else if(dBmValDraw <= -97+3)
+        strV = "S5";
+    else if(dBmValDraw <= -91+3)
+        strV = "S6";
+    else if(dBmValDraw <= -85+3)
+        strV = "S7";
+    else if(dBmValDraw <= -79+3)
+        strV = "S8";
+    else if(dBmValDraw <= -73+3)
+        strV = "S9";
+    else if(dBmValDraw <= -73+5+2.5)
+        strV = "S9 +5";
+    else if(dBmValDraw <= -73+10+2.5)
+        strV = "S9 +10";
+    else if(dBmValDraw <= -73+15+2.5)
+        strV = "S9 +15";
+    else if(dBmValDraw <= -73+20+2.5)
+        strV = "S9 +20";
+    else if(dBmValDraw <= -73+25+2.5)
+        strV = "S9 +25";
+    else if(dBmValDraw <= -73+30+2.5)
+        strV = "S9 +30";
+    else if(dBmValDraw <= -73+35+2.5)
+        strV = "S9 +35";
+    else if(dBmValDraw <= -73+40+2.5)
+        strV = "S9 +40";
+    else if(dBmValDraw <= -73+45+2.5)
+        strV = "S9 +45";
+    else if(dBmValDraw <= -73+50+2.5)
+        strV = "S9 +50";
+    else if(dBmValDraw <= -73+55+2.5)
+        strV = "S9 +55";
+    else if(dBmValDraw <= -73+60+2.5)
+        strV = "S9 +60";
+    else if(dBmValDraw <= -73+65+2.5)
+        strV = "S9 +65";
+    else if(dBmValDraw <= -73+70+2.5)
+        strV = "S9 +70";
+    else if(dBmValDraw <= -73+75+2.5)
+        strV = "S9 +75";
+    else
+        strV = "S9 +80";
+
+    return strV;
+}
+
 void SMeterSDR::drawDbm()
 {
 	pPainter->begin(this);
@@ -791,59 +850,7 @@ void SMeterSDR::drawDbm()
 		pPainter->setPen((*pPenLines));
 		pPainter->drawText(2, 11, strNum);
 
-		QString strV;
-		if(dBmValDraw <= -127+3)
-			strV = "S0";
-		else if(dBmValDraw <= -121+3)
-			strV = "S1";
-		else if(dBmValDraw <= -115+3)
-			strV = "S2";
-		else if(dBmValDraw <= -109+3)
-			strV = "S3";
-		else if(dBmValDraw <= -103+3)
-			strV = "S4";
-		else if(dBmValDraw <= -97+3)
-			strV = "S5";
-		else if(dBmValDraw <= -91+3)
-			strV = "S6";
-		else if(dBmValDraw <= -85+3)
-			strV = "S7";
-		else if(dBmValDraw <= -79+3)
-			strV = "S8";
-		else if(dBmValDraw <= -73+3)
-			strV = "S9";
-		else if(dBmValDraw <= -73+5+2.5)
-			strV = "S9 +5";
-		else if(dBmValDraw <= -73+10+2.5)
-			strV = "S9 +10";
-		else if(dBmValDraw <= -73+15+2.5)
-			strV = "S9 +15";
-		else if(dBmValDraw <= -73+20+2.5)
-			strV = "S9 +20";
-		else if(dBmValDraw <= -73+25+2.5)
-			strV = "S9 +25";
-		else if(dBmValDraw <= -73+30+2.5)
-			strV = "S9 +30";
-		else if(dBmValDraw <= -73+35+2.5)
-			strV = "S9 +35";
-		else if(dBmValDraw <= -73+40+2.5)
-			strV = "S9 +40";
-		else if(dBmValDraw <= -73+45+2.5)
-			strV = "S9 +45";
-		else if(dBmValDraw <= -73+50+2.5)
-			strV = "S9 +50";
-		else if(dBmValDraw <= -73+55+2.5)
-			strV = "S9 +55";
-		else if(dBmValDraw <= -73+60+2.5)
-			strV = "S9 +60";
-		else if(dBmValDraw <= -73+65+2.5)
-			strV = "S9 +65";
-		else if(dBmValDraw <= -73+70+2.5)
-			strV = "S9 +70";
-		else if(dBmValDraw <= -73+75+2.5)
-			strV = "S9 +75";
-		else
-			strV = "S9 +80";
+        QString strV = dBmToText();
 
 		pPenLines->setColor(Qt::black);
 		pPainter->setPen((*pPenLines));
@@ -1574,18 +1581,18 @@ void SMeterSDR::restoreSettings(QSettings *pSettings)
 {
 	SM_PARAM tmp;
 	pSettings->beginGroup("SmeterGui");
-		tmp.ColorSmBackBottColor = pSettings->value("ColorSmBackBottColor", QColor(85, 178, 117)).value<QColor>();
-		tmp.ColorSmBackTopColor = pSettings->value("ColorSmBackTopColor", QColor(46, 54, 50)).value<QColor>();
+        tmp.ColorSmBackBottColor = pSettings->value("ColorSmBackBottColor", QColor(0, 0, 0)).value<QColor>();
+        tmp.ColorSmBackTopColor = pSettings->value("ColorSmBackTopColor", QColor(0, 0, 0)).value<QColor>();
 		tmp.ColorSmCursorBorderColor = pSettings->value("ColorSmCursorBorderColor", Qt::black).value<QColor>();
 		tmp.ColorSmCursorColor = pSettings->value("ColorSmCursorColor", Qt::white).value<QColor>();
 		tmp.ColorSmDbmNum = pSettings->value("ColorSmDbmNum", Qt::yellow).value<QColor>();
 		tmp.ColorSmLimitColor = pSettings->value("ColorSmLimitColor", QColor(255, 255, 255, 150)).value<QColor>();
-		tmp.ColorSmLinesHigh = pSettings->value("ColorSmLinesHigh", QColor(255, 100, 100)).value<QColor>();
+        tmp.ColorSmLinesHigh = pSettings->value("ColorSmLinesHigh", QColor(255, 0, 0)).value<QColor>();
 		tmp.ColorSmLinesLow = pSettings->value("ColorSmLinesLow", Qt::green).value<QColor>();
 		tmp.ColorSmSQLBorderColor = pSettings->value("ColorSmSQLBorderColor", Qt::black).value<QColor>();
 		tmp.ColorSmSQLCursorColor = pSettings->value("ColorSmSQLCursorColor", Qt::yellow).value<QColor>();
 		tmp.ColorSmScaleNum = pSettings->value("ColorSmScaleNum", Qt::white).value<QColor>();
-        tmp.Style = pSettings->value("ColorSmStyle", (int)DARK).toInt();
+        tmp.Style = pSettings->value("ColorSmStyle", (int)USER).toInt();
         SetRxType(pSettings->value("RxType", 0).toInt());
         SetTxType(pSettings->value("TxType", 0).toInt());
 

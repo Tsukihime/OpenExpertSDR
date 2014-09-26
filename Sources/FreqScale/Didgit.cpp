@@ -35,8 +35,8 @@ Didgit::Didgit(QWidget *parent)
     Font.setPointSize(24);
 	setText("0");
 
-	StrEnable = "QPushButton  { color: #DDDDDD; border-radius: 0px; min-width: 30px; } QPushButton::hover { color: #DDDDDD; border: 1px solid #DDDDDD;} ";
-	StrDisable = "QPushButton { color: #787878; border-radius: 0px; min-width: 30px; } QPushButton::hover { color: #787878; border: 1px solid #787878;} ";
+    StrEnable = "QPushButton  { color: #C5C5C5; border-radius: 0px; min-width: 30px; } QPushButton::hover { color: #FFFFFF; border: 0px;} ";
+    StrDisable = "QPushButton { color: #787878; border-radius: 0px; min-width: 30px; } QPushButton::hover { color: #787878; border: 0px;} ";
 }
 
 Didgit::~Didgit()
@@ -130,15 +130,4 @@ void Didgit::emitDecr()
 {
 	emit Decr();
 }
-
-
-
-
-
-
-
-
-
-
-
 

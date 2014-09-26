@@ -57,5 +57,14 @@
         <file>images/Config/txrx.png</file>
         <file>images/spin/down.png</file>
         <file>images/spin/up.png</file>
+        <file>images/arrows/arrow-down.png</file>
+        <file>images/arrows/arrow-left.png</file>
+        <file>images/arrows/arrow-right.png</file>
+        <file>images/power-button.png</file>
+        <file>images/checkbutton_unchacked.png</file>
+        <file>images/checkbutton_unchacked_disable.png</file>
+        <file>images/checkbutton_unchacked_green.png</file>
+        <file>images/checkbutton_unchacked_red.png</file>
+        <file>images/font/DS-DIGI.TTF</file>
     </qresource>
 </RCC>

@@ -225,15 +225,16 @@ void PanoramOpt::readSettings(QSettings *pSettings)
 {
 	pSettings->beginGroup("Panorama");
 		ui.cbPanMode->setCurrentIndex(pSettings->value("PanMode", 0).toInt());
-		ui.cbPanType->setCurrentIndex(pSettings->value("PanType", 0).toInt());
+        ui.cbPanType->setCurrentIndex(pSettings->value("PanType", 1).toInt());
 		ui.chbChangeDDS->setChecked(pSettings->value("ChangeDDS", true).toBool());
+        ui.chbWheelChangeFilter->setChecked(pSettings->value("WheelChangeFilter", false).toBool());
 		ui.chbSwapLeftRight->setChecked(pSettings->value("SwapLeftRight", true).toBool());
-		pColorLineLines->setColor(pSettings->value("ColorLineLines", QColor(0,255,162,255)).value<QColor>());
-		pColorLineSpectrum->setColor(pSettings->value("ColorLineSpectrum", QColor(32,107,73,255)).value<QColor>());
-		pColorLineBack->setColor(pSettings->value("ColorLineBack", QColor(88,0,0,255)).value<QColor>());
+        pColorLineLines->setColor(pSettings->value("ColorLineLines", QColor(0,255,0,255)).value<QColor>());
+        pColorLineSpectrum->setColor(pSettings->value("ColorLineSpectrum", QColor(0,200,40,255)).value<QColor>());
+        pColorLineBack->setColor(pSettings->value("ColorLineBack", QColor(0,50,30,255)).value<QColor>());
 		pColorGradTop->setColor(pSettings->value("ColorGradTop", QColor(8, 255, 123)).value<QColor>());
 		pColorGradBot->setColor(pSettings->value("ColorGradBot", QColor(0, 62, 22)).value<QColor>());
-		pColorGradBack->setColor(pSettings->value("ColorGradBack", QColor(0, 0, 0, 255)).value<QColor>());
+        pColorGradBack->setColor(pSettings->value("ColorGradBack", QColor(8, 43, 33, 255)).value<QColor>());
 		pColorWFgrad->setColor(pSettings->value("ColorWFgrad", QColor(0,213,255,255)).value<QColor>());
 		pColorFilter1->setColor(pSettings->value("ColorFilter1",Qt::red).value<QColor>());
 		pColorFilter2->setColor(pSettings->value("ColorFilter2", QColor(31,182,220,180)).value<QColor>());
@@ -244,11 +245,11 @@ void PanoramOpt::readSettings(QSettings *pSettings)
 		ui.hslTransparentFilter1->setValue(pSettings->value("TransparentFilter1", 128).toInt());
 		ui.hslTransparentFilter2->setValue(pSettings->value("TransparentFilter2", 128).toInt());
 		ui.slTrancpSpectrum->setValue(pSettings->value("TrancpSpectrum", 255).toInt());
-		ui.slTrancpTop->setValue(pSettings->value("TrancpTop", 255).toInt());
+        ui.slTrancpTop->setValue(pSettings->value("TrancpTop", 75).toInt());
 		ui.slSpGradSaturation->setValue(pSettings->value("SpGradSaturation", 255).toInt());
 		ui.slSpGradBrightness->setValue(pSettings->value("SpGradBrightness", 255).toInt());
 		ui.cbWfMode->setCurrentIndex(pSettings->value("WfMode", 1).toInt());
-		ui.comboBox_2->setCurrentIndex(pSettings->value("BackgroundType", 2).toInt());
+        ui.comboBox_2->setCurrentIndex(pSettings->value("BackgroundType", 1).toInt());
 		ui.comboBox_3->setCurrentIndex(pSettings->value("ImgBackgroundType", 0).toInt());
 		ui.cbPowerChange->setCurrentIndex(pSettings->value("StatePowerChange", 1).toInt());
 		ui.horizontalSlider->setValue(pSettings->value("TrncpLineGrid", 30).toInt());
@@ -262,20 +263,20 @@ void PanoramOpt::readSettings(QSettings *pSettings)
 		ui.chbGridOn->setChecked(pSettings->value("GridOn", true).toBool());
 		ColorGradTop = pSettings->value("ColorGradTop", QColor(8, 255, 123)).value<QColor>();
 		ColorGradBot = pSettings->value("ColorGradBot", QColor(0, 62, 22)).value<QColor>();
-		ColorGradBack = pSettings->value("ColorGradBack", QColor(40, 0, 0, 255)).value<QColor>();
-		ColorLineLines = pSettings->value("ColorLineLines", QColor(197, 240, 255)).value<QColor>();
-		ColorLineSpectrum = pSettings->value("ColorLineSpectrum", QColor(0, 41, 135)).value<QColor>();
-		ColorLineBack = pSettings->value("ColorLineBack", QColor(40, 0, 0, 255)).value<QColor>();
+        ColorGradBack = pSettings->value("ColorGradBack", QColor(8, 43, 33, 255)).value<QColor>();
+        ColorLineLines = pSettings->value("ColorLineLines", QColor(0,255,0,255)).value<QColor>();
+        ColorLineSpectrum = pSettings->value("ColorLineSpectrum", QColor(0,200,40,255)).value<QColor>();
+        ColorLineBack = pSettings->value("ColorLineBack", QColor(0,50,30,255)).value<QColor>();
 		ColorWFgrad = pSettings->value("ColorWFgrad", QColor(0, 41, 135)).value<QColor>();
-		PanType = pSettings->value("CustomPanType", 0).toInt();
+        PanType = pSettings->value("CustomPanType", 1).toInt();
 		TrancpSpectrumLine = pSettings->value("CustomTrancpSpectrumLine", 255).toInt();
-		TrancpSpectrum = pSettings->value("CustomTrancpSpectrum", 180).toInt();
+        TrancpSpectrum = pSettings->value("CustomTrancpSpectrum", 75).toInt();
 		WfMode = pSettings->value("CustomWfMode", 1).toInt();
 		BackgroundType = pSettings->value("CustomBackgroundType", 2).toInt();
 		ImgBackgroundType = pSettings->value("CustomImgBackgroundType", 0).toInt();
 		TrancpGradTop = pSettings->value("CustomTrancpGradTop", 255).toInt();
 		TrancpGradBot = pSettings->value("CustomTrancpGradBot", 255).toInt();
-		pColorSolidBack->setColor(pSettings->value("GradBgrnColor2", QColor(88,0,0,255)).value<QColor>());
+        pColorSolidBack->setColor(pSettings->value("GradBgrnColor2", QColor(88,0,0,255)).value<QColor>());
 		pColorSolidLineBack->setColor(pSettings->value("LineBackColor2", QColor(88,0,0,255)).value<QColor>());
 		ui.cbDefaultSettingColor->setCurrentIndex(pSettings->value("StyleType", 0).toInt());
 		ui.chbGridMoving->setChecked(pSettings->value("GridMoving", false).toBool());
@@ -302,6 +303,7 @@ void PanoramOpt::writeSettings(QSettings *pSettings)
 		pSettings->setValue("PanMode", ui.cbPanMode->currentIndex());
 		pSettings->setValue("PanType", ui.cbPanType->currentIndex());
 		pSettings->setValue("ChangeDDS", ui.chbChangeDDS->isChecked());
+        pSettings->setValue("WheelChangeFilter", ui.chbWheelChangeFilter->isChecked());
 		pSettings->setValue("SwapLeftRight", ui.chbSwapLeftRight->isChecked());
 		pSettings->setValue("ColorLineLines", pColorLineLines->getColor());
 		pSettings->setValue("ColorLineSpectrum", pColorLineSpectrum->getColor());
@@ -675,17 +677,4 @@ double PanoramOpt::getZoomPos()
 {
 	return ZoomPos;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 

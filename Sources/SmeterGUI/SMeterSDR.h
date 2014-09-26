@@ -172,6 +172,7 @@ public:
     void saveSettings(QSettings *pS);
     void restoreSettings(QSettings *pS);
 
+    QString dBmToText();
 private:
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);

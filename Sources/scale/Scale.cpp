@@ -51,18 +51,12 @@ Scale::Scale(QWidget *parent) : QWidget(parent)
 
 	Freq = "0000000000";
 
-	styleButOn = 	" QPushButton { border-radius: 3px; background-color: transparent; \n"
-					" color: qlineargradient(spread:repeat, x1:1, y1:1, x2:1, y2:0, stop:0 rgba(213, 249, 250, 255), stop:1 rgba(255, 255, 255, 255)); \n }"
-					" QPushButton:hover { border-radius: 3px; border-bottom: 2px solid; \n"
-					" border-bottom-color: qlineargradient(spread:reflect, x1:0, y1:0.921, x2:0, y2:0.273, stop:0 rgba(86, 104, 132, 255), stop:1 rgba(149, 165, 182, 255)); \n"
-					" background-color: transparent; \n"
-					" color: qlineargradient(spread:repeat, x1:1, y1:1, x2:1, y2:0, stop:0 rgba(213, 249, 250, 255), stop:1 rgba(255, 255, 255, 255)); }";
+    styleButOn =    "QPushButton { color: #C5C5C5;  min-width: 10px; background-color: transparent;} \n"
+                    "QPushButton::hover {color: White; border: 0px; }";
 
-	styleButOff = 	" QPushButton { border-radius: 3px; background-color: transparent; \n"
-					" color: qlineargradient(spread:repeat, x1:1, y1:1, x2:1, y2:0, stop:0 rgba(35, 35, 35, 255), stop:1 rgba(55, 55, 55, 255)); \n }"
-					" QPushButton:hover { border-radius: 3px; border-bottom: 2px solid; \n"
-					" border-bottom-color: qlineargradient(spread:reflect, x1:0, y1:0.921, x2:0, y2:0.273, stop:0 rgba(86, 104, 132, 255), stop:1 rgba(149, 165, 182, 255)); \n"
-					" background-color: transparent; \n }";
+    styleButOff =   "QPushButton { color: #2D2D2D;  min-width: 10px; background-color: transparent;} \n"
+                    "QPushButton::hover {color: #2D2D2D; border: 0px; }";
+
 
 	ui.pbDot->setStyleSheet(styleButOn);
 

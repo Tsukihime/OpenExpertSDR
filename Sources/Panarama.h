@@ -119,7 +119,7 @@ class Panarama : public QGLWidget
     bool isUpdate;
     bool IsWindow;
     bool IsCrossF1;
-    QFont Font1, Font2, fontDb, fontBand;
+    QFont Font1, Font2, fontDb, fontBand, fontInfo;
     QPixmap *pRulePixmap;
     GLuint RuleTexture;
     QPixmap *pLeftRange;
@@ -509,6 +509,7 @@ private:
     float GetMean(float *pBuff, int Size);
     int getBandNum();
     void updateDbmState();
+    QString freqToStr(double freq);
 
 private slots:
 	void MeanTimer();

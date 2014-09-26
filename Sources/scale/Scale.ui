@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>151</width>
+    <width>172</width>
     <height>31</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>151</width>
+    <width>172</width>
     <height>31</height>
    </size>
   </property>
@@ -31,27 +31,28 @@
   <widget class="QPushButton" name="pbD0">
    <property name="geometry">
     <rect>
-     <x>138</x>
-     <y>10</y>
+     <x>156</x>
+     <y>8</y>
      <width>14</width>
-     <height>20</height>
+     <height>24</height>
     </rect>
    </property>
    <property name="minimumSize">
     <size>
      <width>14</width>
-     <height>20</height>
+     <height>24</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
      <width>14</width>
-     <height>20</height>
+     <height>0</height>
     </size>
    </property>
    <property name="font">
     <font>
-     <pointsize>13</pointsize>
+     <family>DS-Digital</family>
+     <pointsize>20</pointsize>
     </font>
    </property>
    <property name="text">
@@ -61,27 +62,28 @@
   <widget class="QPushButton" name="pbD1">
    <property name="geometry">
     <rect>
-     <x>125</x>
-     <y>10</y>
+     <x>143</x>
+     <y>8</y>
      <width>14</width>
-     <height>20</height>
+     <height>24</height>
     </rect>
    </property>
    <property name="minimumSize">
     <size>
      <width>14</width>
-     <height>20</height>
+     <height>24</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
      <width>14</width>
-     <height>20</height>
+     <height>0</height>
     </size>
    </property>
    <property name="font">
     <font>
-     <pointsize>13</pointsize>
+     <family>DS-Digital</family>
+     <pointsize>20</pointsize>
     </font>
    </property>
    <property name="text">
@@ -91,27 +93,28 @@
   <widget class="QPushButton" name="pbD3">
    <property name="geometry">
     <rect>
-     <x>98</x>
+     <x>112</x>
      <y>2</y>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </rect>
    </property>
    <property name="minimumSize">
     <size>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </size>
    </property>
    <property name="font">
     <font>
-     <pointsize>18</pointsize>
+     <family>DS-Digital</family>
+     <pointsize>27</pointsize>
     </font>
    </property>
    <property name="text">
@@ -121,27 +124,28 @@
   <widget class="QPushButton" name="pbD2">
    <property name="geometry">
     <rect>
-     <x>112</x>
-     <y>10</y>
+     <x>130</x>
+     <y>8</y>
      <width>14</width>
-     <height>20</height>
+     <height>24</height>
     </rect>
    </property>
    <property name="minimumSize">
     <size>
      <width>14</width>
-     <height>20</height>
+     <height>24</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
      <width>14</width>
-     <height>20</height>
+     <height>0</height>
     </size>
    </property>
    <property name="font">
     <font>
-     <pointsize>13</pointsize>
+     <family>DS-Digital</family>
+     <pointsize>20</pointsize>
     </font>
    </property>
    <property name="text">
@@ -151,27 +155,28 @@
   <widget class="QPushButton" name="pbD4">
    <property name="geometry">
     <rect>
-     <x>83</x>
+     <x>95</x>
      <y>2</y>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </rect>
    </property>
    <property name="minimumSize">
     <size>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </size>
    </property>
    <property name="font">
     <font>
-     <pointsize>18</pointsize>
+     <family>DS-Digital</family>
+     <pointsize>27</pointsize>
     </font>
    </property>
    <property name="text">
@@ -181,27 +186,28 @@
   <widget class="QPushButton" name="pbD5">
    <property name="geometry">
     <rect>
-     <x>68</x>
+     <x>78</x>
      <y>2</y>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </rect>
    </property>
    <property name="minimumSize">
     <size>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </size>
    </property>
    <property name="font">
     <font>
-     <pointsize>18</pointsize>
+     <family>DS-Digital</family>
+     <pointsize>27</pointsize>
     </font>
    </property>
    <property name="text">
@@ -211,27 +217,28 @@
   <widget class="QPushButton" name="pbD6">
    <property name="geometry">
     <rect>
-     <x>45</x>
+     <x>51</x>
      <y>2</y>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </rect>
    </property>
    <property name="minimumSize">
     <size>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </size>
    </property>
    <property name="font">
     <font>
-     <pointsize>18</pointsize>
+     <family>DS-Digital</family>
+     <pointsize>27</pointsize>
     </font>
    </property>
    <property name="text">
@@ -241,27 +248,28 @@
   <widget class="QPushButton" name="pbD7">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>34</x>
      <y>2</y>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </rect>
    </property>
    <property name="minimumSize">
     <size>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </size>
    </property>
    <property name="font">
     <font>
-     <pointsize>18</pointsize>
+     <family>DS-Digital</family>
+     <pointsize>27</pointsize>
     </font>
    </property>
    <property name="text">
@@ -271,27 +279,28 @@
   <widget class="QPushButton" name="pbD8">
    <property name="geometry">
     <rect>
-     <x>15</x>
+     <x>17</x>
      <y>2</y>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </rect>
    </property>
    <property name="minimumSize">
     <size>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </size>
    </property>
    <property name="font">
     <font>
-     <pointsize>18</pointsize>
+     <family>DS-Digital</family>
+     <pointsize>27</pointsize>
     </font>
    </property>
    <property name="text">
@@ -303,25 +312,26 @@
     <rect>
      <x>0</x>
      <y>2</y>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </rect>
    </property>
    <property name="minimumSize">
     <size>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>16</width>
+     <width>20</width>
      <height>30</height>
     </size>
    </property>
    <property name="font">
     <font>
-     <pointsize>18</pointsize>
+     <family>DS-Digital</family>
+     <pointsize>27</pointsize>
     </font>
    </property>
    <property name="text">
@@ -331,27 +341,28 @@
   <widget class="QPushButton" name="pbDot">
    <property name="geometry">
     <rect>
-     <x>59</x>
+     <x>68</x>
      <y>2</y>
-     <width>10</width>
+     <width>12</width>
      <height>30</height>
     </rect>
    </property>
    <property name="minimumSize">
     <size>
-     <width>10</width>
+     <width>12</width>
      <height>30</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>10</width>
+     <width>12</width>
      <height>30</height>
     </size>
    </property>
    <property name="font">
     <font>
-     <pointsize>18</pointsize>
+     <family>DS-Digital</family>
+     <pointsize>27</pointsize>
     </font>
    </property>
    <property name="text">
