@@ -1831,6 +1831,7 @@ retry:
 		}
 		settings.setValue("MainStep", pMenuStep->actions().indexOf(pAgStep->checkedAction()));
 		settings.setValue("FullScreen", this->isFullScreen());
+		settings.setValue("Maximized", this->isMaximized());
 		settings.setValue("pbSplit", ui.pbSplit->isChecked());
 		settings.setValue("pbLock", ui.pbLock->isChecked());
 		settings.setValue("pbTxF", ui.pbTf->isChecked());
@@ -2445,7 +2446,14 @@ void ExpertSDR_vA2_1::readSettings()
 			this->showFullScreen();
 		else
 		{
-			this->showNormal();;
+			if(settings.value("Maximized", 0).toBool())
+			{
+				this->showMaximized();
+			}
+			else
+			{
+				this->showNormal();
+			}
 			MainWindowSize = settings.value("Size", QSize(900, 500)).toSize();
 			resize(MainWindowSize);
 			move(MainWindowPos);
