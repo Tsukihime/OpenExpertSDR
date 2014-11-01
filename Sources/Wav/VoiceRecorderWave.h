@@ -45,6 +45,8 @@ typedef struct
 	unsigned long  subchunk2Size;
 }WAVHEADER_V;
 
+const unsigned short IEEE_FLOAT = 0x0003;
+
 class VoiceRecorder : public QObject
 {
 	Q_OBJECT

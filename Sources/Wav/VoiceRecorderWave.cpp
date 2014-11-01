@@ -98,24 +98,25 @@ bool VoiceRecorder::onRec(bool state)
 
 	if(!state)
 	{
+		unsigned long file_sz = waveFile.size();
 		QString str;
 		str = "RIFF";
 		qMemCopy(wavHeader.riff, str.toAscii().data(), 4);
-		wavHeader.chunkSize = 8;
+		wavHeader.chunkSize = file_sz - 8;
 		str = "WAVE";
 		qMemCopy(wavHeader.wave, str.toAscii().data(), 4);
 		str = "fmt ";
 		qMemCopy(wavHeader.fmt, str.toAscii().data(), 4);
 		wavHeader.subchunk1Size = 16;
-		wavHeader.audioFormat = 1;
+		wavHeader.audioFormat = IEEE_FLOAT;
 		wavHeader.channels = 2;
 		wavHeader.samplesPerSec = samplesPerSec;
 		wavHeader.bitsPerSample = 32;
 		wavHeader.bytesPerSec = samplesPerSec*wavHeader.channels*wavHeader.bitsPerSample/8;
-		wavHeader.blockAlign = 4;
+		wavHeader.blockAlign = wavHeader.channels * ((wavHeader.bitsPerSample + 7) / 8);
 		str = "data";
 		qMemCopy(wavHeader.subchunk2ID, str.toAscii().data(), 4);
-		wavHeader.subchunk2Size = voiceArray.size();
+		wavHeader.subchunk2Size = file_sz - sizeof(WAVHEADER_V);
 		waveFile.seek(0);
 		waveFile.write(reinterpret_cast<char *>(&wavHeader), sizeof(wavHeader));
 		waveFile.close();
@@ -185,7 +186,7 @@ bool VoiceRecorder::onPlay(bool state)
 			return (false);
 		}
 		if((qstrncmp(wavHeader.subchunk2ID, "data", 4) != 0) || (qstrncmp(wavHeader.riff, "RIFF", 4) != 0) || (wavHeader.samplesPerSec != samplesPerSec) ||
-				  (qstrncmp(wavHeader.wave, "WAVE", 4) != 0) || (qstrncmp(wavHeader.fmt , "fmt ", 4) != 0) || (wavHeader.audioFormat != 1))
+				  (qstrncmp(wavHeader.wave, "WAVE", 4) != 0) || (qstrncmp(wavHeader.fmt , "fmt ", 4) != 0) || (wavHeader.audioFormat != IEEE_FLOAT))
 		{
 			waveFile.close();
 			isOpened = false;
@@ -304,30 +305,4 @@ void VoiceRecorder::setTrxMode(bool state)
 {
 	isTx = state;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
