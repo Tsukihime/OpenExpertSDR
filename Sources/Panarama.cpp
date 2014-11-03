@@ -4723,37 +4723,39 @@ void Panarama::SetSpectrumBuffer(float *pBuffer, int Size)
 	int Offset2 = (int)((sFilter2+dFilter2) * 2048.0f);
 	for(int i = 0; i < BUFF_SIZE; i++)
 	{
-#if(RX_LISTEN_CHANNEL == 0)
-		pCircleBuff[CircleCnt][i] = pBuffer[(i-Offset)&0x0FFF] + CalibrateLevel;//*2.0;
-#else
-		if(TRxMode == TX)
+		if(RX_LISTEN_CHANNEL == 0)
 		{
-			if(TxVfo == 0)
+			pCircleBuff[CircleCnt][i] = pBuffer[(i-Offset)&0x0FFF] + CalibrateLevel;//*2.0;
+		}
+		else{
+			if(TRxMode == TX)
 			{
-				pCircleBuff[CircleCnt][i] = pBuffer[(i-Offset)&0x0FFF] + CalibrateLevel;
-			}
-			else if(TxVfo == 1 && IsFilter2)
-			{
-				pCircleBuff[CircleCnt][i] = pBuffer[(i-Offset2)&0x0FFF] + CalibrateLevel;
-			}
-			else if(TxVfo == 1 && !IsFilter2 && (sFilter2 <= 1.0 && sFilter2 >= -1.0))
-			{
-				pCircleBuff[CircleCnt][i] = pBuffer[(i-Offset2)&0x0FFF] + CalibrateLevel;
-			}
-			else if(TxVfo == 1 && !IsFilter2 && (sFilter2 > 1.0 || sFilter2 < -1.0))
-			{
-				pCircleBuff[CircleCnt][i] = pBuffer[(i-Offset)&0x0FFF] + CalibrateLevel;
-			}
-			else if(TxVfo != 0 && (sFilter2 > 1.0 || sFilter2 < -1.0))
-			{
-				pCircleBuff[CircleCnt][i] = pBuffer[(i-Offset)&0x0FFF] + CalibrateLevel;
+				if(TxVfo == 0)
+				{
+					pCircleBuff[CircleCnt][i] = pBuffer[(i-Offset)&0x0FFF] + CalibrateLevel;
+				}
+				else if(TxVfo == 1 && IsFilter2)
+				{
+					pCircleBuff[CircleCnt][i] = pBuffer[(i-Offset2)&0x0FFF] + CalibrateLevel;
+				}
+				else if(TxVfo == 1 && !IsFilter2 && (sFilter2 <= 1.0 && sFilter2 >= -1.0))
+				{
+					pCircleBuff[CircleCnt][i] = pBuffer[(i-Offset2)&0x0FFF] + CalibrateLevel;
+				}
+				else if(TxVfo == 1 && !IsFilter2 && (sFilter2 > 1.0 || sFilter2 < -1.0))
+				{
+					pCircleBuff[CircleCnt][i] = pBuffer[(i-Offset)&0x0FFF] + CalibrateLevel;
+				}
+				else if(TxVfo != 0 && (sFilter2 > 1.0 || sFilter2 < -1.0))
+				{
+					pCircleBuff[CircleCnt][i] = pBuffer[(i-Offset)&0x0FFF] + CalibrateLevel;
+				}
+				else
+					pCircleBuff[CircleCnt][i] = pBuffer[(i-Offset)&0x0FFF] + CalibrateLevel;
 			}
 			else
-				pCircleBuff[CircleCnt][i] = pBuffer[(i-Offset)&0x0FFF] + CalibrateLevel;
-		}
-		else
 				pCircleBuff[CircleCnt][i] = pBuffer[i] + CalibrateLevel;
-#endif
+		}
 
 		if(TRxMode == TX)
 			continue;

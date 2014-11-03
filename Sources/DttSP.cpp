@@ -192,19 +192,19 @@ void DttSP::SetDcBlock(bool Status)
 	DspSetDCBlock(Status);
 }
 
-int DttSP::SetFilter(double a, double b, int c, TRXMODE d)
+int DttSP::SetFilter(double low_frequency, double high_frequency, int taps, TRXMODE trx)
 {
 	int i;
 
 	DspSetRXListen(RX_CHANNEL0);
-	DspSetFilter(a,b,c,d);
+	DspSetFilter(low_frequency,high_frequency,taps,trx);
 	DspSetRXListen(RX_CHANNEL1);
-	DspSetFilter(a,b,c,d);
+	DspSetFilter(low_frequency,high_frequency,taps,trx);
 	DspSetRXListen(RX_CHANNEL2);
-	i = DspSetFilter(a,b,c,d);
+	i = DspSetFilter(low_frequency,high_frequency,taps,trx);
 	DspSetRXListen(RX_LISTEN_CHANNEL);
 
-	return(DspSetFilter(a,b,c,d));
+	return(DspSetFilter(low_frequency,high_frequency,taps,trx));
 }
 
 int DttSP::SetRxOutputGain(double Gain)
@@ -228,11 +228,10 @@ int DttSP::SetRxOsc(double Freq)
 
 	int i;
 	DspSetRXListen(RX_CHANNEL0);
-#if (RX_LISTEN_CHANNEL == 0)
-	DspSetOsc(Freq);
-#else
-	DspSetOsc(0.0);
-#endif
+	if(RX_LISTEN_CHANNEL == 0)
+		DspSetOsc(Freq);
+	else
+		DspSetOsc(0.0);
 	DspSetRXListen(RX_CHANNEL1);
 	i = DspSetOsc(Freq);
 	DspSetRXListen(RX_LISTEN_CHANNEL);
@@ -272,14 +271,14 @@ void DttSP::SetBlkNr(bool Status)
 	DspSetRXListen(RX_LISTEN_CHANNEL);
 }
 
-void DttSP::SetNrVals(int a, int b, double c, double d)
+void DttSP::SetNrVals(int taps, int delay, double gain, double leak)
 {
 	DspSetRXListen(RX_CHANNEL0);
-	DspSetNRvals(a, b, c, d);
+	DspSetNRvals(taps, delay, gain, leak);
 	DspSetRXListen(RX_CHANNEL1);
-	DspSetNRvals(a, b, c, d);
+	DspSetNRvals(taps, delay, gain, leak);
 	DspSetRXListen(RX_CHANNEL2);
-	DspSetNRvals(a, b, c, d);
+	DspSetNRvals(taps, delay, gain, leak);
 	DspSetRXListen(RX_LISTEN_CHANNEL);
 }
 
@@ -327,14 +326,14 @@ void DttSP::SetBlkAnf(bool Status)
 	DspSetRXListen(RX_LISTEN_CHANNEL);
 }
 
-void DttSP::SetANFvals(int a, int b, double c, double d)
+void DttSP::SetANFvals(int taps, int delay, double gain, double leak)
 {
 	DspSetRXListen(RX_CHANNEL0);
-	DspSetANFvals(a,b,c,d);
+	DspSetANFvals(taps,delay,gain,leak);
 	DspSetRXListen(RX_CHANNEL1);
-	DspSetANFvals(a,b,c,d);
+	DspSetANFvals(taps,delay,gain,leak);
 	DspSetRXListen(RX_CHANNEL2);
-	DspSetANFvals(a,b,c,d);
+	DspSetANFvals(taps,delay,gain,leak);
 	DspSetRXListen(RX_LISTEN_CHANNEL);
 }
 
@@ -704,9 +703,9 @@ float DttSP::CalculateMeters(METERTYPE Meter)
 	return(DspCalculate_Meters(Meter));
 }
 
-void* DttSP::NewResampler(int a, int b)
+void* DttSP::NewResampler(int samplerate_in, int samplerate_out)
 {
-	return(DspNewResampler(a,b));
+	return(DspNewResampler(samplerate_in,samplerate_out));
 }
 
 void DttSP::DoResampler(COMPLEX *p1, COMPLEX *p2, int a, int *b, ResSt c)
@@ -719,16 +718,16 @@ void DttSP::DelPolyPhaseFIR(ResSt p)
 	DspDelPolyPhaseFIR(p);
 }
 
-void* DttSP::NewResamplerF(int a, int b)
+void* DttSP::NewResamplerF(int samplerate_in, int samplerate_out)
 {
-	return(DspNewResamplerF(a,b));
+	return(DspNewResamplerF(samplerate_in, samplerate_out));
 }
 
-void DttSP::DoResamplerF(float *p1, float *p2, int a, int* b,ResStF c)
+void DttSP::DoResamplerF(float *input, float *output, int numsamps, int* outsamps, ResStF ptr)
 {
-	if((int)c == 0)
+	if((int)ptr == 0)
 		return;
-	DspDoResamplerF(p1, p2, a, b, c);
+	DspDoResamplerF(input, output, numsamps, outsamps, ptr);
 }
 
 void DttSP::DelPolyPhaseFIRF(ResSt p)
@@ -736,19 +735,19 @@ void DttSP::DelPolyPhaseFIRF(ResSt p)
 	DspDelPolyPhaseFIRF(p);
 }
 
-void DttSP::SetRxListen(int Val)
+void DttSP::SetRxListen(int rx_index)
 {
-	DspSetRXListen(Val);
+	DspSetRXListen(rx_index);
 }
 
-void DttSP::SetRXOn(int Val)
+void DttSP::SetRXOn(int rx_index)
 {
-	DspSetRXOn(Val);
+	DspSetRXOn(rx_index);
 }
 
-void DttSP::SetRxOff(int Val)
+void DttSP::SetRxOff(int rx_index)
 {
-	DspSetRXOff(Val);
+	DspSetRXOff(rx_index);
 }
 
 void DttSP::SetRxPan(float Val)
@@ -1032,11 +1031,10 @@ int DttSP::SetRx2Osc(double Freq)
 {
 	int i;
 	DspSetRXListen(RX_CHANNEL0);
-#if (RX_LISTEN_CHANNEL == 0)
-	DspSetOsc(Freq);
-#else
-	DspSetOsc(0.0);
-#endif
+	if(RX_LISTEN_CHANNEL == 0)
+		DspSetOsc(Freq);
+	else
+		DspSetOsc(0.0);
 	DspSetRXListen(RX_CHANNEL2);
 	i = DspSetOsc(Freq);
 	DspSetRXListen(RX_LISTEN_CHANNEL);

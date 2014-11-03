@@ -4568,7 +4568,7 @@ void ExpertSDR_vA2_1::OnStart(bool Start)
 			onCalibrationGen(pOpt->ui.cbCalGen->isChecked());
 			pDsp->SetSampleRate(pOpt->getSampleRate());
 			pDsp->SetRxListen(RX_CHANNEL0);
-			pDsp->SetRXOn(0);
+			pDsp->SetRXOn(RX_CHANNEL0);
 			pDsp->SetRxOsc(0.0);
 			pDsp->SetRxOutputGain(0.0);
 			pDsp->SetDcBlock(true);

@@ -31,14 +31,16 @@
 #include "Defines.h"
 #include "ThreadFunc.h"
 
-#define MAX_DSP_MEMORY_BUF	1000
+const int MAX_DSP_MEMORY_BUF = 1000;
 
-#define RX_CHANNEL0 0
-#define RX_CHANNEL1	1
-#define RX_CHANNEL2	2
-#define RX_LISTEN_CHANNEL	RX_CHANNEL1
+typedef enum {
+    RX_CHANNEL0 = 0,
+    RX_CHANNEL1 = 1,
+    RX_CHANNEL2 = 2,
+    RX_LISTEN_CHANNEL = RX_CHANNEL1
+} DspChannels;
 
-#define DSP_PI 3.1415926536
+const double DSP_PI = 3.1415926536;
 
 typedef enum _swchstate {
   SWCH_FALL,
@@ -299,21 +301,21 @@ class DttSP : public QThread
 		int SetMode(SDRMODE Mode);
 		SDRMODE GetMode(){ return SdrMode;};
 		void SetDcBlock(bool Status);
-		int SetFilter(double , double , int, TRXMODE);
+		int SetFilter(double low_frequency, double high_frequency, int taps, TRXMODE trx);
 		int SetRxOutputGain(double Gain);
 		int SetRxOsc(double Freq);
 		int SetTxOsc(double Freq);
 		int SetSampleRate(double Rate);
 		void SetNr(bool Status);
 		void SetBlkNr(bool Status);
-		void SetNrVals(int a, int b, double c, double d);
+		void SetNrVals(int taps, int delay, double gain, double leak);
 		void SetTxCompandSt(int Param);
 		void SetTxCompand(double Param);
 		void SetTxSquelchSt(bool Status);
 		void SetTxSquelchVal(float Val);
 		void SetAnf(bool Status);
 		void SetBlkAnf(bool Status);
-		void SetANFvals(int a, int b, double c, double d);
+		void SetANFvals(int taps, int delay, double gain, double leak);
 		void SetNB(bool Status);
 		void SetNBvals(double Val);
 		void SetSdrOm(bool Status);
@@ -363,15 +365,16 @@ class DttSP : public QThread
 		void ProcessScope(float *pBuf, int Param);
 		void SetRingBufferOffset(int *Param);
 		float CalculateMeters(METERTYPE Meter);
-		void* NewResampler(int a, int b);
+		void* NewResampler(int samplerate_in, int samplerate_out);
 		void DoResampler(COMPLEX *p1, COMPLEX *p2, int a, int *b, ResSt c);
 		void DelPolyPhaseFIR(ResSt p);
-		void* NewResamplerF(int a, int b);
-		void DoResamplerF(float *p1, float *p2, int a, int* b,ResStF c);
+		void* NewResamplerF(int samplerate_in, int samplerate_out);
+		void DoResamplerF(float *input, float *output, int numsamps, int *outsamps,
+						  ResStF ptr);
 		void DelPolyPhaseFIRF(ResSt p);
-		void SetRxListen(int Val);
-		void SetRXOn(int Val);
-		void SetRxOff(int Val);
+		void SetRxListen(int rx_index);
+		void SetRXOn(int rx_index);
+		void SetRxOff(int rx_index);
 		void SetRxPan(float Val);
 		void ProcessSamplesThread();
 		void AudioCallback(float* pInL, float* pInR, float* pOutL, float* pOutR, unsigned int FrameCount);
