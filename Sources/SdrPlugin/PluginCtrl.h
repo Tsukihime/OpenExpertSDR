@@ -25,6 +25,7 @@
 
 #include <QtGui>
 #include "qt_windows.h"
+#include "extioplugin.h"
 
 enum StateChgReason {
     crPtt = 0,
@@ -52,8 +53,27 @@ typedef __cdecl void (*PluginFunc_setUhfOsc)(unsigned int);
 typedef __cdecl void (*PluginFunc_setCalGen)(bool);
 typedef __cdecl void (*PluginFunc_setXvAnt)(int);
 
+typedef struct
+{
+    PluginFunc_getInfo getInfo;
+    PluginFunc_showPluginGui showPluginGui;
+    PluginFunc_init init;
+    PluginFunc_deinit deinit;
+    PluginFunc_open open;
+    PluginFunc_close close;
+    PluginFunc_isOpen isOpen;
+    PluginFunc_setPreamp setPreamp;
+    PluginFunc_setExtCtrl setExtCtrl;
+    PluginFunc_setDdsFreq setDdsFreq;
+    PluginFunc_setTrxMode setTrxMode;
+    PluginFunc_setMute setMute;
+    PluginFunc_setVhfOsc setVhfOsc;
+    PluginFunc_setUhfOsc setUhfOsc;
+    PluginFunc_setCalGen setCalGen;
+    PluginFunc_setXvAnt setXvAnt;
+} InternalPluginRouts;
 
-class pluginCtrl : public QObject
+class pluginCtrl : public ExtIOPlugin
 {
     Q_OBJECT
 
@@ -78,32 +98,16 @@ public:
     void setXvAnt(int Mode);
 
     static bool getInfo(QString libpath, QString &PlugName);
-    QString getInfo();
     bool isLoaded();
     void showPluginGui();
 
 private:
-    QString InfoStr;
     QLibrary *pPlugLib;
     bool pluginLoaded;
 
-    PluginFunc_getInfo _getInfo;
-    PluginFunc_showPluginGui _showPluginGui;
+    int DdsFreq;
 
-    PluginFunc_init _init;
-    PluginFunc_deinit _deinit;
-    PluginFunc_open _open;
-    PluginFunc_close _close;
-    PluginFunc_isOpen _isOpen;
-    PluginFunc_setPreamp _setPreamp;
-    PluginFunc_setExtCtrl _setExtCtrl;
-    PluginFunc_setDdsFreq _setDdsFreq;
-    PluginFunc_setTrxMode _setTrxMode;
-    PluginFunc_setMute _setMute;
-    PluginFunc_setVhfOsc _setVhfOsc;
-    PluginFunc_setUhfOsc _setUhfOsc;
-    PluginFunc_setCalGen _setCalGen;
-    PluginFunc_setXvAnt _setXvAnt;
+    InternalPluginRouts routs;
 
     static __cdecl void SdrStateChanged(QObject *PlugCtrl, StateChgReason reason, bool arg1, int arg2, int arg3);
 

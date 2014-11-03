@@ -84,6 +84,9 @@ class SdrPlugin : public QWidget
     public slots:
         void onSdrPluginChanged(QString path);
         void onSdrShowConfig();
+        void OnModeChanged(int mode);
+        void OnTuneChanged(int Freq);
+        void SoundCardSampleRateChanged(int rate);
 
 	private slots:
 		void onPaDriverChanged(int Index);
@@ -97,6 +100,10 @@ class SdrPlugin : public QWidget
 		void sunsdrConnectInfo(QString);
         void AdcChanged(int, int);
         void forceStop();
+        void Start(bool);
+        void ChangeMode(int);
+        void DDSChanged(long);
+        void TuneChanged(long);
 };
 
 #endif // SDRPLUGIN_H

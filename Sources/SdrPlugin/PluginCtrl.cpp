@@ -21,47 +21,63 @@
  */
 
 #include "PluginCtrl.h"
+#include "extioplugin.h"
 
 pluginCtrl::pluginCtrl(QString libpath)
 {
+    memset(&routs, 0, sizeof(InternalPluginRouts));
     pluginLoaded = false;
     pPlugLib = new QLibrary(libpath);
     pPlugLib->load();
     if(!pPlugLib->isLoaded())
         return;
 
-    _getInfo = (PluginFunc_getInfo)pPlugLib->resolve("getInfo");
-    if(_getInfo == NULL)
+    routs.getInfo = (PluginFunc_getInfo)pPlugLib->resolve("getInfo");
+    if(routs.getInfo == NULL)
     {
-        pPlugLib->unload();
-        return;
+        if(ExtIOPlugin::IsExtIO(pPlugLib))
+        {
+            connect(this, SIGNAL(Ptt(bool)), this, SIGNAL(PttChanged(bool)));
+            ExtIOPluginInit(pPlugLib);
+        }
+        else
+        {
+            pPlugLib->unload();
+            return;
+        }
     }
 
-    QByteArray bname(MAX_PATH, 0);
-    _getInfo(bname.data());
-    InfoStr = QString::fromLatin1(bname.data());
+    if(!IsExtIOMode())
+    {
+        QByteArray bname(MAX_PATH, 0);
+        routs.getInfo(bname.data());
+        InfoStr = QString::fromLatin1(bname.data());
 
-    _init = (PluginFunc_init)pPlugLib->resolve("init");
-    _deinit = (PluginFunc_deinit)pPlugLib->resolve("deinit");
-    _open = (PluginFunc_open)pPlugLib->resolve("open");
-    _close = (PluginFunc_close)pPlugLib->resolve("close");
-    _isOpen = (PluginFunc_isOpen)pPlugLib->resolve("isOpen");
-    _setPreamp = (PluginFunc_setPreamp)pPlugLib->resolve("setPreamp");
-    _setExtCtrl = (PluginFunc_setExtCtrl)pPlugLib->resolve("setExtCtrl");
-    _setDdsFreq = (PluginFunc_setDdsFreq)pPlugLib->resolve("setDdsFreq");
-    _setTrxMode = (PluginFunc_setTrxMode)pPlugLib->resolve("setTrxMode");
-    _setMute = (PluginFunc_setMute)pPlugLib->resolve("setMute");
-    _setVhfOsc = (PluginFunc_setVhfOsc)pPlugLib->resolve("setVhfOsc");
-    _setUhfOsc = (PluginFunc_setUhfOsc)pPlugLib->resolve("setUhfOsc");
-    _setCalGen = (PluginFunc_setCalGen)pPlugLib->resolve("setCalGen");
-    _setXvAnt = (PluginFunc_setXvAnt)pPlugLib->resolve("setXvAnt");
-    _showPluginGui = (PluginFunc_showPluginGui)pPlugLib->resolve("showPluginGui");
+        routs.init = (PluginFunc_init)pPlugLib->resolve("init");
+        routs.deinit = (PluginFunc_deinit)pPlugLib->resolve("deinit");
+        routs.open = (PluginFunc_open)pPlugLib->resolve("open");
+        routs.close = (PluginFunc_close)pPlugLib->resolve("close");
+        routs.isOpen = (PluginFunc_isOpen)pPlugLib->resolve("isOpen");
+        routs.setPreamp = (PluginFunc_setPreamp)pPlugLib->resolve("setPreamp");
+        routs.setExtCtrl = (PluginFunc_setExtCtrl)pPlugLib->resolve("setExtCtrl");
+        routs.setDdsFreq = (PluginFunc_setDdsFreq)pPlugLib->resolve("setDdsFreq");
+        routs.setTrxMode = (PluginFunc_setTrxMode)pPlugLib->resolve("setTrxMode");
+        routs.setMute = (PluginFunc_setMute)pPlugLib->resolve("setMute");
+        routs.setVhfOsc = (PluginFunc_setVhfOsc)pPlugLib->resolve("setVhfOsc");
+        routs.setUhfOsc = (PluginFunc_setUhfOsc)pPlugLib->resolve("setUhfOsc");
+        routs.setCalGen = (PluginFunc_setCalGen)pPlugLib->resolve("setCalGen");
+        routs.setXvAnt = (PluginFunc_setXvAnt)pPlugLib->resolve("setXvAnt");
+        routs.showPluginGui = (PluginFunc_showPluginGui)pPlugLib->resolve("showPluginGui");
+    }
 
     pluginLoaded = true;
 }
 
 pluginCtrl::~pluginCtrl()
 {
+    if(IsExtIOMode())
+        ExtIOPluginDeinit();
+
     if(!pPlugLib->isLoaded())
         pPlugLib->unload();
 
@@ -70,87 +86,111 @@ pluginCtrl::~pluginCtrl()
 
 void pluginCtrl::init()
 {
-    if(_init && pluginLoaded)
-        _init(this, &SdrStateChanged);
+    if(IsExtIOMode())
+        OpenHW();
+    else
+        if(routs.init && pluginLoaded)
+            routs.init(this, &SdrStateChanged);
 }
 
 void pluginCtrl::deinit()
 {
-    if(_deinit && pluginLoaded)
-        _deinit();
+    if(IsExtIOMode())
+        CloseHW();
+    else
+        if(routs.deinit && pluginLoaded)
+            routs.deinit();
 }
 
 void pluginCtrl::open(int SdrNum, int DdsMul)
 {
-    if(_open && pluginLoaded)
-        _open(SdrNum,DdsMul);
+    if(IsExtIOMode())
+        StartHW(DdsFreq);
+    else
+        if(routs.open && pluginLoaded)
+            routs.open(SdrNum,DdsMul);
 }
 
 void pluginCtrl::close()
 {
-    if(_close && pluginLoaded)
-        _close();
+    if(IsExtIOMode())
+        StopHW();
+    else
+        if(routs.close && pluginLoaded)
+            routs.close();
 }
 
 bool pluginCtrl::isOpen()
 {
-    if(_isOpen && pluginLoaded)
-        return _isOpen();
+    if(IsExtIOMode())
+        return IsExtIOOpen();
+    else
+        if(routs.isOpen && pluginLoaded)
+            return routs.isOpen();
+
     return false;
 }
 
 void pluginCtrl::setPreamp(int Preamp)
 {
-    if(_setPreamp && pluginLoaded)
-        _setPreamp(Preamp);
+    if(routs.setPreamp && pluginLoaded)
+        routs.setPreamp(Preamp);
 }
 
 void pluginCtrl::setExtCtrl(DWORD ExtData)
 {
-    if(_setExtCtrl && pluginLoaded)
-        _setExtCtrl(ExtData);
+    if(routs.setExtCtrl && pluginLoaded)
+        routs.setExtCtrl(ExtData);
 }
 
 void pluginCtrl::setDdsFreq(int Freq)
 {
-    if(_setDdsFreq && pluginLoaded)
-        _setDdsFreq(Freq);
+    DdsFreq = Freq;
+
+    if(IsExtIOMode()&&IsExtIOOpen())
+        SetHWLO(Freq);
+    else
+        if(routs.setDdsFreq && pluginLoaded)
+            routs.setDdsFreq(Freq);
 }
 
 void pluginCtrl::setTrxMode(bool Mode)
 {
-    if(_setTrxMode && pluginLoaded)
-        _setTrxMode(Mode);
+    if(IsExtIOMode())
+        SetModeRxTx(Mode);
+    else
+        if(routs.setTrxMode && pluginLoaded)
+            routs.setTrxMode(Mode);
 }
 
 void pluginCtrl::setMute(bool Status)
 {
-    if(_setMute && pluginLoaded)
-        _setMute(Status);
+    if(routs.setMute && pluginLoaded)
+        routs.setMute(Status);
 }
 
 void pluginCtrl::setVhfOsc(quint32 freq)
 {
-    if(_setVhfOsc && pluginLoaded)
-        _setVhfOsc(freq);
+    if(routs.setVhfOsc && pluginLoaded)
+        routs.setVhfOsc(freq);
 }
 
 void pluginCtrl::setUhfOsc(quint32 freq)
 {
-    if(_setUhfOsc && pluginLoaded)
-        _setUhfOsc(freq);
+    if(routs.setUhfOsc && pluginLoaded)
+        routs.setUhfOsc(freq);
 }
 
 void pluginCtrl::setCalGen(bool Mode)
 {
-    if(_setCalGen && pluginLoaded)
-        _setCalGen(Mode);
+    if(routs.setCalGen && pluginLoaded)
+        routs.setCalGen(Mode);
 }
 
 void pluginCtrl::setXvAnt(int Mode)
 {
-    if(_setXvAnt && pluginLoaded)
-        _setXvAnt(Mode);
+    if(routs.setXvAnt && pluginLoaded)
+        routs.setXvAnt(Mode);
 }
 
 bool pluginCtrl::getInfo(QString libpath, QString &PlugName)
@@ -163,8 +203,18 @@ bool pluginCtrl::getInfo(QString libpath, QString &PlugName)
     PluginFunc_getInfo getInfoProc = (PluginFunc_getInfo)plugin.resolve("getInfo");
     if(getInfoProc == NULL)
     {
-        plugin.unload();
-        return false;
+        if(ExtIOPlugin::IsExtIO(&plugin))
+        {
+            QFileInfo fi(libpath);
+            PlugName = fi.fileName();
+            plugin.unload();
+            return true;
+        }
+        else
+        {
+            plugin.unload();
+            return false;
+        }
     }
     QByteArray bname(MAX_PATH, 0);
     getInfoProc(bname.data());
@@ -174,11 +224,6 @@ bool pluginCtrl::getInfo(QString libpath, QString &PlugName)
     return true;
 }
 
-QString pluginCtrl::getInfo()
-{
-    return InfoStr;
-}
-
 bool pluginCtrl::isLoaded()
 {
     return pluginLoaded;
@@ -186,8 +231,11 @@ bool pluginCtrl::isLoaded()
 
 void pluginCtrl::showPluginGui()
 {
-    if(_showPluginGui && pluginLoaded)
-        _showPluginGui();
+    if(IsExtIOMode())
+        ShowGUI();
+    else
+        if(routs.showPluginGui && pluginLoaded)
+            routs.showPluginGui();
 }
 
 void pluginCtrl::SdrStateChanged(QObject *PlugCtrl, StateChgReason reason, bool arg1, int arg2, int arg3)

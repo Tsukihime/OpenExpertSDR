@@ -85,12 +85,33 @@ void SdrPlugin::onSdrPluginChanged(QString path)
     connect(pSDRhw, SIGNAL(DashChanged(bool)), this, SIGNAL(DashChanged(bool)));
     connect(pSDRhw, SIGNAL(DotChanged(bool)), this, SIGNAL(DotChanged(bool)));
     connect(pSDRhw, SIGNAL(AdcChanged(int, int)), this, SIGNAL(AdcChanged(int, int)));
+    connect(pSDRhw, SIGNAL(Start(bool)), this, SIGNAL(Start(bool)));
+    connect(pSDRhw, SIGNAL(ChangeMode(int)), this, SIGNAL(ChangeMode(int)));
+    connect(pSDRhw, SIGNAL(DDSChanged(long)), this, SIGNAL(DDSChanged(long)));
+    connect(pSDRhw, SIGNAL(TuneChanged(long)), this, SIGNAL(TuneChanged(long)));
 }
 
 void SdrPlugin::onSdrShowConfig()
 {
     if(pSDRhw)
         pSDRhw->showPluginGui();
+}
+
+void SdrPlugin::OnModeChanged(int mode)
+{
+    if(pSDRhw)
+        pSDRhw->OnModeChanged(mode);
+}
+
+void SdrPlugin::OnTuneChanged(int Freq)
+{
+    if(pSDRhw)
+        pSDRhw->OnTuneChanged(Freq);
+}
+
+void SdrPlugin::SoundCardSampleRateChanged(int rate)
+{
+    pSDRhw->SoundCardSampleRateChanged(rate);
 }
 
 void SdrPlugin::onS2ChangeBuffers(int NumBuffers)

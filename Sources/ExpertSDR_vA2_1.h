@@ -508,10 +508,15 @@ class ExpertSDR_vA2_1 : public QWidget
 		void resetRitValue();
 		void setUpdateTime(int ms);
 		void setRxEnable(bool state);
+		void OnNewTune(long freq);
+		void OnNewDDS(long freq);
 
 	signals:
 		void emitFreqDbm(int freq, float dbm);
 		void emitDbm(float val);
+		void TuneChanged(int Freq);
+		void ModeChanged(int mode);
+		void SoundCardSampleRateChanged(int rate);
 };
 
 #endif // EXPERTSDR_VA2_1_H

@@ -1210,6 +1210,13 @@ ExpertSDR_vA2_1::ExpertSDR_vA2_1(QWidget *parent) : QWidget(parent)
 	connect(ui.pbStart, SIGNAL(clicked(bool)), this, SLOT(OnStart(bool)));
 	connect(ui.pbMox, SIGNAL(clicked(bool)), this, SLOT(OnMox(bool)));
 	connect(pSdrCtrl, SIGNAL(PttChanged(bool)), this, SLOT(OnMox(bool)));	// todo телеграф
+	connect(pSdrCtrl, SIGNAL(Start(bool)), this, SLOT(OnStart(bool)));
+	connect(pSdrCtrl, SIGNAL(ChangeMode(int)), this, SLOT(OnChangeMode(int)));
+	connect(pSdrCtrl, SIGNAL(TuneChanged(long)), this, SLOT(OnNewTune(long)));
+	connect(pSdrCtrl, SIGNAL(DDSChanged(long)), this, SLOT(OnNewDDS(long)));
+	connect(this, SIGNAL(TuneChanged(int)), pSdrCtrl, SLOT(OnTuneChanged(int)));
+	connect(this, SIGNAL(ModeChanged(int)), pSdrCtrl, SLOT(OnModeChanged(int)));
+	connect(this, SIGNAL(SoundCardSampleRateChanged(int)), pSdrCtrl, SLOT(SoundCardSampleRateChanged(int)));
 	connect(pPanel, SIGNAL(KeyPtt(bool)),  pSdrCtrl, SIGNAL(PttChanged(bool)));
 	connect(pCatManager, SIGNAL(PttChanged(bool)),  pSdrCtrl, SIGNAL(PttChanged(bool)));
 	connect(pOpt, SIGNAL(PttChanged(bool)),  pSdrCtrl, SIGNAL(PttChanged(bool)), Qt::QueuedConnection);
@@ -4024,6 +4031,7 @@ void ExpertSDR_vA2_1::OnChangeMode(int Mode)
 	ui.sbVarLowFreq->setValue(OptBands[CurrentBandIndex].Mode[CurrMode].VarFilterL);
 	SetFreq(pGraph->pGl->GetDDSFreq() + pGraph->pGl->GetFilter());
 	OnChangeFilter(OptBands[CurrentBandIndex].Mode[Mode].FilterIndex);
+	emit ModeChanged(Mode);
 }
 
 void ExpertSDR_vA2_1::OnChangeFilter(int Filter)
@@ -4537,6 +4545,7 @@ void ExpertSDR_vA2_1::OnStart(bool Start)
 {
     if(/*pOpt->ui.cbSdrType->currentIndex() == 0*/ true)
 	{
+		ui.pbStart->setChecked(Start);
 		if(Start)
 		{
 			if(isStarted == true)
@@ -4547,7 +4556,7 @@ void ExpertSDR_vA2_1::OnStart(bool Start)
             int plugidx = pOpt->ui.cbSdrType->currentIndex();
             QString plugpath = pOpt->ui.cbSdrType->itemData(plugidx).toString();
             pSdrCtrl->onSdrPluginChanged(plugpath);
-
+			pSdrCtrl->SoundCardSampleRateChanged((int)pOpt->getSampleRate());
 			OnLock(ui.pbLock->isChecked());
 			if(pMem->isWavPlay())
 			{
@@ -6135,6 +6144,7 @@ void ExpertSDR_vA2_1::MainFreqChange(int Freq)
 		}
 	}
 	OptBands[CurrentBandIndex].MainFreq = Freq;
+	emit TuneChanged(Freq);
 }
 
 void ExpertSDR_vA2_1::OnAmCarrier(int Val)
@@ -7631,6 +7641,22 @@ void ExpertSDR_vA2_1::setRxEnable(bool state)
 {
 	pDsp->SetRitEnable(state);
 	pDsp->SetRxOsc((float)(-pGraph->pGl->GetFilter()));
+}
+
+void ExpertSDR_vA2_1::OnNewTune(long freq)
+{
+	int filter_freq = freq - pGraph->pGl->GetDDSFreq();
+	pGraph->pGl->SetFilter(filter_freq);
+	SetFreq(freq);
+	MainFreqChange(freq);
+}
+
+void ExpertSDR_vA2_1::OnNewDDS(long freq)
+{
+	pGraph->pGl->SetDDSFreq(freq);
+	int tune = freq + pGraph->pGl->GetFilter();
+	SetFreq(tune);
+	MainFreqChange(tune);
 }
 
 void ExpertSDR_vA2_1::setLock(int flags)
