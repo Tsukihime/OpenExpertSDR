@@ -72,5 +72,6 @@
         <file>images/rec_disable.png</file>
         <file>images/rec_press.png</file>
         <file>images/rec_unpress.png</file>
+        <file>images/arrows/arrow-up.png</file>
     </qresource>
 </RCC>

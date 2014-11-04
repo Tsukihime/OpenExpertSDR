@@ -28,7 +28,7 @@ Options::Options(QWidget *parent) : QWidget(parent)
 {
 	ui.setupUi(this);
 
-    SetupPluginList();
+	SetupPluginList();
 
 	ui.sbPaTxDelayValue->setVisible(false);
 	ui.sbVoiceRepeatTime->setVisible(false);
@@ -51,9 +51,9 @@ Options::Options(QWidget *parent) : QWidget(parent)
 				dir.mkdir(pathDefaultWaveIQ + "ExpertSDR");
 			pathDefaultWaveIQ = pathDefaultWaveIQ + "ExpertSDR/";
 		}
-		else if(dir.exists(QDir::homePath() + pTxtCodec->toUnicode("/Мои документы")))
+		else if(dir.exists(QDir::homePath() + pTxtCodec->toUnicode("/РњРѕРё РґРѕРєСѓРјРµРЅС‚С‹")))
 		{
-				pathDefaultWaveIQ = QDir::homePath() + pTxtCodec->toUnicode("/Мои документы/");
+				pathDefaultWaveIQ = QDir::homePath() + pTxtCodec->toUnicode("/РњРѕРё РґРѕРєСѓРјРµРЅС‚С‹/");
 			if(!dir.exists(pathDefaultWaveIQ + "ExpertSDR"))
 				dir.mkdir(pathDefaultWaveIQ + "ExpertSDR");
 			pathDefaultWaveIQ = pathDefaultWaveIQ + "ExpertSDR/";
@@ -89,9 +89,9 @@ Options::Options(QWidget *parent) : QWidget(parent)
 				dir.mkdir(pathDefaultWaveIQ + "ExpertSDR");
 			pathDefaultWaveIQ = pathDefaultWaveIQ + "ExpertSDR/";
 		}
-		else if(dir.exists(QDir::homePath() + pTxtCodec->toUnicode("/Мои документы")))
+		else if(dir.exists(QDir::homePath() + pTxtCodec->toUnicode("/РњРѕРё РґРѕРєСѓРјРµРЅС‚С‹")))
 		{
-			pathDefaultWaveIQ = QDir::homePath() + pTxtCodec->toUnicode("/Мои документы/");
+			pathDefaultWaveIQ = QDir::homePath() + pTxtCodec->toUnicode("/РњРѕРё РґРѕРєСѓРјРµРЅС‚С‹/");
 			if(!dir.exists(pathDefaultWaveIQ + "ExpertSDR"))
 				dir.mkdir(pathDefaultWaveIQ + "ExpertSDR");
 			pathDefaultWaveIQ = pathDefaultWaveIQ + "ExpertSDR/";
@@ -155,42 +155,24 @@ Options::Options(QWidget *parent) : QWidget(parent)
 	connect(ui.pbProg4, SIGNAL(clicked()), this, SLOT(OnProg4()));
 	connect(ui.pbApply, SIGNAL(clicked()), this, SLOT(LaunchProgs()));
 	connect(ui.pbOK, SIGNAL(clicked()), this, SLOT(LaunchProgs()));
-	for(int i = 0; i < ui.twPaSettings->rowCount(); i++)
-	{
-		ui.twPaSettings->setCellWidget (i, 1, new QSpinBox);
-		(reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (i, 1)))->setValue(55);
-	}
 	if(ui.chbExtCtrl->isChecked())
 		OnEnableExControl(1);
 	else
 		OnEnableExControl(0);
 	connect(ui.chbExtCtrl, SIGNAL(stateChanged(int)), this, SLOT(OnEnableExControl(int)));
-	connect((reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (0, 1))), SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect160(int)));
-	connect((reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (1, 1))), SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect80(int)));
-	connect((reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (2, 1))), SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect60(int)));
-	connect((reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (3, 1))), SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect40(int)));
-	connect((reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (4, 1))), SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect30(int)));
-	connect((reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (5, 1))), SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect20(int)));
-	connect((reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (6, 1))), SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect17(int)));
-	connect((reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (7, 1))), SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect15(int)));
-	connect((reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (8, 1))), SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect12(int)));
-	connect((reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (9, 1))), SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect10(int)));
-	connect((reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (10, 1))), SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect6(int)));
-	connect((reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (11, 1))), SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect2(int)));
-	connect((reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (12, 1))), SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect07(int)));
-	reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget(0, 1))->setMinimum(45);
-	reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget(1, 1))->setMinimum(45);
-	reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget(2, 1))->setMinimum(45);
-	reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget(3, 1))->setMinimum(45);
-	reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget(4, 1))->setMinimum(45);
-	reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget(5, 1))->setMinimum(45);
-	reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget(6, 1))->setMinimum(45);
-	reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget(7, 1))->setMinimum(45);
-	reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget(8, 1))->setMinimum(45);
-	reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget(9, 1))->setMinimum(45);
-	reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget(10, 1))->setMinimum(45);
-	reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget(11, 1))->setMinimum(45);
-	reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget(12, 1))->setMinimum(45);
+	connect(ui.spinBox_0, SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect160(int)));
+	connect(ui.spinBox_1, SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect80(int)));
+	connect(ui.spinBox_2, SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect60(int)));
+	connect(ui.spinBox_3, SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect40(int)));
+	connect(ui.spinBox_4, SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect30(int)));
+	connect(ui.spinBox_5, SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect20(int)));
+	connect(ui.spinBox_6, SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect17(int)));
+	connect(ui.spinBox_7, SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect15(int)));
+	connect(ui.spinBox_8, SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect12(int)));
+	connect(ui.spinBox_9, SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect10(int)));
+	connect(ui.spinBox_10, SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect6(int)));
+	connect(ui.spinBox_11, SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect2(int)));
+	connect(ui.spinBox_12, SIGNAL(valueChanged(int)), this, SLOT(PowerCorrect07(int)));
 	connect(ui.chbPttEnable, SIGNAL(clicked(bool)), this, SLOT(pttOpen(bool)));
 	ui.chbPttDtr->setVisible(false);
 	ui.chbPttRts->setVisible(false);
@@ -282,17 +264,17 @@ QString Options::getWaveFilesDirLocationDefault()
 
 void Options::SetupPluginList()
 {
-    QString plugin_dir = QDir::currentPath() + "/device";
-    QDir plug_dir(plugin_dir, "*.dll", QDir::Name, QDir::Files | QDir::Hidden | QDir::System);
+	QString plugin_dir = QDir::currentPath() + "/device";
+	QDir plug_dir(plugin_dir, "*.dll", QDir::Name, QDir::Files | QDir::Hidden | QDir::System);
 
-    for(int i = 0; i < plug_dir.count(); i++)
-    {
-        QString libpath = plugin_dir + "/" + plug_dir[i];
+	for(int i = 0; i < plug_dir.count(); i++)
+	{
+		QString libpath = plugin_dir + "/" + plug_dir[i];
 		QString InfoStr = "";
 
 		if(pluginCtrl::getInfo(libpath, InfoStr))
 			ui.cbSdrType->addItem(InfoStr, libpath);
-    }
+	}
 }
 
 void Options::StartProgs()
@@ -721,17 +703,95 @@ void Options::OnEnableExControl(int State)
 
 void Options::GetPowerCorrection(BAND_MODE Band, float *pValDb)
 {
-	if(Band > BAND07M)
-		return;
-
-	(*pValDb) = (reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (Band, 1)))->value();
+	switch (Band) {
+	case BAND160M:
+		(*pValDb) = ui.spinBox_0->value();
+		break;
+	case BAND80M:
+		(*pValDb) = ui.spinBox_1->value();
+		break;
+	case BAND60M:
+		(*pValDb) = ui.spinBox_2->value();
+		break;
+	case BAND40M:
+		(*pValDb) = ui.spinBox_3->value();
+		break;
+	case BAND30M:
+		(*pValDb) = ui.spinBox_4->value();
+		break;
+	case BAND20M:
+		(*pValDb) = ui.spinBox_5->value();
+		break;
+	case BAND17M:
+		(*pValDb) = ui.spinBox_6->value();
+		break;
+	case BAND15M:
+		(*pValDb) = ui.spinBox_7->value();
+		break;
+	case BAND12M:
+		(*pValDb) = ui.spinBox_8->value();
+		break;
+	case BAND10M:
+		(*pValDb) = ui.spinBox_9->value();
+		break;
+	case BAND6M:
+		(*pValDb) = ui.spinBox_10->value();
+		break;
+	case BAND2M:
+		(*pValDb) = ui.spinBox_11->value();
+		break;
+	case BAND07M:
+		(*pValDb) = ui.spinBox_12->value();
+		break;
+	default:
+		break;
+	}
 }
 void Options::SetPowerCorrection(BAND_MODE Band, float ValDb)
 {
-	if(Band > BAND07M)
-		return;
-
-	(reinterpret_cast<QSpinBox*>(ui.twPaSettings->cellWidget (Band, 1)))->setValue(ValDb);
+	switch (Band) {
+	case BAND160M:
+		ui.spinBox_0->setValue(ValDb);
+		break;
+	case BAND80M:
+		ui.spinBox_1->setValue(ValDb);
+		break;
+	case BAND60M:
+		ui.spinBox_2->setValue(ValDb);
+		break;
+	case BAND40M:
+		ui.spinBox_3->setValue(ValDb);
+		break;
+	case BAND30M:
+		ui.spinBox_4->setValue(ValDb);
+		break;
+	case BAND20M:
+		ui.spinBox_5->setValue(ValDb);
+		break;
+	case BAND17M:
+		ui.spinBox_6->setValue(ValDb);
+		break;
+	case BAND15M:
+		ui.spinBox_7->setValue(ValDb);
+		break;
+	case BAND12M:
+		ui.spinBox_8->setValue(ValDb);
+		break;
+	case BAND10M:
+		ui.spinBox_9->setValue(ValDb);
+		break;
+	case BAND6M:
+		ui.spinBox_10->setValue(ValDb);
+		break;
+	case BAND2M:
+		ui.spinBox_11->setValue(ValDb);
+		break;
+	case BAND07M:
+		ui.spinBox_12->setValue(ValDb);
+		break;
+	default:
+		break;
+	}
 }
 
 void Options::SetWindowType(int type)
@@ -1098,6 +1158,6 @@ void Options::viewLocationLogFile()
 
 void Options::onSdrTypeChanged(int index)
 {
-    QString path = ui.cbSdrType->itemData(index).toString();
-    emit SdrPluginChanged(path);
+	QString path = ui.cbSdrType->itemData(index).toString();
+	emit SdrPluginChanged(path);
 }
