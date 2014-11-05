@@ -36,91 +36,38 @@ Options::Options(QWidget *parent) : QWidget(parent)
 	ui.tbSDR->setCurrentIndex(0);
 	ui.SwMain->setCurrentIndex(0);
 
-	QString fileName;
+	QString DocumentsLocation = QDesktopServices::storageLocation(QDesktopServices:: DocumentsLocation);
 	QDir dir;
-	QTextCodec *pTxtCodec = QTextCodec::codecForName("CP1251");
-	switch(QSysInfo::WindowsVersion)
+
+	if(dir.exists(DocumentsLocation))
 	{
-	case QSysInfo::WV_2000:
-	case QSysInfo::WV_XP:
-	case QSysInfo::WV_2003:
-		if(dir.exists(QDir::homePath() + "/My documents"))
-		{
-			pathDefaultWaveIQ = QDir::homePath() + "/My documents/";
-			if(!dir.exists(pathDefaultWaveIQ + "ExpertSDR"))
-				dir.mkdir(pathDefaultWaveIQ + "ExpertSDR");
-			pathDefaultWaveIQ = pathDefaultWaveIQ + "ExpertSDR/";
-		}
-		else if(dir.exists(QDir::homePath() + pTxtCodec->toUnicode("/Мои документы")))
-		{
-				pathDefaultWaveIQ = QDir::homePath() + pTxtCodec->toUnicode("/Мои документы/");
-			if(!dir.exists(pathDefaultWaveIQ + "ExpertSDR"))
-				dir.mkdir(pathDefaultWaveIQ + "ExpertSDR");
-			pathDefaultWaveIQ = pathDefaultWaveIQ + "ExpertSDR/";
-		}
+		if(!dir.exists(DocumentsLocation + "/ExpertSDR"))
+			dir.mkdir(DocumentsLocation + "/ExpertSDR");
+		pathDefaultWaveIQ = DocumentsLocation + "/ExpertSDR/";
+	}
+	else
+	{
+		if(dir.mkdir(QDir::homePath() + "/ExpertSDR"))
+			pathDefaultWaveIQ = QDir::homePath() + "/ExpertSDR/";
 		else
 		{
-			if(dir.mkdir(QDir::homePath() + "/ExpertSDR"))
-				pathDefaultWaveIQ = QDir::homePath() + "/ExpertSDR/";
-			else
+			QMessageBox msgBox;
+			msgBox.setText("Choose a directory where wave files will be located.");
+			msgBox.exec();
+			//
+			QString path = QDir::homePath();
+			if(path.isEmpty())
 			{
-				QMessageBox msgBox;
-				msgBox.setText("Choose a directory where wave files will be located.");
+				msgBox.setText("Wave file location:\n" + QDir::homePath());
 				msgBox.exec();
-				//
-				QString path = QDir::homePath();
-				if(path.isEmpty())
-				{
-					msgBox.setText("Wave file location:\n" + QDir::homePath());
-					msgBox.exec();
-					pathDefaultWaveIQ = QDir::homePath() + "/";
-				}
-				else
-					pathDefaultWaveIQ = path + "/";
+				pathDefaultWaveIQ = QDir::homePath() + "/";
 			}
-		}
-		break;
-	case QSysInfo::WV_VISTA:
-	case QSysInfo::WV_WINDOWS7:
-		if(dir.exists(QDir::homePath() + "/Documents"))
-		{
-			pathDefaultWaveIQ = QDir::homePath() + "/Documents/";
-			if(!dir.exists(pathDefaultWaveIQ + "ExpertSDR"))
-				dir.mkdir(pathDefaultWaveIQ + "ExpertSDR");
-			pathDefaultWaveIQ = pathDefaultWaveIQ + "ExpertSDR/";
-		}
-		else if(dir.exists(QDir::homePath() + pTxtCodec->toUnicode("/Мои документы")))
-		{
-			pathDefaultWaveIQ = QDir::homePath() + pTxtCodec->toUnicode("/Мои документы/");
-			if(!dir.exists(pathDefaultWaveIQ + "ExpertSDR"))
-				dir.mkdir(pathDefaultWaveIQ + "ExpertSDR");
-			pathDefaultWaveIQ = pathDefaultWaveIQ + "ExpertSDR/";
-		}
-		else
-		{
-			if(dir.mkdir(QDir::homePath() + "/ExpertSDR"))
-				pathDefaultWaveIQ = QDir::homePath() + "/ExpertSDR/";
 			else
-			{
-				QMessageBox msgBox;
-				msgBox.setText("Choose a directory where wave files will be located.");
-				msgBox.exec();
-				QString path = QDir::homePath();
-				if(path.isEmpty())
-				{
-					msgBox.setText("Wave file location:\n" + QDir::homePath());
-					msgBox.exec();
-					pathDefaultWaveIQ = QDir::homePath() + "/";
-				}
-				else
-					pathDefaultWaveIQ = path + "/";
-			}
+				pathDefaultWaveIQ = path + "/";
 		}
-		break;
 	}
 	pathDefaultWaveIQDefault = pathDefaultWaveIQ;
 	ui.lbWavePathIQ->setText(pathDefaultWaveIQ);
-	QColor Color;
 	pProg0 = new QProcess(this);
 	pProg1 = new QProcess(this);
 	pProg2 = new QProcess(this);
@@ -193,7 +140,7 @@ Options::Options(QWidget *parent) : QWidget(parent)
 	connect(ui.sbPaVacLattency, SIGNAL(valueChanged(int)), this, SLOT(soundVacChanged(int)));
 	connect(ui.chbVacEnable, SIGNAL(stateChanged(int)), this, SLOT(soundChanged(int)));
 	connect(ui.cbSdrType, SIGNAL(currentIndexChanged(int)), this, SLOT(OnSdrType(int)));
-	connect(ui.cbSdrType, SIGNAL(currentIndexChanged(int)), this, SLOT(onSdrTypeChanged(int)));	
+	connect(ui.cbSdrType, SIGNAL(currentIndexChanged(int)), this, SLOT(onSdrTypeChanged(int)));
 	onEnableXvtrx(false);
 	connect(ui.chbXvtrxEnable, SIGNAL(clicked(bool)), this, SLOT(onEnableXvtrx(bool)));
 	connect(ui.pbWavePath, SIGNAL(clicked()), this, SLOT(openWaveDir()));
@@ -967,12 +914,12 @@ void Options::pttOpen(bool stat)
 		if(!pPttPort->isOpen())
 		{
 			ui.chbPttEnable->setChecked(false);
-			 QMessageBox msgBox;
-			 msgBox.setText(tr("Couldn't open PTT Com port!"));
-			 msgBox.exec();
-			 ui.cbPttPortName->setEnabled(true);
-			 ui.chbPttDtr->setVisible(false);
-			 ui.chbPttRts->setVisible(false);
+			QMessageBox msgBox;
+			msgBox.setText(tr("Couldn't open PTT Com port!"));
+			msgBox.exec();
+			ui.cbPttPortName->setEnabled(true);
+			ui.chbPttDtr->setVisible(false);
+			ui.chbPttRts->setVisible(false);
 			return;
 		}
 		ui.cbPttPortName->setEnabled(false);
@@ -1014,12 +961,12 @@ void Options::keyOpen(bool stat)
 		if(!pKeyPort->isOpen())
 		{
 			ui.chbKeyEnable->setChecked(false);
-			 QMessageBox msgBox;
-			 msgBox.setText(tr("Couldn't open Alternate Key Com port!"));
-			 msgBox.exec();
-			 ui.cbKeyPortName->setEnabled(true);
-			 ui.cbKeyPttLine->setEnabled(true);
-			 ui.cbKeyKeyLine->setEnabled(true);
+			QMessageBox msgBox;
+			msgBox.setText(tr("Couldn't open Alternate Key Com port!"));
+			msgBox.exec();
+			ui.cbKeyPortName->setEnabled(true);
+			ui.cbKeyPttLine->setEnabled(true);
+			ui.cbKeyKeyLine->setEnabled(true);
 			return;
 		}
 		ui.cbKeyPortName->setEnabled(false);
