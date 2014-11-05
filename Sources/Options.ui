@@ -2657,6 +2657,19 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </widget>
+       <widget class="QCheckBox" name="chbBlackMagic">
+        <property name="geometry">
+         <rect>
+          <x>450</x>
+          <y>180</y>
+          <width>91</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Black Magic</string>
+        </property>
+       </widget>
       </widget>
      </widget>
      <widget class="QWidget" name="page_10">

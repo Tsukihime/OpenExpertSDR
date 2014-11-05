@@ -1214,6 +1214,7 @@ ExpertSDR_vA2_1::ExpertSDR_vA2_1(QWidget *parent) : QWidget(parent)
 	connect(pSdrCtrl, SIGNAL(ChangeMode(int)), this, SLOT(OnChangeMode(int)));
 	connect(pSdrCtrl, SIGNAL(TuneChanged(long)), this, SLOT(OnNewTune(long)));
 	connect(pSdrCtrl, SIGNAL(DDSChanged(long)), this, SLOT(OnNewDDS(long)));
+	connect(pOpt->ui.chbBlackMagic, SIGNAL(stateChanged(int)), pDsp, SLOT(SetUseBlackMagic(int)));
 	connect(this, SIGNAL(TuneChanged(int)), pSdrCtrl, SLOT(OnTuneChanged(int)));
 	connect(this, SIGNAL(ModeChanged(int)), pSdrCtrl, SLOT(OnModeChanged(int)));
 	connect(this, SIGNAL(SoundCardSampleRateChanged(int)), pSdrCtrl, SLOT(SoundCardSampleRateChanged(int)));
@@ -1822,6 +1823,7 @@ retry:
 	setSunSDR.endGroup();
 
 	settings.beginGroup("MainWindow");
+		settings.setValue("useBlackMagic", pOpt->ui.chbBlackMagic->isChecked());
 		settings.setValue("SMPosition", pSM->pos());
 		settings.setValue("Smeter_options", pSM->getSettings());
 		settings.setValue("SM_Enable", ui.pbSm->isChecked());
@@ -2441,6 +2443,7 @@ void ExpertSDR_vA2_1::readSettings()
 		setSunSDR.endGroup();
 	setSunSDR.endGroup();
 	settings.beginGroup("MainWindow");
+		pOpt->ui.chbBlackMagic->setChecked(settings.value("useBlackMagic", false).toBool());
 		pSM->move(settings.value("SMPosition", QPoint(300, 300)).toPoint());
 		pSM->setSettings(settings.value("Smeter_options", false));
 		ui.pbSm->setChecked(settings.value("SM_Enable", false).toBool());

@@ -266,6 +266,7 @@ class DttSP : public QThread
 
 		int RitValue;
 		bool RitEnable;
+		bool useBlackMagic;
 
 	public:
 
@@ -413,6 +414,7 @@ public slots:
 
 		void SetRitEnable(bool state);
 		void SetRitValue(int value);
+		void SetUseBlackMagic(int val);
 
 
 signals:

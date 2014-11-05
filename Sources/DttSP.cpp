@@ -252,7 +252,8 @@ int DttSP::SetSampleRate(double Rate)
 void DttSP::SetNr(bool Status)
 {
 	DspSetRXListen(RX_CHANNEL0);
-	DspSetNR(Status);
+	if(!useBlackMagic)
+		DspSetNR(Status);
 	DspSetRXListen(RX_CHANNEL1);
 	DspSetNR(Status);
 	DspSetRXListen(RX_CHANNEL2);
@@ -307,7 +308,8 @@ void DttSP::SetTxSquelchVal(float Val)
 void DttSP::SetAnf(bool Status)
 {
 	DspSetRXListen(RX_CHANNEL0);
-	DspSetANF(Status);
+	if(!useBlackMagic)
+		DspSetANF(Status);
 	DspSetRXListen(RX_CHANNEL1);
 	DspSetANF(Status);
 	DspSetRXListen(RX_CHANNEL2);
@@ -340,7 +342,8 @@ void DttSP::SetANFvals(int taps, int delay, double gain, double leak)
 void DttSP::SetNB(bool Status)
 {
 	DspSetRXListen(RX_CHANNEL0);
-	DspSetNB(Status);
+	if(!useBlackMagic)
+		DspSetNB(Status);
 	DspSetRXListen(RX_CHANNEL1);
 	DspSetNB(Status);
 	DspSetRXListen(RX_CHANNEL2);
@@ -384,7 +387,8 @@ void DttSP::SetSdrOmvals(double Val)
 void DttSP::SetBin(bool Status)
 {
 	DspSetRXListen(RX_CHANNEL0);
-	DspSetBIN(Status);
+	if(!useBlackMagic)
+		DspSetBIN(Status);
 	DspSetRXListen(RX_CHANNEL1);
 	DspSetBIN(Status);
 	DspSetRXListen(RX_CHANNEL2);
@@ -1049,4 +1053,9 @@ void DttSP::SetRitEnable(bool state)
 void DttSP::SetRitValue(int value)
 {
 	RitValue = -value;
+}
+
+void DttSP::SetUseBlackMagic(int val)
+{
+	useBlackMagic = (bool)val;
 }
