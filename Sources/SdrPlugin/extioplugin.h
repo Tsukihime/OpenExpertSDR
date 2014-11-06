@@ -27,6 +27,8 @@ typedef __stdcall void (*ExtIO_RawDataReady)(long, int*, int*, int);
 typedef __stdcall void (*ExtIO_GetFilters)(int&, int&, int&);
 //
 typedef __stdcall int (*ExtIOext_SetModeRxTx)(int);
+typedef __stdcall int (*ExtIOext_ActivateTx)(int, int);
+typedef __stdcall void (*ExtIOext_VersionInfo)(const char*, int, int);
 
 //GetStatus GetHWSR, HideGUI, RawDataReady, GetFilters are not implemented
 
@@ -54,6 +56,8 @@ typedef struct
     ExtIO_GetFilters GetFilters;
 
     ExtIOext_SetModeRxTx SetModeRxTx;
+    ExtIOext_ActivateTx ActivateTx;
+    ExtIOext_VersionInfo VersionInfo;
 } ExtIORouts;
 
 enum ExtIOCallbackStatus {
@@ -134,6 +138,8 @@ private:
     bool init_hw();
     void set_callback();
     void ubdate_if_limits();
+    int activate_tx(int magicA, int magicB);
+    void version_info(const char *name, int ver_major, int ver_minor);
 
     static ExtIOPlugin* plugin_instance;
 

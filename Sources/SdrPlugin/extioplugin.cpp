@@ -41,9 +41,17 @@ void ExtIOPlugin::ExtIOPluginInit(QLibrary *plugin)
     routs.GetFilters = (ExtIO_GetFilters)plugin->resolve("GetFilters");
     // hdsdr routs
     routs.SetModeRxTx = (ExtIOext_SetModeRxTx)plugin->resolve("SetModeRxTx");
+    routs.ActivateTx = (ExtIOext_ActivateTx)plugin->resolve("ActivateTx");
+    routs.VersionInfo = (ExtIOext_VersionInfo)plugin->resolve("VersionInfo");
+    typedef __stdcall void (*ExtIOext_VersionInfo)(char *name, int ver_major, int ver_minor);
 
-    init_hw();
+    if(init_hw())
+    {
+        version_info("HDSDR", 2, 70);
+    }
     set_callback();
+    activate_tx(12345678, 87654321); // random ints in first pass
+    activate_tx(-1, -1); // -1 in second pass
 }
 
 void ExtIOPlugin::ExtIOPluginDeinit()
@@ -152,9 +160,9 @@ void ExtIOPlugin::SetModeRxTx(bool mode)
 {
     HwModeRxTx rxtx_mode;
     if(mode)
-        rxtx_mode = hmRX;
-    else
         rxtx_mode = hmTX;
+    else
+        rxtx_mode = hmRX;
 
     if(routs.SetModeRxTx)
         routs.SetModeRxTx((int)rxtx_mode);
@@ -283,6 +291,18 @@ void ExtIOPlugin::ubdate_if_limits()
         IFLimitHigh = new_if_h;
         IFLimitsChanged(IFLimitLow, IFLimitHigh);
     }
+}
+
+int ExtIOPlugin::activate_tx(int magicA, int magicB)
+{
+    if(routs.ActivateTx)
+        routs.ActivateTx(magicA, magicB);
+}
+
+void ExtIOPlugin::version_info(const char *name, int ver_major, int ver_minor)
+{
+    if(routs.VersionInfo)
+        routs.VersionInfo(name, ver_major, ver_minor);
 }
 
 void ExtIOPlugin::extIOCallback(int cnt, int status, float IQoffs, short IQdata[])
