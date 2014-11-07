@@ -106,10 +106,15 @@ private:
     bool pluginLoaded;
 
     int DdsFreq;
+    int SampleRate;
+    HwModeRxTx rxtx_mode;
 
     InternalPluginRouts routs;
 
     static __cdecl void SdrStateChanged(QObject *PlugCtrl, StateChgReason reason, bool arg1, int arg2, int arg3);
+
+public slots:
+    void SoundCardSampleRateChanged(int rate);
 
 signals:
     void PttChanged(bool);

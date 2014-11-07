@@ -9,8 +9,6 @@ ExtIOPlugin::ExtIOPlugin()
     sdrmode = -1;
     IFLimitLow = 0;
     IFLimitHigh = 0;
-    SampleRate = 0;
-    dds_f = -1;
     memset(&routs, 0, sizeof(ExtIORouts));
 }
 
@@ -89,12 +87,8 @@ void ExtIOPlugin::StopHW()
 int ExtIOPlugin::SetHWLO(long LOfreq)
 {
     int res = 0;
-    dds_f = LOfreq;
     if(routs.SetHWLO)
-    {
         res = routs.SetHWLO(LOfreq);
-        ubdate_if_limits();
-    }
     return res;
 }
 
@@ -156,16 +150,10 @@ SDRMODE ExtIOPlugin::GetMode()
     return mode;
 }
 
-void ExtIOPlugin::SetModeRxTx(bool mode)
+void ExtIOPlugin::SetModeRxTx(HwModeRxTx mode)
 {
-    HwModeRxTx rxtx_mode;
-    if(mode)
-        rxtx_mode = hmTX;
-    else
-        rxtx_mode = hmRX;
-
     if(routs.SetModeRxTx)
-        routs.SetModeRxTx((int)rxtx_mode);
+        routs.SetModeRxTx((int)mode);
 }
 
 bool ExtIOPlugin::IsExtIOMode()
@@ -276,14 +264,14 @@ void ExtIOPlugin::set_callback()
         routs.SetCallback(extIOCallback);
 }
 
-void ExtIOPlugin::ubdate_if_limits()
+void ExtIOPlugin::UbdateIfLimits(long dds_freq, int sample_rate)
 {
-    if((dds_f < 0) || (SampleRate <= 0))
+    if((dds_freq < 0) || (sample_rate <= 0))
         return;
 
-    long half_filter = SampleRate / 2;
-    long new_if_l = dds_f - half_filter;
-    long new_if_h = dds_f + half_filter;
+    long half_filter = sample_rate / 2;
+    long new_if_l = dds_freq - half_filter;
+    long new_if_h = dds_freq + half_filter;
 
     if((new_if_l != IFLimitLow) || (new_if_h != IFLimitHigh))
     {
@@ -296,7 +284,8 @@ void ExtIOPlugin::ubdate_if_limits()
 int ExtIOPlugin::activate_tx(int magicA, int magicB)
 {
     if(routs.ActivateTx)
-        routs.ActivateTx(magicA, magicB);
+        return routs.ActivateTx(magicA, magicB);
+    return -1;
 }
 
 void ExtIOPlugin::version_info(const char *name, int ver_major, int ver_minor)
@@ -368,12 +357,6 @@ void ExtIOPlugin::OnTuneChanged(int freq)
     if(IsExtIOOpen())
         if(routs.TuneChanged)
             routs.TuneChanged(freq);
-}
-
-void ExtIOPlugin::SoundCardSampleRateChanged(int rate)
-{
-    SampleRate = rate;
-    ubdate_if_limits();
 }
 
 void ExtIOPlugin::OnExtIOCallback(int status)

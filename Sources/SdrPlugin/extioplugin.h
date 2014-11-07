@@ -108,10 +108,11 @@ protected:
 
     long GetHWLO();
     void IFLimitsChanged(long low, long high);
+    void UbdateIfLimits(long dds_freq, int sample_rate);
     long GetTune();
     SDRMODE GetMode();
 
-    void SetModeRxTx(bool mode);
+    void SetModeRxTx(HwModeRxTx mode);
 
     bool IsExtIOMode();
     bool IsExtIOOpen();
@@ -126,10 +127,8 @@ protected:
 private:
     bool ExtIOMode;
     bool EXtIOOpen;
-    int SampleRate;
     int sdrmode;
 
-    long dds_f;
     int IFLimitLow;
     int IFLimitHigh;
 
@@ -137,7 +136,6 @@ private:
 
     bool init_hw();
     void set_callback();
-    void ubdate_if_limits();
     int activate_tx(int magicA, int magicB);
     void version_info(const char *name, int ver_major, int ver_minor);
 
@@ -155,7 +153,6 @@ signals:
 public slots:
     void OnModeChanged(int mode);
     void OnTuneChanged(int freq);
-    void SoundCardSampleRateChanged(int rate);
 
 private slots:
     void OnExtIOCallback(int status);

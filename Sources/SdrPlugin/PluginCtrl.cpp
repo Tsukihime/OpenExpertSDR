@@ -25,6 +25,9 @@
 
 pluginCtrl::pluginCtrl(QString libpath)
 {
+    SampleRate = 48000;
+    DdsFreq = 0;
+    rxtx_mode = hmRX;
     memset(&routs, 0, sizeof(InternalPluginRouts));
     pluginLoaded = false;
     pPlugLib = new QLibrary(libpath);
@@ -145,10 +148,17 @@ void pluginCtrl::setExtCtrl(DWORD ExtData)
 
 void pluginCtrl::setDdsFreq(int Freq)
 {
+    bool dds_chg = DdsFreq != Freq;
     DdsFreq = Freq;
 
     if(IsExtIOMode()&&IsExtIOOpen())
-        SetHWLO(Freq);
+    {
+        if(dds_chg && (rxtx_mode == hmRX))
+        {
+            SetHWLO(Freq);
+            UbdateIfLimits(DdsFreq, SampleRate);
+        }
+    }
     else
         if(routs.setDdsFreq && pluginLoaded)
             routs.setDdsFreq(Freq);
@@ -157,7 +167,16 @@ void pluginCtrl::setDdsFreq(int Freq)
 void pluginCtrl::setTrxMode(bool Mode)
 {
     if(IsExtIOMode())
-        SetModeRxTx(Mode);
+    {
+        if(Mode)
+            rxtx_mode = hmTX;
+        else
+            rxtx_mode = hmRX;
+
+        StopHW();
+        SetModeRxTx(rxtx_mode);
+        StartHW(DdsFreq);
+    }
     else
         if(routs.setTrxMode && pluginLoaded)
             routs.setTrxMode(Mode);
@@ -236,6 +255,12 @@ void pluginCtrl::showPluginGui()
     else
         if(routs.showPluginGui && pluginLoaded)
             routs.showPluginGui();
+}
+
+void pluginCtrl::SoundCardSampleRateChanged(int rate)
+{
+    SampleRate = rate;
+    UbdateIfLimits(DdsFreq, SampleRate);
 }
 
 void pluginCtrl::SdrStateChanged(QObject *PlugCtrl, StateChgReason reason, bool arg1, int arg2, int arg3)
