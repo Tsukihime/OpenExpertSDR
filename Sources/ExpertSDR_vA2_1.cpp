@@ -1214,7 +1214,6 @@ ExpertSDR_vA2_1::ExpertSDR_vA2_1(QWidget *parent) : QWidget(parent)
 	connect(pSdrCtrl, SIGNAL(ChangeMode(int)), this, SLOT(OnChangeMode(int)));
 	connect(pSdrCtrl, SIGNAL(TuneChanged(long)), this, SLOT(OnNewTune(long)));
 	connect(pSdrCtrl, SIGNAL(DDSChanged(long)), this, SLOT(OnNewDDS(long)));
-	connect(pOpt->ui.chbBlackMagic, SIGNAL(stateChanged(int)), pDsp, SLOT(SetUseBlackMagic(int)));
 	connect(this, SIGNAL(TuneChanged(int)), pSdrCtrl, SLOT(OnTuneChanged(int)));
 	connect(this, SIGNAL(ModeChanged(int)), pSdrCtrl, SLOT(OnModeChanged(int)));
 	connect(this, SIGNAL(SoundCardSampleRateChanged(int)), pSdrCtrl, SLOT(SoundCardSampleRateChanged(int)));
@@ -1823,7 +1822,6 @@ retry:
 	setSunSDR.endGroup();
 
 	settings.beginGroup("MainWindow");
-		settings.setValue("useBlackMagic", pOpt->ui.chbBlackMagic->isChecked());
 		settings.setValue("SMPosition", pSM->pos());
 		settings.setValue("Smeter_options", pSM->getSettings());
 		settings.setValue("SM_Enable", ui.pbSm->isChecked());
@@ -2443,7 +2441,6 @@ void ExpertSDR_vA2_1::readSettings()
 		setSunSDR.endGroup();
 	setSunSDR.endGroup();
 	settings.beginGroup("MainWindow");
-		pOpt->ui.chbBlackMagic->setChecked(settings.value("useBlackMagic", false).toBool());
 		pSM->move(settings.value("SMPosition", QPoint(300, 300)).toPoint());
 		pSM->setSettings(settings.value("Smeter_options", false));
 		ui.pbSm->setChecked(settings.value("SM_Enable", false).toBool());
@@ -3215,14 +3212,14 @@ void ExpertSDR_vA2_1::readSettings()
 		}
 		pOpt->ui.sbVacRxGain->setValue(tmpIValue);
 
-		pOpt->ui.sbNrTaps->setValue(settings.value("NR_Taps", 65).toInt());
-		pOpt->ui.sbNrDelay->setValue(settings.value("NR_Delay", 50).toInt());
-		pOpt->ui.sbNrGain->setValue(settings.value("NR_Gain", 10).toInt());
-		pOpt->ui.sbNrLeak->setValue(settings.value("NR_Leak", 1).toInt());
-		pOpt->ui.sbAnfTaps->setValue(settings.value("ANF_Taps", 65).toInt());
-		pOpt->ui.sbAnfDelay->setValue(settings.value("ANF_Delay", 50).toInt());
-		pOpt->ui.sbAnfGain->setValue(settings.value("ANF_Gain", 25).toInt());
-		pOpt->ui.sbAnfLeak->setValue(settings.value("ANF_Leak", 10).toInt());
+		pOpt->ui.sbNrTaps->setValue(settings.value("NR_Taps", 45).toInt());
+		pOpt->ui.sbNrDelay->setValue(settings.value("NR_Delay", 64).toInt());
+		pOpt->ui.sbNrGain->setValue(settings.value("NR_Gain", 16).toInt());
+		pOpt->ui.sbNrLeak->setValue(settings.value("NR_Leak", 10).toInt());
+		pOpt->ui.sbAnfTaps->setValue(settings.value("ANF_Taps", 31).toInt());
+		pOpt->ui.sbAnfDelay->setValue(settings.value("ANF_Delay", 64).toInt());
+		pOpt->ui.sbAnfGain->setValue(settings.value("ANF_Gain", 10).toInt());
+		pOpt->ui.sbAnfLeak->setValue(settings.value("ANF_Leak", 1).toInt());
 		pOpt->ui.sbNb1Thr->setValue(settings.value("NB1_Thr", 20).toInt());
 		pOpt->ui.sbNb2Thr->setValue(settings.value("NB2_Thr", 15).toInt());
 		pOpt->ui.sbAlcAttak->setValue(settings.value("Alc_Attak", 2).toInt());
@@ -4467,7 +4464,7 @@ void ExpertSDR_vA2_1::OnBin(bool Val)
 
 void ExpertSDR_vA2_1::OnOptChangeNrVals(int val)
 {
-	pDsp->SetNrVals((double)pOpt->ui.sbNrTaps->value(), (double)pOpt->ui.sbNrDelay->value(), 0.00001*(double)pOpt->ui.sbNrGain->value(), 0.00005);
+	pDsp->SetNrVals((double)pOpt->ui.sbNrTaps->value(), (double)pOpt->ui.sbNrDelay->value(), 0.0001*(double)pOpt->ui.sbNrGain->value(), 0.0000001*(double)pOpt->ui.sbNrLeak->value());
 }
 
 void ExpertSDR_vA2_1::OnOptChangeAgcVals(int val)
@@ -4487,7 +4484,7 @@ void ExpertSDR_vA2_1::OnOptChangeNbsVals(int val)
 
 void ExpertSDR_vA2_1::OnOptChangeAnfVals(int val)
 {
-	pDsp->SetANFvals((double)pOpt->ui.sbAnfTaps->value(), (double)pOpt->ui.sbAnfDelay->value(), 0.00001*(double)pOpt->ui.sbAnfGain->value(), 0.00005);
+	pDsp->SetANFvals((double)pOpt->ui.sbAnfTaps->value(), (double)pOpt->ui.sbAnfDelay->value(), 0.0001*(double)pOpt->ui.sbAnfGain->value(), 0.0000001*(double)pOpt->ui.sbAnfLeak->value());
 }
 
 void ExpertSDR_vA2_1::OnOptChangeSampleRate(int index)
@@ -4579,19 +4576,15 @@ void ExpertSDR_vA2_1::OnStart(bool Start)
 			ui.pbTone->setEnabled(true);
 			onCalibrationGen(pOpt->ui.cbCalGen->isChecked());
 			pDsp->SetSampleRate(pOpt->getSampleRate());
-			pDsp->SetRxListen(RX_CHANNEL0);
-			pDsp->SetRXOn(RX_CHANNEL0);
-			pDsp->SetRxOsc(0.0);
-			pDsp->SetRxOutputGain(0.0);
+			pDsp->SetPanaramaOn(true);
 			pDsp->SetDcBlock(true);
-			pDsp->SetRxListen(RX_LISTEN_CHANNEL);
-			pDsp->SetRXOn(RX_LISTEN_CHANNEL);
+			pDsp->SetRx1On(true);
 			pDsp->SetRx1Volume(ui.slRx1Vol->value());
 			pDsp->AudioReset();
 			pDsp->SetSpectrumPolyphase(pOpt->ui.chbPoliphase->isChecked());
 			pDsp->SetWindow((Windowtype)pOpt->ui.cbWinType->currentIndex());
 			pDsp->SetAudioSize(pOpt->ui.cbPaBufferSize->currentText().toInt());
-			pDsp->SetRxOsc((float)(-pGraph->pGl->GetFilter()));
+			pDsp->SetRx1Osc((float)(-pGraph->pGl->GetFilter()));
 			pDsp->SetTxLevelerTop(3.162278);
 
             SetVhfOsc(pOpt->ui.sbVhfOsc->value());
@@ -4668,7 +4661,7 @@ StopSun1:
 			}
 			pPaVac->stop();
 			pVac->close();
-			pDsp->SetRxOsc(-SaveFilter);
+			pDsp->SetRx1Osc(-SaveFilter);
 			pSdrCtrl->Stop();
 			pCwMacro->stop();
 			OnMox(RX);
@@ -4858,7 +4851,7 @@ void ExpertSDR_vA2_1::OnMox(bool Tx)
 		MicScale = 0.0;
 		SetSdrTrx(RX);
 		pDsp->SetTrx(RX);
-		pDsp->SetRxOsc(-pGraph->pGl->GetFilter());
+		pDsp->SetRx1Osc(-pGraph->pGl->GetFilter());
 		pGraph->pGl->SpectrumEnable(true);
 		ui.pbMox->setChecked(false);
 		pOpt->ui.cbTrTypeSignal->setCurrentIndex(0);
@@ -4884,7 +4877,7 @@ void ExpertSDR_vA2_1::OnMox(bool Tx)
 
 void ExpertSDR_vA2_1::SetDspTrx(bool Tx)
 {
-	(Tx == true) ? pDsp->SetTxOsc(0.0) : pDsp->SetRxOsc(-pGraph->pGl->GetFilter());
+	(Tx == true) ? pDsp->SetTxOsc(0.0) : pDsp->SetRx1Osc(-pGraph->pGl->GetFilter());
 	pDsp->SetTrx((TRXMODE)Tx);
 }
 
@@ -5125,7 +5118,7 @@ void ExpertSDR_vA2_1::timerEvent(QTimerEvent *e)
 void ExpertSDR_vA2_1::OnChangeFilterFreq(int Freq)
 {
 	FilterPosFreq = Freq;
-	pDsp->SetRxOsc(-Freq);
+	pDsp->SetRx1Osc(-Freq);
 	pDsp->SetTxOsc(-Freq);
 	SetFreq(Freq + pGraph->pGl->GetDDSFreq());
 	MainFreqChange(Freq + pGraph->pGl->GetDDSFreq());
@@ -6405,11 +6398,7 @@ void ExpertSDR_vA2_1::SetTxFilter()
 	double high = band.y();
 	double low = band.x();
 	pGraph->pGl->SetTxBandFilter(low, high);
-	pDsp->SetRxListen(0);
 	pDsp->SetFilter(low, high, 2048, TX);
-	pDsp->SetRxListen(1);
-	pDsp->SetFilter(low, high, 2048, TX);
-	pDsp->SetRxListen(0);
 }
 
 void ExpertSDR_vA2_1::SetLockMode(bool state)
@@ -6790,55 +6779,28 @@ void ExpertSDR_vA2_1::OnTune()
 		case USB:
 		case DIGU:
 			RxFreqSignal = 1000.0;
-			pDsp->SetRxListen(0);
 			pDsp->SetFilter(RxFreqSignal - 100, RxFreqSignal + 100, 2048, TX);
-			pDsp->SetRxListen(1);
-			pDsp->SetFilter(RxFreqSignal - 100, RxFreqSignal + 100, 2048, TX);
-			pDsp->SetRxListen(0);
 			break;
 
 		case CWU:
 			RxFreqSignal = ui.slPitch->value();
-			pDsp->SetRxListen(0);
 			pDsp->SetFilter(RxFreqSignal - 100, RxFreqSignal + 100, 2048, TX);
-			pDsp->SetRxListen(1);
-			pDsp->SetFilter(RxFreqSignal - 100, RxFreqSignal + 100, 2048, TX);
-			pDsp->SetRxListen(0);
 			break;
 		case LSB:
 		case DIGL:
 			RxFreqSignal = 1000.0;
-			pDsp->SetRxListen(0);
 			pDsp->SetFilter(-RxFreqSignal - 100, -RxFreqSignal + 100, 2048, TX);
-			pDsp->SetRxListen(1);
-			pDsp->SetFilter(-RxFreqSignal - 100, -RxFreqSignal + 100, 2048, TX);
-			pDsp->SetRxListen(0);
 			break;
 		case CWL:
 			RxFreqSignal = ui.slPitch->value();
-			pDsp->SetRxListen(0);
 			pDsp->SetFilter(-RxFreqSignal - 100, -RxFreqSignal + 100, 2048, TX);
-			pDsp->SetRxListen(1);
-			pDsp->SetFilter(-RxFreqSignal - 100, -RxFreqSignal + 100, 2048, TX);
-			pDsp->SetRxListen(0);
 			break;
 		case DSB:
-			RxFreqSignal = 1000.0;
-			pDsp->SetRxListen(0);
-			pDsp->SetFilter(RxFreqSignal - 100, RxFreqSignal + 100, 2048, TX);
-			pDsp->SetRxListen(1);
-			pDsp->SetFilter(RxFreqSignal - 100, RxFreqSignal + 100, 2048, TX);
-			pDsp->SetRxListen(0);
-			break;
 		case AM:
 		case SAM:
 		case FMN:
 			RxFreqSignal = 1000.0;
-			pDsp->SetRxListen(0);
 			pDsp->SetFilter(RxFreqSignal - 100, RxFreqSignal + 100, 2048, TX);
-			pDsp->SetRxListen(1);
-			pDsp->SetFilter(RxFreqSignal - 100, RxFreqSignal + 100, 2048, TX);
-			pDsp->SetRxListen(0);
 			break;
 		default:
 			break;
@@ -7643,7 +7605,7 @@ void ExpertSDR_vA2_1::setRampDelayEnable(bool state)
 void ExpertSDR_vA2_1::setRxEnable(bool state)
 {
 	pDsp->SetRitEnable(state);
-	pDsp->SetRxOsc((float)(-pGraph->pGl->GetFilter()));
+	pDsp->SetRx1Osc((float)(-pGraph->pGl->GetFilter()));
 }
 
 void ExpertSDR_vA2_1::OnNewTune(long freq)

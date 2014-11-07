@@ -62,7 +62,8 @@ HEADERS += CalibrateSC/Calibrator/CalibrProc.h \
     RingResampler/RingResampler.h \
     RingResampler/RingBuffer.h \
     SdrPlugin/PluginCtrl.h \
-    SdrPlugin/extioplugin.h
+    SdrPlugin/extioplugin.h \
+    dttsplibrary.h
 SOURCES += CalibrateSC/Calibrator/CalibrProc.cpp \
     CalibrateSC/Calibrator/Calibrator.cpp \
     Wav/fileList.cpp \
@@ -114,7 +115,8 @@ SOURCES += CalibrateSC/Calibrator/CalibrProc.cpp \
     RingResampler/RingResampler.cpp \
     RingResampler/RingBuffer.cpp \
     SdrPlugin/PluginCtrl.cpp \
-    SdrPlugin/extioplugin.cpp
+    SdrPlugin/extioplugin.cpp \
+    dttsplibrary.cpp
 RESOURCES += images.qrc
 FORMS += CalibrateSC/Calibrator/Calibrator.ui \
     Wav/fileList.ui \
