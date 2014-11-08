@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>260</width>
-    <height>500</height>
+    <height>325</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -20,55 +20,7 @@
    <string>fileList</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QPushButton { /* all types of tool button */ 
-color: #050505;
-border: 0px solid #2e3236; /*#848584;*/
-border-radius: 0px;
-background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #e7e7e7, stop:0.45 #c8c9c9, stop:0.5 #bcbebc, stop: 1 #818382);
-min-height: 18px;
-min-width: 30px;
-}
-
-QPushButton:hover { /* all types of tool button */
-color: #050505;
-border: 1px solid #a75e16; /*#848584;*/
-border-radius: 0px;
-background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #e7e7e7, stop:0.45 #c8c9c9, stop:0.5 #bcbebc, stop: 1 #818382);
-}
-
-/*QPushButton:pressed {
-background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #737372, stop:0.45 #b0b1b0, stop:0.5 #c2c1c2, stop: 1 #c2c1c2);
-color: #050505;
-border: 1px solid #2e3236;
-}
-
-QPushButton:checked {
-background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #737372, stop:0.45 #b0b1b0, stop:0.5 #c2c1c2, stop: 1 #c2c1c2);
-color: #050505;
-border: 1px solid #2e3236;
-}*/
-
-QPushButton:pressed {
-background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
-/*background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #267194, stop:0.45 #307FA4, stop:0.5 #3987AC, stop: 1 #549EC1); */
-color: WHITE;
-border: 0px solid #124159;
-}
-
-QPushButton::checked {
-background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
-color: WHITE;
-border: 0px solid #124159;
-}
-
-QLabel 
+   <string notr="true">QLabel 
 { 
 color: rgb(215, 215, 215); 
 } 
@@ -96,62 +48,41 @@ QTableWidget::item:selected:active {
 background: rgb(54, 54, 54); 
 } 
 
-/*QTableWidget::item:hover 
-{ 
-background: rgb(75, 45, 32); 
-} */
-/* Наведение на активный итем*/ 
-/*QTableWidget::item:hover:selected:active{ 
-background: rgb(75, 45, 32); 
-} */
 QScrollBar:vertical { 
 border: 1px solid black; 
 background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(60, 60, 60, 255), stop:1 rgba(50, 50, 50, 255)); 
-width: 13px; 
+width: 13px;
 margin: 12px 3px 12px 3px; 
 } 
-QScrollBar::handle:vertical { 
-border: 1px solid black; 
-border-radius: 3px; 
-background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(194, 194, 194, 255), stop:0.517045 rgba(221, 221, 221, 255), stop:1 rgba(194, 194, 194, 255));
-/*background: transparent;*//*qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(198, 198, 198, 255), stop:1 rgba(193, 193, 193, 255)); */
-margin: 0 -3px; 
-min-height: 10px;
-max-height: 10px;
- image: url(:/images/scroll_handle_2.png);
-/* margin: 0 22px 0 22px;*/ 
-} 
+
+QScrollBar::handle:vertical {
+	background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(60, 60, 60, 255), stop:1 rgba(137, 137, 137, 255));
+	border: 1px solid;
+	border-color: rgb(150, 150, 150);
+	border-radius: 1px;
+	min-width: 18px;
+	margin: 3px -2px 3px -2px; 
+}
 
 QScrollBar::add-line:vertical 
 {
-      /*border: 2px solid grey;*/
-      background: transparent;
-      height: 11px;
-	  width: 11px;
-      subcontrol-position: bottom;
-      subcontrol-origin: margin;
-	 image: url(:/images/scroll_down.png);
+	background: transparent;
+	height: 11px;
+	width: 11px;
+	subcontrol-position: bottom;
+	subcontrol-origin: margin;
+	image: url(:images/arrows/arrow-down.png);
   }
 
  QScrollBar::sub-line:vertical 
 {
-      background: transparent;
-      height: 11px;
-	  width: 11px;
-      subcontrol-position: top;
-    subcontrol-origin: margin;
-	 image: url(:/images/scroll_up.png);
+	background: transparent;
+	height: 11px;
+	width: 11px;
+	subcontrol-position: top;
+	subcontrol-origin: margin;
+	image: url(:images/arrows/arrow-up.png);
   }
-
-/*  QScrollBar::add-line:vertical {
-     
-      background: transparent;
-      height: 11px;
-	  width: 11px;
-      subcontrol-position: bottom;
-    subcontrol-origin: margin;
-	 image: url(:/images/scroll_down.png);
-  }*/
 
 QScrollBar::up-arrow:vertical
 {
@@ -162,12 +93,6 @@ QScrollBar::up-arrow:vertical
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
       background: none;
   }
-
-/*QScrollBar::down-arrow:vertical {
-      width: 11px;
-      height: 11px;
- 	  image: url(:/images/scroll_down.png);
-  }*/
 
 QCheckBox {
      spacing: 5px;
@@ -220,13 +145,6 @@ border: 1px solid black;
 margin: 0px 0;
 }
 QSlider::handle:horizontal {
-/*height: 6px;
-width: 10px;
-	background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(0, 170, 255, 255), stop:0.19397 rgba(0, 85, 127, 255), stop:0.504819 rgba(0, 170, 255, 255), stop:0.79 rgba(0, 213, 255, 255), stop:1 rgba(255, 255, 255, 255));
-border: 1px solid #686868;
-border-radius: 3px;
-margin: -1px 0; 
-border-radius: 3px;*/
 image: url(:/images/slider.png);
 margin: -3px 0;
 }
@@ -237,19 +155,26 @@ border: 1px solid black;
  }
 
  QSlider::sub-page:horizontal {
-     /*background:  rgb(254, 191, 0);*/
 background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
 	 border: 1px solid black;
  }
-
-  </string>
+</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>1</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>3</number>
+   </property>
+   <property name="topMargin">
+    <number>3</number>
+   </property>
+   <property name="rightMargin">
+    <number>3</number>
+   </property>
+   <property name="bottomMargin">
     <number>3</number>
    </property>
    <item>
@@ -257,13 +182,7 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
      <property name="spacing">
       <number>1</number>
      </property>
-     <property name="leftMargin">
-      <number>2</number>
-     </property>
      <property name="topMargin">
-      <number>2</number>
-     </property>
-     <property name="rightMargin">
       <number>2</number>
      </property>
      <property name="bottomMargin">
@@ -280,7 +199,7 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        <property name="minimumSize">
         <size>
          <width>30</width>
-         <height>18</height>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -294,9 +213,6 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        </property>
        <property name="autoFillBackground">
         <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
        </property>
        <property name="text">
         <string>Rec</string>
@@ -320,7 +236,7 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        <property name="minimumSize">
         <size>
          <width>30</width>
-         <height>18</height>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -334,9 +250,6 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        </property>
        <property name="autoFillBackground">
         <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
        </property>
        <property name="text">
         <string>Play</string>
@@ -359,8 +272,8 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        </property>
        <property name="minimumSize">
         <size>
-         <width>30</width>
-         <height>18</height>
+         <width>35</width>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -374,9 +287,6 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        </property>
        <property name="autoFillBackground">
         <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
        </property>
        <property name="text">
         <string>Pause</string>
@@ -397,7 +307,7 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        <property name="minimumSize">
         <size>
          <width>30</width>
-         <height>18</height>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -411,9 +321,6 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        </property>
        <property name="autoFillBackground">
         <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
        </property>
        <property name="text">
         <string>Stop</string>
@@ -431,7 +338,7 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        <property name="minimumSize">
         <size>
          <width>30</width>
-         <height>18</height>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -445,9 +352,6 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        </property>
        <property name="autoFillBackground">
         <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
        </property>
        <property name="text">
         <string>Back</string>
@@ -465,7 +369,7 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        <property name="minimumSize">
         <size>
          <width>30</width>
-         <height>18</height>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -476,9 +380,6 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        </property>
        <property name="autoFillBackground">
         <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
        </property>
        <property name="text">
         <string>Loop</string>
@@ -512,7 +413,7 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        <property name="minimumSize">
         <size>
          <width>30</width>
-         <height>18</height>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -523,9 +424,6 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        </property>
        <property name="autoFillBackground">
         <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
        </property>
        <property name="text">
         <string>Add</string>
@@ -543,7 +441,7 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        <property name="minimumSize">
         <size>
          <width>30</width>
-         <height>18</height>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -554,9 +452,6 @@ stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
        </property>
        <property name="autoFillBackground">
         <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
        </property>
        <property name="text">
         <string>Del</string>
@@ -712,21 +607,6 @@ color: #E5E5E5;
       <bool>false</bool>
      </attribute>
      <attribute name="verticalHeaderVisible">
-      <bool>false</bool>
-     </attribute>
-     <attribute name="verticalHeaderCascadingSectionResizes">
-      <bool>false</bool>
-     </attribute>
-     <attribute name="verticalHeaderShowSortIndicator" stdset="0">
-      <bool>false</bool>
-     </attribute>
-     <attribute name="verticalHeaderStretchLastSection">
-      <bool>false</bool>
-     </attribute>
-     <attribute name="verticalHeaderVisible">
-      <bool>false</bool>
-     </attribute>
-     <attribute name="horizontalHeaderVisible">
       <bool>false</bool>
      </attribute>
      <attribute name="verticalHeaderCascadingSectionResizes">
