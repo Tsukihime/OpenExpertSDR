@@ -383,7 +383,53 @@ border: none;
 QPushButton::checked {
 background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 stop: 0 #325C32, stop:0.45 #366436, stop:0.55 #366436, stop: 1 #4e9d4e);
-}</string>
+}
+/***************************************************************/
+QScrollBar:vertical { 
+border: 1px solid black; 
+background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(60, 60, 60, 255), stop:1 rgba(50, 50, 50, 255)); 
+width: 13px;
+margin: 12px 3px 12px 3px; 
+} 
+
+QScrollBar::handle:vertical {
+	background: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(60, 60, 60, 255), stop:1 rgba(137, 137, 137, 255));
+	border: 1px solid;
+	border-color: rgb(150, 150, 150);
+	border-radius: 1px;
+	min-width: 18px;
+	margin: 3px -2px 3px -2px; 
+}
+
+QScrollBar::add-line:vertical 
+{
+	background: transparent;
+	height: 11px;
+	width: 11px;
+	subcontrol-position: bottom;
+	subcontrol-origin: margin;
+	image: url(:images/arrows/arrow-down.png);
+  }
+
+ QScrollBar::sub-line:vertical 
+{
+	background: transparent;
+	height: 11px;
+	width: 11px;
+	subcontrol-position: top;
+	subcontrol-origin: margin;
+	image: url(:images/arrows/arrow-up.png);
+  }
+
+QScrollBar::up-arrow:vertical
+{
+      width: 11px;
+      height: 11px;
+  }
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+      background: none;
+  }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
