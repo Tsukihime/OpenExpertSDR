@@ -169,67 +169,42 @@ QCheckBox::indicator:unchecked:disabled {
 	border-color: rgb(80, 80, 80);
 }
 /***********************************************/
-QSpinBox { 
-border: 1px solid black;
-background-color: #323232;
-padding-right: 0px; /* make room for the arrows */
-color: black;
+QSpinBox{
+	background-color: rgb(52, 52, 52);
+	border: 1px solid;
+	border-color: black;
+	color: rgb(255, 255, 255);
+	selection-background-color: rgb(70, 150, 70);
 }
-
-QSpinBox::up-button { 
-subcontrol-origin: border;
-subcontrol-position: top right; /* position at the top right corner */
-
-width: 16px; /* 16 + 2*1px border-width = 15px padding + 3px parent border */
-border-image: url(:/images/ee_spinup.png) 1;
-border-width: 1px;
+QSpinBox:disabled{
+	background-color: rgb(52, 52, 52);
+	border: 1px solid;
+	border-color: rgb(160, 160, 160);
+	min-width: 55px;
+	min-height: 18px;
+	color: rgb(160, 160, 160);
+	selection-background-color: rgb(70, 150, 70);
 }
-
-QSpinBox::up-button:hover {
-border-image: url(:/images/ee_spinup_hover.png) 1;
+QSpinBox::up-button {
+	subcontrol-origin: border;
+	subcontrol-position: top right;
+	width: 16px;
+	image: url(:images/arrows/arrow-up.png);
+	border-width: 1px;
 }
-
 QSpinBox::up-button:pressed {
-border-image: url(:/images/ee_spinup_pressed.png) 1;
+	image: url(:images/arrows/arrow-up.png);
 }
-
-QSpinBox::up-arrow {
-image: url(:/images/ee_spinup_arrow.png);
-width: 7px;
-height: 7px;
-}
-
-QSpinBox::up-arrow:disabled, QSpinBox::up-arrow:off { /* off state when value is max */
-image: url(:/images/up_arrow_disabled.png);
-}
-
 QSpinBox::down-button {
-subcontrol-origin: border;
-subcontrol-position: bottom right; /* position at bottom right corner */
-
-width: 16px;
-border-image: url(:/images/ee_spindown.png) 1;
-border-width: 1px;
-border-top-width: 0;
+	subcontrol-origin: border;
+	subcontrol-position: bottom right; 
+	width: 16px;
+	image: url(:images/arrows/arrow-down.png);
+	border-width: 1px;
+	border-top-width: 0;
 }
-
-QSpinBox::down-button:hover {
-border-image: url(:/images/ee_spindown_hover.png) 1;
-}
-
 QSpinBox::down-button:pressed {
-border-image: url(:/images/ee_spindown_pressed.png) 1;
-}
-
-QSpinBox::down-arrow {
-image: url(:/images/ee_spindown_arrow.png);
-width: 7px;
-height: 7px;
-}
-
-QSpinBox::down-arrow:disabled,
-QSpinBox::down-arrow:off { /* off state when value in min */
-image: url(:/images/down_arrow_disabled.png);
+	image: url(:images/arrows/arrow-down.png);
 }
 /***pbVoicePlay*********************************/
 QPushButton#pbVoicePlay {
@@ -5505,12 +5480,6 @@ border-radius: 1px;
            <property name="toolTip">
             <string>Filter Low Frequency</string>
            </property>
-           <property name="styleSheet">
-            <string notr="true">QWidget { 
-border: 1px solid #1e1e1e;
-color: #E5E5E5;
-}</string>
-           </property>
            <property name="minimum">
             <number>-15000</number>
            </property>
@@ -5535,12 +5504,6 @@ color: #E5E5E5;
            </property>
            <property name="toolTip">
             <string>Filter High Frequency</string>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QWidget { 
-border: 1px solid #0e0e0e;
-color: #E5E5E5;
-}</string>
            </property>
            <property name="minimum">
             <number>-15000</number>
@@ -5580,23 +5543,6 @@ p, li { white-space: pre-wrap; }
              <height>16</height>
             </size>
            </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton:pressed {
-background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
-/*background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #267194, stop:0.45 #307FA4, stop:0.5 #3987AC, stop: 1 #549EC1); */
-color: WHITE;
-border: 1px solid #124159;
-}
-
-QPushButton::checked {
-background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
-color: WHITE;
-border: 1px solid #124159;
-}</string>
-           </property>
            <property name="text">
             <string>U</string>
            </property>
@@ -5609,23 +5555,6 @@ border: 1px solid #124159;
              <width>0</width>
              <height>16</height>
             </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton:pressed {
-background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
-/*background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #267194, stop:0.45 #307FA4, stop:0.5 #3987AC, stop: 1 #549EC1); */
-color: WHITE;
-border: 1px solid #124159;
-}
-
-QPushButton::checked {
-background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
-color: WHITE;
-border: 1px solid #124159;
-}</string>
            </property>
            <property name="text">
             <string>D</string>
@@ -5712,9 +5641,6 @@ border: 1px solid #124159;
            <property name="toolTip">
             <string>Enable equalizer</string>
            </property>
-           <property name="styleSheet">
-            <string notr="true"/>
-           </property>
            <property name="text">
             <string>ON</string>
            </property>
@@ -5746,9 +5672,6 @@ border: 1px solid #124159;
              <pointsize>7</pointsize>
             </font>
            </property>
-           <property name="styleSheet">
-            <string notr="true"/>
-           </property>
            <property name="text">
             <string>RX</string>
            </property>
@@ -5779,9 +5702,6 @@ border: 1px solid #124159;
              <family>Verdana</family>
              <pointsize>7</pointsize>
             </font>
-           </property>
-           <property name="styleSheet">
-            <string notr="true"/>
            </property>
            <property name="text">
             <string>TX</string>
@@ -6085,12 +6005,6 @@ border: 1px solid #124159;
              <height>18</height>
             </size>
            </property>
-           <property name="styleSheet">
-            <string notr="true">QWidget { 
-border: 1px solid #0e0e0e;
-color: #E5E5E5;
-}</string>
-           </property>
            <property name="minimum">
             <number>-10000</number>
            </property>
@@ -6106,12 +6020,6 @@ color: #E5E5E5;
              <width>0</width>
              <height>18</height>
             </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QWidget { 
-border: 1px solid #0e0e0e;
-color: #E5E5E5;
-}</string>
            </property>
            <property name="minimum">
             <number>-10000</number>
@@ -6416,9 +6324,6 @@ color: #E5E5E5;
            <property name="toolTip">
             <string>Squelch Enable</string>
            </property>
-           <property name="styleSheet">
-            <string notr="true"/>
-           </property>
            <property name="text">
             <string>SQL</string>
            </property>
@@ -6453,9 +6358,6 @@ color: #E5E5E5;
            <property name="toolTip">
             <string>Gate Enable</string>
            </property>
-           <property name="styleSheet">
-            <string notr="true"/>
-           </property>
            <property name="text">
             <string>GATE</string>
            </property>
@@ -6475,12 +6377,6 @@ color: #E5E5E5;
              <height>20</height>
             </size>
            </property>
-           <property name="styleSheet">
-            <string notr="true">QWidget { 
-border: 1px solid #0e0e0e;
-color: #E5E5E5;
-}</string>
-           </property>
            <property name="minimum">
             <number>-165</number>
            </property>
@@ -6496,12 +6392,6 @@ color: #E5E5E5;
              <width>0</width>
              <height>20</height>
             </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QWidget { 
-border: 1px solid #0e0e0e;
-color: #E5E5E5;
-}</string>
            </property>
            <property name="minimum">
             <number>-165</number>
@@ -6659,23 +6549,6 @@ color: #E5E5E5;
               <pointsize>7</pointsize>
              </font>
             </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton:pressed {
-background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
-/*background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #267194, stop:0.45 #307FA4, stop:0.5 #3987AC, stop: 1 #549EC1); */
-color: WHITE;
-border: 1px solid #124159;
-}
-
-QPushButton::checked {
-background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
-color: WHITE;
-border: 1px solid #124159;
-}</string>
-            </property>
             <property name="text">
              <string>COMP</string>
             </property>
@@ -6706,23 +6579,6 @@ border: 1px solid #124159;
               <family>Verdana</family>
               <pointsize>7</pointsize>
              </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton:pressed {
-background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
-/*background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #267194, stop:0.45 #307FA4, stop:0.5 #3987AC, stop: 1 #549EC1); */
-color: WHITE;
-border: 1px solid #124159;
-}
-
-QPushButton::checked {
-background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #f4d4b4, stop:0.45 #b77738, stop:0.5 #a7601b, stop: 1 #884d12);
-color: WHITE;
-border: 1px solid #124159;
-}</string>
             </property>
             <property name="text">
              <string>CPDR</string>
@@ -6769,12 +6625,6 @@ border: 1px solid #124159;
               <height>20</height>
              </size>
             </property>
-            <property name="styleSheet">
-             <string notr="true">QWidget { 
-border: 1px solid #0e0e0e;
-color: #E5E5E5;
-}</string>
-            </property>
             <property name="maximum">
              <number>20</number>
             </property>
@@ -6787,12 +6637,6 @@ color: #E5E5E5;
               <width>0</width>
               <height>20</height>
              </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QWidget { 
-border: 1px solid #0e0e0e;
-color: #E5E5E5;
-}</string>
             </property>
             <property name="maximum">
              <number>10</number>
