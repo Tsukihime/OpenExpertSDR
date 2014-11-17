@@ -5076,12 +5076,16 @@ void ExpertSDR_vA2_1::timerEvent(QTimerEvent *e)
 		tmp += smeter2mCorr;
 	else if(pBandBut->checkedId() == BAND07M)
 		tmp += smeter07mCorr;
+
+	bool Mox = ui.pbMox->isChecked();
+	float pre_calc = Mox ? CalibrateLevel[0] : CalibrateLevel[pMenuPreamp->actions().indexOf(pAgPreamp->checkedAction())] + tmp - 3.0f;
+
 	for(int i = 0; i< 4096; i++)
 	{
-		if(!ui.pbMox->isChecked())
-			SpBuffer[i] += (ui.pbMox->isChecked()) ? CalibrateLevel[0] : CalibrateLevel[pMenuPreamp->actions().indexOf(pAgPreamp->checkedAction())] + tmp - 3.0f;
+		if(!Mox)
+			SpBuffer[i] += pre_calc;
 		else
-			SpBuffer[i] += (ui.pbMox->isChecked()) ? CalibrateLevel[0] : CalibrateLevel[pMenuPreamp->actions().indexOf(pAgPreamp->checkedAction())] + tmp + 6.0f;
+			SpBuffer[i] += pre_calc + 6.0f + 3.0f;
 	}
 	pGraph->pGl->SetSpectrumBuffer(SpBuffer, 4096);
 	float tmp1 = pDsp->CalculateMeters(SIGNAL_STRENGTH);

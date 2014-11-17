@@ -42,6 +42,11 @@ Panarama::Panarama(QWidget *pOpt, QWidget *parent)
 	pPanOpt = new PanoramOpt(pOpt);
 	pPanOpt->show();
 
+	info_font = NULL;
+	dbm_font = NULL;
+	band_font = NULL;
+	last_update = 0;
+	waterfall_mode = 1;
 	fps = 30;
 	Vis = 0.01f;
 	Cursor = CROSS;
@@ -285,19 +290,7 @@ Panarama::Panarama(QWidget *pOpt, QWidget *parent)
 	ritLimHigh = 0;
 	glRitLimLow = 0.0;
 	glRitLimHigh = 0.0;
-	ritFont = font();
-	ritFont.setPointSize(14);
-	ritFont.setWeight(QFont::Bold);
-	fontBand = font();
-	fontBand.setFamily("Calibri");
-	fontBand.setPointSize(12);
-	fontBand.setWeight(QFont::Bold);
-    fontBand.setStyleStrategy(QFont::PreferQuality);
-    fontInfo = font();
-    fontInfo.setFamily("Calibri");
-    fontInfo.setPointSize(11);
-    fontInfo.setWeight(10);
-    fontInfo.setStyleStrategy(QFont::StyleStrategy(QFont::PreferQuality | QFont::OpenGLCompatible));
+
 	SetPowerComp(pPanOpt->ui.cbPowerChange->currentIndex());
 	SetStepDbm();
 	SetStepGrid();
@@ -315,6 +308,10 @@ Panarama::~Panarama()
 	for(int i = 0; i < CIRCLE_BUFF_SIZE; i++)
 		delete[] pCircleBuff[i];
 	delete[] pCircleBuff;
+
+	delete info_font;
+	delete dbm_font;
+	delete band_font;
 }
 
 void Panarama::SetBand(int band)
@@ -392,197 +389,16 @@ void Panarama::initializeGL()
 	Len = BeginX + 1;
 	StepCount = ((int)(Len/Step));
 
-	glGenTextures(1,&WFTexture11);
-	glBindTexture(GL_TEXTURE_2D,WFTexture11);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage11);
-
-	glGenTextures(1,&WFTexture12);
-	glBindTexture(GL_TEXTURE_2D,WFTexture12);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage12);
-
-	glGenTextures(1,&WFTexture13);
-	glBindTexture(GL_TEXTURE_2D,WFTexture13);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage13);
-
-	glGenTextures(1,&WFTexture14);
-	glBindTexture(GL_TEXTURE_2D,WFTexture14);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage14);
-
-	glGenTextures(1,&WFTexture15);
-	glBindTexture(GL_TEXTURE_2D,WFTexture15);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage15);
-
-	glGenTextures(1,&WFTexture16);
-	glBindTexture(GL_TEXTURE_2D,WFTexture16);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage16);
-
-	glGenTextures(1,&WFTexture17);
-	glBindTexture(GL_TEXTURE_2D,WFTexture17);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage17);
-
-	glGenTextures(1,&WFTexture18);
-	glBindTexture(GL_TEXTURE_2D,WFTexture18);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage18);
-
-	glGenTextures(1,&WFTexture21);
-	glBindTexture(GL_TEXTURE_2D,WFTexture21);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage21);
-
-	glGenTextures(1,&WFTexture22);
-	glBindTexture(GL_TEXTURE_2D,WFTexture22);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage22);
-
-	glGenTextures(1,&WFTexture23);
-	glBindTexture(GL_TEXTURE_2D,WFTexture23);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage23);
-
-	glGenTextures(1,&WFTexture24);
-	glBindTexture(GL_TEXTURE_2D,WFTexture24);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage24);
-
-	glGenTextures(1,&WFTexture25);
-	glBindTexture(GL_TEXTURE_2D,WFTexture25);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage25);
-
-	glGenTextures(1,&WFTexture26);
-	glBindTexture(GL_TEXTURE_2D,WFTexture26);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage26);
-
-	glGenTextures(1,&WFTexture27);
-	glBindTexture(GL_TEXTURE_2D,WFTexture27);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage27);
-
-	glGenTextures(1,&WFTexture28);
-	glBindTexture(GL_TEXTURE_2D,WFTexture28);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage28);
-
-	glGenTextures(1,&WFTexture31);
-	glBindTexture(GL_TEXTURE_2D,WFTexture31);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage31);
-
-	glGenTextures(1,&WFTexture32);
-	glBindTexture(GL_TEXTURE_2D,WFTexture32);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage32);
-
-	glGenTextures(1,&WFTexture33);
-	glBindTexture(GL_TEXTURE_2D,WFTexture33);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage33);
-
-	glGenTextures(1,&WFTexture34);
-	glBindTexture(GL_TEXTURE_2D,WFTexture34);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage34);
-
-	glGenTextures(1,&WFTexture35);
-	glBindTexture(GL_TEXTURE_2D,WFTexture35);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage35);
-
-	glGenTextures(1,&WFTexture36);
-	glBindTexture(GL_TEXTURE_2D,WFTexture36);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage36);
-
-	glGenTextures(1,&WFTexture37);
-	glBindTexture(GL_TEXTURE_2D,WFTexture37);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage37);
-
-	glGenTextures(1,&WFTexture38);
-	glBindTexture(GL_TEXTURE_2D,WFTexture38);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage38);
+	for(int i = 0; i < 2; i++)
+	{
+		glGenTextures(1,&WFTexture[i]);
+		glBindTexture(GL_TEXTURE_2D,WFTexture[i]);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WF_TEXTURE_WIDTH, WF_TEXTURE_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage);
+	}
 
 	glEnable(GL_MULTISAMPLE);
 	StepMoveGrid = 0;
@@ -591,14 +407,11 @@ void Panarama::initializeGL()
 	posRule = 1.0 - sPosRule*2.0/height();
 	lenRule = RULE_HEIGH*2.0f/height();
 
-	fontDb.setFamily("Arial");
-	fontDb.setPointSize(8);
-	fontDb.setBold(false);
-	fontDb.setWeight(QFont::Normal);
-	fontDb.setStyle(QFont::StyleNormal);
-	fontDb.setStyleHint(QFont::Monospace);
-	fontDb.setStyleStrategy(QFont::OpenGLCompatible);
+	info_font = new GLFont(this, QFont("Calibri", 11));
+	dbm_font = new GLFont(this, QFont("Arial", 9));
+	band_font = new GLFont(this, QFont("Calibri", 12, QFont::Bold));
 }
+
 void Panarama::paintGL()
 {
 	makeCurrent();
@@ -616,14 +429,15 @@ void Panarama::paintGL()
 	if(IsEnableSp)
 		DrawSpectr();
 
+	DrawZoomer();
 	DrawGrid();
+	DrawFilter();
 	if((1.0-posRule)/ScaleWindowY > 50)
 		DrawDbm();
-	DrawFilter();
-	DrawZoomer();
+	DrawWaterfall();
 	if(IsWindow)
 		DrawCursor();
-	DrawWaterfall();
+
 	glFlush();
 	swapBuffers();
 }
@@ -1681,6 +1495,7 @@ void Panarama::mouseReleaseEvent(QMouseEvent *event)
 }
 void Panarama::timerEvent(QTimerEvent *event)
 {
+	UpdateLevels();
 	bool ssst = false;
 
 	if(pPanOpt->ui.chbGridMoving->isChecked() && !LockGrid)
@@ -2183,26 +1998,23 @@ void Panarama::DrawRule()
 				glColor4f(1,1,1,1);
 				drawTexture(QRectF(BeginX + Fox20 - tmpX3, 1.0 - oy2_5, WidthImgL, tmpX1), LeftRange, GL_TEXTURE_2D);
 				drawTexture(QRectF(EndX - WidthImgR - tmpX3, 1.0 - oy2_5, WidthImgR, tmpX2), RightRange, GL_TEXTURE_2D);
-				qglColor(QColor(30, 181, 252,255));
-				renderText(BeginX + 10*Fox5 + WidthImgL - tmpX3, 1.0 - 1.5*oy10, -0.08, BandStr[i], fontBand);
+				band_font->draw(BeginX + 10*Fox5 + WidthImgL - tmpX3, 1.0 - 1.5*oy10, -0.08, BandStr[i], QColor(30, 181, 252,255));
 			}
 			else if(Max >= EndX && Min > (BeginX + Fox20) && Min < tmpX7)
 			{
 				glColor4f(1,1,1,1);
 				drawTexture(QRectF(Min - tmpX3, 1.0 - oy2_5, WidthImgL, tmpX1), LeftRange, GL_TEXTURE_2D);
 				drawTexture(QRectF(EndX - tmpX3 - WidthImgR, 1.0 - oy2_5, WidthImgR, tmpX2), RightRange, GL_TEXTURE_2D);
-				qglColor(QColor(30, 181, 252,255));
 				if(Min < (EndX - WidthImgR - WidthImgL - Fox20 - FpixelsWide))
-					renderText(Min - tmpX3 + 2*Fox5 + WidthImgL, 1.0 - 1.5*oy10, -0.08, BandStr[i], fontBand);
+					band_font->draw(Min - tmpX3 + 2*Fox5 + WidthImgL, 1.0 - 1.5*oy10, -0.08, BandStr[i], QColor(30, 181, 252,255));
 			}
 			else if(Max < EndX && Min <= (BeginX + Fox20) && Max > tmpX5)
 			{
 				glColor4f(1,1,1,1);
 				drawTexture(QRectF(BeginX - tmpX3 + Fox20, 1.0 - oy2_5, WidthImgL, tmpX1), LeftRange, GL_TEXTURE_2D);
 				drawTexture(QRectF( Max - tmpX3 - WidthImgR, 1.0 - oy2_5, WidthImgR, tmpX2), RightRange, GL_TEXTURE_2D);
-				qglColor(QColor(30, 181, 252,255));
 				if(Max > tmpX6)
-					renderText(BeginX + 10*Fox5 + WidthImgL - tmpX3, 1.0 - 1.5*oy10, -0.08, BandStr[i], fontBand);
+					band_font->draw(BeginX + 10*Fox5 + WidthImgL - tmpX3, 1.0 - 1.5*oy10, -0.08, BandStr[i], QColor(30, 181, 252,255));
 			}
 			else if(Min >= tmpX4)
 			{
@@ -2219,16 +2031,14 @@ void Panarama::DrawRule()
 				glColor4f(1,1,1,1);
 				drawTexture(QRectF( Min - tmpX3, 1.0 - oy2_5, WidthImgL, tmpX1), LeftRange, GL_TEXTURE_2D);
 				drawTexture(QRectF( Max - tmpX3 - WidthImgR, 1.0 - oy2_5, WidthImgR, tmpX2), RightRange, GL_TEXTURE_2D);
-				qglColor(QColor(30, 181, 252,255));
-				renderText(Min - tmpX3 + Fox5 + WidthImgL, 1.0 - 1.5*oy10, -0.08, BandStr[i], fontBand);
+				band_font->draw(Min - tmpX3 + Fox5 + WidthImgL, 1.0 - 1.5*oy10, -0.08, BandStr[i], QColor(30, 181, 252,255));
 			}
 			break;
 		}
 	}
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
-	glColor4d(1.0, 1.0, 1.0, 1.0);
-    renderText(1.0-ox30, posRule - oy10-oy5, -1.0, "Hz");
+	info_font->draw(1.0-ox30, posRule - oy10-oy5, -1.0, "Hz");
 }
 
 void Panarama::DrawGrid()
@@ -2272,7 +2082,7 @@ void Panarama::DrawGrid()
 	glColor4d(1.0, 1.0, 1.0, 1.0);
 	BeginGrid -= CntD*GridStep;
 	QString StrNum;
-	QFontMetrics fm(fontDb);
+	QFontMetrics fm(info_font->font());
 	double Num = qAbs((CntStepGrid)*StepNum);
 	while((BeginGrid - 1.0) <= BeginX)
 	{
@@ -2286,7 +2096,7 @@ void Panarama::DrawGrid()
         StrNum = freqToStr(qRound(Num*1000000));
 		OffsetNum = fm.width(StrNum)/(double)width()/(sScaleRuleX + dScaleRuleX);
 
-		renderText(i - OffsetNum -(sPosZoomPan + dPosZoomPan), posRule -oy10-oy5, 0.02, StrNum);
+		info_font->draw(i - OffsetNum -(sPosZoomPan + dPosZoomPan), posRule -oy10-oy5, 0.02, StrNum);
 		Num += StepNum;
 		glBegin(GL_POINTS);
 			glVertex3d(i - (sPosZoomPan + dPosZoomPan), posRule  - oy2_5, 0.02);
@@ -2341,16 +2151,13 @@ void Panarama::DrawFilter()
 			glVertex3d(tmpPosX2, tmpY1, -0.38);
 		}
 		glEnd();
-		QFont fnt = font();
-		fnt.setPointSize(10);
-		fnt.setWeight(QFont::Bold);
-		QFontMetrics fm(this->font());
+		QFontMetrics fm(info_font->font());
 		int pixelsWide = fm.width("TX");
 		float tmpxx = tmpPosX1 + (BandTxHigh*2.0/SampleRate - BandTxLow*2.0/SampleRate)/2.0;
 		if(Mode == CWL || Mode == CWU)
-			renderText(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX", fnt);
+			info_font->draw(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX");
 		else
-			renderText(tmpxx - pixelsWide*ScaleWindowX/2.0, 1.0 - 1.8*oy20/(1.0 - posRule), -0.45, "TX", fnt);
+			info_font->draw(tmpxx - pixelsWide*ScaleWindowX/2.0, 1.0 - 1.8*oy20/(1.0 - posRule), -0.45, "TX");
 		glPopMatrix();
 	}
 	else if(TxVfo == 0 && !IsOnIndicateTxFilter && IsFilter2)
@@ -2386,16 +2193,13 @@ void Panarama::DrawFilter()
 			glVertex3d(tmpPosX2, tmpY1, -0.38);
 		}
 		glEnd();
-		QFont fnt = font();
-		fnt.setPointSize(10);
-		fnt.setWeight(QFont::Bold);
-		QFontMetrics fm(this->font());
+		QFontMetrics fm(info_font->font());
 		int pixelsWide = fm.width("TX");
 		float tmpxx = tmpPosX1 + (BandTxHigh*2.0/SampleRate - BandTxLow*2.0/SampleRate)/2.0;
 		if(Mode == CWL || Mode == CWU)
-			renderText(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX", fnt);
+			info_font->draw(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX");
 		else
-			renderText(tmpxx - pixelsWide*ScaleWindowX/2.0, 1.0 - 1.8*oy20/(1.0 - posRule), -0.45, "TX", fnt);
+			info_font->draw(tmpxx - pixelsWide*ScaleWindowX/2.0, 1.0 - 1.8*oy20/(1.0 - posRule), -0.45, "TX");
 		glPopMatrix();
 	}
 	else if((TxVfo != 0) && ((sFilter2+dFilter2) > 1.0 || (sFilter2+dFilter2) < -1.0) && (TRxMode == TX))
@@ -2431,16 +2235,13 @@ void Panarama::DrawFilter()
 				glVertex3d(tmpPosX2, tmpY1, -0.38);
 			}
 		glEnd();
-		QFont fnt = font();
-		fnt.setPointSize(10);
-		fnt.setWeight(QFont::Bold);
-		QFontMetrics fm(this->font());
+		QFontMetrics fm(info_font->font());
 		int pixelsWide = fm.width("TX");
 		float tmpxx = tmpPosX1 + (BandTxHigh*2.0/SampleRate - BandTxLow*2.0/SampleRate)/2.0;
 		if(Mode == CWL || Mode == CWU)
-			renderText(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX", fnt);
+			info_font->draw(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX");
 		else
-			renderText(tmpxx - pixelsWide*ScaleWindowX/2.0, 1.0 - 1.8*oy20/(1.0 - posRule), -0.45, "TX", fnt);
+			info_font->draw(tmpxx - pixelsWide*ScaleWindowX/2.0, 1.0 - 1.8*oy20/(1.0 - posRule), -0.45, "TX");
 		glPopMatrix();
 	}
 	else if(TxVfo != 0 )
@@ -2476,16 +2277,13 @@ void Panarama::DrawFilter()
 				glVertex3d(tmpPosX2, tmpY1, -0.35);
 			}
 		glEnd();
-		QFont fnt = font();
-		fnt.setPointSize(10);
-		fnt.setWeight(QFont::Bold);
-        QFontMetrics fm(fontInfo);
+		QFontMetrics fm(info_font->font());
 		int pixelsWide = fm.width("TX");
 		float tmpxx = tmpPosX1 + (BandTxHigh*2.0/SampleRate - BandTxLow*2.0/SampleRate)/2.0;
 		if(Mode == CWL || Mode == CWU)
-			renderText(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX", fnt);
+			info_font->draw(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX");
 		else
-			renderText(tmpxx - pixelsWide*ScaleWindowX/2.0, 1.0 - 1.8*oy20/(1.0 - posRule), -0.45, "TX", fnt);
+			info_font->draw(tmpxx - pixelsWide*ScaleWindowX/2.0, 1.0 - 1.8*oy20/(1.0 - posRule), -0.45, "TX");
 		glPopMatrix();
 		double Num = ((sFilter2+dFilter2)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
 		QString str;
@@ -2568,7 +2366,7 @@ void Panarama::DrawFilter()
 		double Num = ((sFilter2+dFilter2)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
         QString str;
         str = "B: " + freqToStr(Num) + " Hz";
-        QFontMetrics fm(fontInfo);
+		QFontMetrics fm(info_font->font());
         int pixelsWide = fm.width(str);
         int pixH = fm.height();
 
@@ -2683,7 +2481,7 @@ void Panarama::DrawFilter()
 	double Num = ((sFilter+dFilter)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
 	QString str;
     str = "A: " + freqToStr(Num) + " Hz";
-    QFontMetrics fm(fontInfo);
+	QFontMetrics fm(info_font->font());
     int pixelsWide = fm.width(str);
     int pixH = fm.height();
 
@@ -2747,9 +2545,9 @@ void Panarama::DrawSpectr()
 		glScaled(tmpS, 1.0 - (posRule), 1.0);
 		glColor4f(1.0, 1.0, 1.0, 0.7);
 		if(alphaRitLim <= 0.0f)
-			renderText(tmpL + 1.2*ox5 + tmpF, 1.0-oy20/(1.0 - (posRule)), -0.42, tr("RIT"), ritFont);
+			info_font->draw(tmpL + 1.2*ox5 + tmpF, 1.0-oy20/(1.0 - (posRule)), -0.42, tr("RIT"));
 		else
-			renderText(tmpL + 1.2*ox5 + tmpF, 1.0-oy20/(1.0 - (posRule)), -1.0, tr("Out of range!"), ritFont);
+			info_font->draw(tmpL + 1.2*ox5 + tmpF, 1.0-oy20/(1.0 - (posRule)), -1.0, tr("Out of range!"));
 		glColor4f(1.0, 1.0, 1.0, 0.2);
 		glBegin(GL_QUADS);
 			glVertex3f(tmpF-tmpL, 1.0, -0.05);
@@ -2782,61 +2580,48 @@ void Panarama::DrawSpectr()
 	float tmp1 = sPosZoomPan + dPosZoomPan - ox2_5/(sScaleRuleX + dScaleRuleX);
 	if(pPanOpt->ui.cbPanType->currentIndex() == LINES)
 	{
-		qglColor(ColorLine);
 		GLdouble Begin = -1 + Step*StepCount;
+		int arr_sz = 0;
+		for(int j = StepCount, i = 0; Begin < EndX && j < SizeSpBuff-1; j++, i += 3, arr_sz += 2)
+		{
+			ArrayV[i] = Begin - (tmp1);
+			ArrayV[i+1] = (pSpBuff[j] < Zero) ? Zero : pSpBuff[j];
+			ArrayV[i+2] = -0.5f;
+
+			ArrayV2[i] = ArrayV[i];
+			ArrayV2[i+1] = ArrayV[i+1];
+			ArrayV2[i+2] = -0.1f;
+
+			i += 3;
+
+			ArrayV[i] = Begin - (tmp1);
+			ArrayV[i+1] = (pSpBuff[j] < Zero) ? Zero : pSpBuff[j];
+			ArrayV[i+2] = -0.5f;
+
+			ArrayV2[i] = ArrayV[i];
+			ArrayV2[i+1] = Zero;
+			ArrayV2[i+2] = -0.1f;
+
+			Begin += Step;
+		}
+
 		glPushMatrix();
 		glTranslated(tmp1, posRule, 0.0);
 		glScaled(1.0, 1.0 - (posRule), 1.0);
 
 		glScaled(sScaleRuleX + dScaleRuleX, 1.0/(sLenDbmY+dLenDbmY), 1.0);
 		glTranslated(0.0, -Zero, 0.0);
-		int s = 0;
-		for(int j = StepCount, i = 0; Begin < EndX && j < SizeSpBuff-1; j++, i += 3, s++)
-		{
-			if(pSpBuff[j] < Zero)
-			{
-				ArrayV[i] = Begin - (tmp1);
-				ArrayV[i+1] = Zero;
-				ArrayV[i+2] = -0.5f;
 
-				LineSpBuff[j][0] = Begin - (tmp1);
-				LineSpBuff[j][1] = Zero;
-			}
-			else
-			{
-				ArrayV[i] = Begin - (tmp1);
-				ArrayV[i+1] = pSpBuff[j];
-				ArrayV[i+2] = -0.5f;
-
-				LineSpBuff[j][0] = Begin - (tmp1);
-				LineSpBuff[j][1] = pSpBuff[j];
-			}
-			Begin += Step;
-		}
+		qglColor(ColorLine);
 		glVertexPointer(3, GL_FLOAT, 0, ArrayV);
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glDrawArrays(GL_LINE_STRIP,0,s);
+		glDrawArrays(GL_LINE_STRIP,0, arr_sz);
 		glDisableClientState(GL_VERTEX_ARRAY);
-		Begin = -1 + Step*StepCount;
-		s = 0;
-		for(int j = StepCount, i = 0; Begin < EndX && j < SizeSpBuff-1; j++, i += 3, s += 2)
-		{
-			ArrayV[i] = LineSpBuff[j][0];
-			ArrayV[i+1] = LineSpBuff[j][1];
-			ArrayV[i+2] = -0.1f;
 
-			i += 3;
-
-			ArrayV[i] = LineSpBuff[j][0];
-			ArrayV[i+1] = Zero;
-			ArrayV[i+2] = -0.1f;
-
-			Begin += Step;
-		}
 		qglColor(ColorSp);
-		glVertexPointer(3, GL_FLOAT, 0, ArrayV);
+		glVertexPointer(3, GL_FLOAT, 0, ArrayV2);
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glDrawArrays(GL_QUAD_STRIP,0,s);
+		glDrawArrays(GL_QUAD_STRIP,0, arr_sz+1);
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glPopMatrix();
 	}
@@ -2918,24 +2703,24 @@ void Panarama::DrawDbm()
 	glEnd();
 	int Num = -200 - x;
 	QString str;
-	QFontMetrics fm(fontDb);
+	QFontMetrics fm(dbm_font->font());
 	GLfloat numH = (fm.height()*3.2/height()*(1.0/(1.0 - posRule))*(sLenDbmY+dLenDbmY))*0.15f;
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 	for(float i = Num; i < (SaveOffsetDbm + SaveLenDbmY); i += StepDbm)
 	{
 		str.setNum(Num);
 		if(Num <= -100)
-			renderText(-1.0 +  2*ox1, i-numH, -0.9, str, fontDb);
+			dbm_font->draw(-1.0 +  2*ox1, i-numH, -0.9, str);
 		else if(Num <= -10)
-			renderText(-1.0 +  8*ox1, i-numH, -0.9, str, fontDb);
+			dbm_font->draw(-1.0 +  8*ox1, i-numH, -0.9, str);
 		else if(Num < 0)
-			renderText(-1.0 + 14*ox1, i-numH, -0.9, str, fontDb);
+			dbm_font->draw(-1.0 + 14*ox1, i-numH, -0.9, str);
 		else if(Num < 10)
-			renderText(-1.0 + 19*ox1, i-numH, -0.9, str, fontDb);
+			dbm_font->draw(-1.0 + 19*ox1, i-numH, -0.9, str);
 		else if(Num < 100)
-			renderText(-1.0 + 13*ox1, i-numH, -0.9, str, fontDb);
+			dbm_font->draw(-1.0 + 13*ox1, i-numH, -0.9, str);
 		else
-			renderText(-1.0 +  7*ox1, i-numH, -0.9, str, fontDb);
+			dbm_font->draw(-1.0 +  7*ox1, i-numH, -0.9, str);
 
 		glLineWidth(1.2);
 		glBegin(GL_LINES);
@@ -3388,8 +3173,20 @@ void Panarama::SetStepGrid()
 
 void Panarama::SetStepDbm()
 {
-	QFontMetrics fm(fontDb);
-	float glFontH = (fm.height()*4.0f/height())*(1.0/(1.0 - posRule))*(sLenDbmY + dLenDbmY);
+	int font_height;
+	if(dbm_font)
+	{
+		QFontMetrics fm(dbm_font->font());
+		font_height = fm.height();
+	}
+	else
+	{
+		QFontMetrics fm(this->font());
+		font_height = fm.height();
+	}
+
+
+	float glFontH = (font_height*4.0f/height())*(1.0/(1.0 - posRule))*(sLenDbmY + dLenDbmY);
 	float glMinStepDb = 1.2f*glFontH;
 
 	for(int i = 0; i < (STEP_DB_SIZE-1); i++)
@@ -3588,102 +3385,15 @@ void Panarama::PichPos2()
 
 void Panarama::DrawInfo(GLdouble X, GLdouble Y, QString Str, QColor color)
 {
-	int r,g,b,a;
-	color.getRgb(&r,&g,&b,&a);
 	glPushMatrix();
-	glTranslated(X, Y,0.0);  
-	qglColor(color);
-    renderText(0, -4*ScaleWindowY, -0.75, Str, fontInfo);
+	glTranslated(X, Y, 0.0);
+	info_font->draw(0, -4*ScaleWindowY, -0.75, Str, color);
 	glPopMatrix();
 }
 
-void Panarama::CreatTexture()
+void Panarama::CreateTexture()
 {
-	for(int i = 0; i < IMAGE_LEN; i++)
-	{
-		for(int j = 0; j < IMAGE_LEN; j++)
-		{
-			pImage21[i][j][0] = 255;
-			pImage21[i][j][1] = 0;
-			pImage21[i][j][2] = 255;
-			pImage21[i][j][3] = 255;
-
-			pImage22[i][j][0] = 255;
-			pImage22[i][j][1] = 0;
-			pImage22[i][j][2] = 255;
-			pImage22[i][j][3] = 255;
-
-			pImage23[i][j][0] = 255;
-			pImage23[i][j][1] = 0;
-			pImage23[i][j][2] = 255;
-			pImage23[i][j][3] = 255;
-
-			pImage24[i][j][0] = 255;
-			pImage24[i][j][1] = 0;
-			pImage24[i][j][2] = 255;
-			pImage24[i][j][3] = 255;
-
-			pImage25[i][j][0] = 255;
-			pImage25[i][j][1] = 0;
-			pImage25[i][j][2] = 255;
-			pImage25[i][j][3] = 255;
-
-			pImage26[i][j][0] = 255;
-			pImage26[i][j][1] = 0;
-			pImage26[i][j][2] = 255;
-			pImage26[i][j][3] = 255;
-
-			pImage27[i][j][0] = 255;
-			pImage27[i][j][1] = 0;
-			pImage27[i][j][2] = 255;
-			pImage27[i][j][3] = 255;
-
-			pImage28[i][j][0] = 255;
-			pImage28[i][j][1] = 0;
-			pImage28[i][j][2] = 255;
-			pImage28[i][j][3] = 255;
-
-			pImage31[i][j][0] = 0;
-			pImage31[i][j][1] = 255;
-			pImage31[i][j][2] = 255;
-			pImage31[i][j][3] = 255;
-
-			pImage32[i][j][0] = 0;
-			pImage32[i][j][1] = 255;
-			pImage32[i][j][2] = 255;
-			pImage32[i][j][3] = 255;
-
-			pImage33[i][j][0] = 0;
-			pImage33[i][j][1] = 255;
-			pImage33[i][j][2] = 255;
-			pImage33[i][j][3] = 255;
-
-			pImage34[i][j][0] = 0;
-			pImage34[i][j][1] = 255;
-			pImage34[i][j][2] = 255;
-			pImage34[i][j][3] = 255;
-
-			pImage35[i][j][0] = 0;
-			pImage35[i][j][1] = 255;
-			pImage35[i][j][2] = 255;
-			pImage35[i][j][3] = 255;
-
-			pImage36[i][j][0] = 0;
-			pImage36[i][j][1] = 255;
-			pImage36[i][j][2] = 255;
-			pImage36[i][j][3] = 255;
-
-			pImage37[i][j][0] = 0;
-			pImage37[i][j][1] = 255;
-			pImage37[i][j][2] = 255;
-			pImage37[i][j][3] = 255;
-
-			pImage38[i][j][0] = 0;
-			pImage38[i][j][1] = 255;
-			pImage38[i][j][2] = 255;
-			pImage38[i][j][3] = 255;
-		}
-	}
+	memset(pImage, 0xFF000000, WF_TEXTURE_WIDTH * WF_TEXTURE_HEIGHT * NUM_COLOR);
 }
 
 void Panarama::DrawWaterfall()
@@ -3692,619 +3402,48 @@ void Panarama::DrawWaterfall()
 	glEnable(GL_TEXTURE_2D);
 	MakeSubTexture();
 	GLdouble Zero = 0.0;
-	GLdouble LenH = -IMAGE_LEN*ScaleWindowY;
+	GLdouble LenH = -WF_TEXTURE_HEIGHT*ScaleWindowY;
 	GLdouble dx = -1.0 - (sPosZoomPan + dPosZoomPan);
-	GLdouble OffsetWf = (IMAGE_LEN - IndxSubTexture - ((double)CntLineSpeed)/LineSpeedMax)*ScaleWindowY;
+	GLdouble OffsetWf = (WF_TEXTURE_HEIGHT - IndxSubTexture - ((double)CntLineSpeed)/LineSpeedMax)*ScaleWindowY;
 	glColor4f(1,1,1,1);
 	glTranslatef(sPosZoomPan + dPosZoomPan - ox1, posRule - (RULE_HEIGH-1)*ScaleWindowY, 0.0);
 	glScaled(sScaleRuleX + dScaleRuleX, 1.15, 1.0);
 	glTranslatef(0.0, OffsetWf, 0.0);
 	glPushMatrix();
-	if(NumLineTextures == 0)
-	{
-		glBindTexture(GL_TEXTURE_2D, WFTexture11);
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage1);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture12);
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage2);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture13);
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage3);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture14);
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage4);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture15);
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage5);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture16);
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage6);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture17);
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage7);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture18);
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage8);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 8*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 8*1.0/4.0, LenH, 0.0);
-		glEnd();
-		//
-		glTranslated(0.0, -IMAGE_LEN*ScaleWindowY, 0.0);
-		glBindTexture(GL_TEXTURE_2D, WFTexture21);
-		glColor4f(1,1,1,1);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture22);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture23);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture24);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture25);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture26);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture27);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture28);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 8*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 8*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glTranslated(0.0, -IMAGE_LEN*ScaleWindowY, 0.0);
-		glBindTexture(GL_TEXTURE_2D, WFTexture31);
-		glColor4f(1,1,1,1);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture32);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture33);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, WFTexture34);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-		glEnd();
 
-		glBindTexture(GL_TEXTURE_2D, WFTexture35);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-		glEnd();
+	GLuint cur_tex, old_tex;
 
-		glBindTexture(GL_TEXTURE_2D, WFTexture36);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture37);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture38);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 8*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 8*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glPopMatrix();
+	switch(NumLineTextures){
+	case 0:
+		cur_tex = WFTexture[0];
+		old_tex = WFTexture[1];
+		break;
+	case 1:
+	default:
+		cur_tex = WFTexture[1];
+		old_tex = WFTexture[0];
+		break;
 	}
-	else if(NumLineTextures == 1)
-	{
-		glBindTexture(GL_TEXTURE_2D, WFTexture11);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-		glEnd();
 
-		glBindTexture(GL_TEXTURE_2D, WFTexture12);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-		glEnd();
+	glBindTexture(GL_TEXTURE_2D, cur_tex);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (WF_TEXTURE_HEIGHT - 1)&IndxSubTexture, WF_TEXTURE_WIDTH, 1, GL_RGBA, GL_UNSIGNED_BYTE, pNewLineImage);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0, 0.0); glVertex3f(dx, LenH, 0.0);
+	glTexCoord2f(0.0, 1.0); glVertex3f(dx, Zero, 0.0);
+	glTexCoord2f(1.0, 1.0); glVertex3f(dx + 2.0, Zero, 0.0);
+	glTexCoord2f(1.0, 0.0); glVertex3f(dx + 2.0, LenH, 0.0);
+	glEnd();
 
-		glBindTexture(GL_TEXTURE_2D, WFTexture13);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-		glEnd();
+	glTranslated(0.0, -WF_TEXTURE_HEIGHT*ScaleWindowY, 0.0);
+	glBindTexture(GL_TEXTURE_2D, old_tex);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0, 0.0); glVertex3f(dx, LenH, 0.0);
+	glTexCoord2f(0.0, 1.0); glVertex3f(dx, Zero, 0.0);
+	glTexCoord2f(1.0, 1.0); glVertex3f(dx + 2.0, Zero, 0.0);
+	glTexCoord2f(1.0, 0.0); glVertex3f(dx + 2.0, LenH, 0.0);
+	glEnd();
+	glPopMatrix();
 
-		glBindTexture(GL_TEXTURE_2D, WFTexture14);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture15);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture16);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture17);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture18);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 1.0); glVertex3f(dx + 8*1.0/4.0, Zero, 0.0);
-			glTexCoord2f(1.0, 0.0); glVertex3f(dx + 8*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glTranslated(0.0, -IMAGE_LEN*ScaleWindowY, 0.0);
-		glBindTexture(GL_TEXTURE_2D, WFTexture21);
-		glColor4f(1,1,1,1);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture22);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture23);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture24);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture25);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture26);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture27);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture28);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 8*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 8*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glTranslated(0.0, 2*IMAGE_LEN*ScaleWindowY, 0.0);
-		glBindTexture(GL_TEXTURE_2D, WFTexture31);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage1);
-		glColor4f(1,1,1,1);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture32);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage2);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture33);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage3);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture34);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage4);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture35);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage5);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture36);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage6);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture37);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage7);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-		glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, WFTexture38);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage8);
-		glBegin(GL_QUADS);
-				glTexCoord2f(0.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-				glTexCoord2f(0.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 1.0); glVertex3f(dx + 8*1.0/4.0, Zero, 0.0);
-				glTexCoord2f(1.0, 0.0); glVertex3f(dx + 8*1.0/4.0, LenH, 0.0);
-		glEnd();
-		glPopMatrix();
-
-	}
-		else if(NumLineTextures == 2)
-		{
-			glBindTexture(GL_TEXTURE_2D, WFTexture11);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture12);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture13);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture14);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture15);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture16);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture17);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture18);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 8*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 8*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			//
-			glTranslated(0.0, 2*IMAGE_LEN*ScaleWindowY, 0.0);
-			glBindTexture(GL_TEXTURE_2D, WFTexture21);
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage1);
-			glColor4f(1,1,1,1);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture22);
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage2);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture23);
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage3);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture24);
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage4);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture25);
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage5);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture26);
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage6);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture27);
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage7);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture28);
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (IMAGE_LEN-1)&IndxSubTexture, IMAGE_LEN, IMAGE_SUB_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pSubImage8);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 8*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 8*1.0/4.0, LenH, 0.0);
-			glEnd();
-			//
-			glTranslated(0.0, -IMAGE_LEN*ScaleWindowY, 0.0);
-			glBindTexture(GL_TEXTURE_2D, WFTexture31);
-			glColor4f(1,1,1,1);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture32);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture33);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 2*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 2*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture34);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 3*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 3*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture35);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 4*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 4*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture36);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 5*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 5*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture37);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 6*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 6*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-			glEnd();
-
-			glBindTexture(GL_TEXTURE_2D, WFTexture38);
-			glBegin(GL_QUADS);
-					glTexCoord2f(0.0, 0.0); glVertex3f(dx + 7*1.0/4.0, LenH, 0.0);
-					glTexCoord2f(0.0, 1.0); glVertex3f(dx + 7*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 1.0); glVertex3f(dx + 8*1.0/4.0, Zero, 0.0);
-					glTexCoord2f(1.0, 0.0); glVertex3f(dx + 8*1.0/4.0, LenH, 0.0);
-			glEnd();
-			glPopMatrix();
-		}
 
 	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
@@ -4318,228 +3457,163 @@ void Panarama::DrawWaterfall()
 			CntLineSpeed = 0;
 			CntLinesTexture++;
 
-			if(CntLinesTexture >= 3*IMAGE_LEN)
+			if(CntLinesTexture >= WF_TEXTURE_HEIGHT*2)
 				CntLinesTexture = 0;
 
-				IndxSubTexture++;
-			if(IndxSubTexture >= IMAGE_LEN*3)
+			IndxSubTexture++;
+			if(IndxSubTexture >= WF_TEXTURE_HEIGHT)
 				IndxSubTexture = 0;
-			NumLineTextures = CntLinesTexture/IMAGE_LEN;
+			NumLineTextures = CntLinesTexture/WF_TEXTURE_HEIGHT;
 		}
 	}
-	qglColor(Qt::green);
-	glBegin(GL_TRIANGLES);
-		glVertex3f(sPosZoomPan + dPosZoomPan - ox5, -1.0 + oy1, 0);
-		glVertex3f(sPosZoomPan + dPosZoomPan + ox5, -1.0 + oy1, 0);
-		glVertex3f(sPosZoomPan + dPosZoomPan, -1.0 + oy10, 0);
-	glEnd();
 }
 
-QColor Panarama::GetRGB(float Value)
+void Panarama::UpdateLevels()
 {
-	QColor HSV;
-	if(pPanOpt->ui.cbWfMode->currentIndex() == 1)
+	if(--last_update > 0)
+		return;
+
+	last_update = 20;
+
+	waterfall_mode = pPanOpt->ui.cbWfMode->currentIndex();
+
+	AUTO_LEVEL lvl;
+
+	if(!pPanOpt->ui.chbStopWhenTx->isChecked() && TRxMode==TX)
+		lvl = MULTIHAND;
+	else
+		lvl = (AUTO_LEVEL)pPanOpt->ui.cbAutoLevel->currentIndex();
+
+	switch(lvl)
 	{
-		double Level = 70;
-		double Max,Min;
-		if(!pPanOpt->ui.chbStopWhenTx->isChecked() && TRxMode==TX)
-			goto txr;
+	case WATERFALL_AUTO:
+	case ALL_AUTO:
+		level_max = HighDb + pPanOpt->ui.sbWfMaxOffset->value();
+		level_min = LowDb + pPanOpt->ui.sbWfMinOffset->value();
+		break;
+	case MULTIHAND:
+	default:
+		level_max = SaveOffsetDbm + SaveLenDbmY;
+		level_min = SaveOffsetDbm;
+		break;
+	}
 
-		switch((AUTO_LEVEL)pPanOpt->ui.cbAutoLevel->currentIndex())
-		{
-		case WATERFALL_AUTO:
-			Max = HighDb + pPanOpt->ui.sbWfMaxOffset->value();
-			Min = LowDb + pPanOpt->ui.sbWfMinOffset->value();
-			break;
-		case MULTIHAND:
-txr:			Max = SaveOffsetDbm + SaveLenDbmY;
-			Min = SaveOffsetDbm;
-			break;
-		case ALL_AUTO:
-			Max = HighDb + pPanOpt->ui.sbWfMaxOffset->value();
-			Min = LowDb + pPanOpt->ui.sbWfMinOffset->value();
-			break;
-		default:
-			Max = SaveOffsetDbm + SaveLenDbmY;
-			Min = SaveOffsetDbm;
-			break;
-		}
-		if((Max - Min) < 30)
-			Max = Min + 30;
+	if((level_max - level_min) < 30)
+		level_max = level_min + 30;
 
-		float Q = 300 + Level;
-		float Len = Max - Min;
-		float KLen = Q/Len;
-		Value -= Min;
+	level_range = level_max - level_min;
+	level_multiplier = levels_count / level_range;
+}
+
+inline void Panarama::GetRGB(float Value, GLubyte *red, GLubyte *green, GLubyte *blue)
+{	
+	const int color_max = 255;
+
+	if(waterfall_mode == 1)
+	{
+		Value -= level_min;
+
 		if(Value < 0)
-			Value = 0;
-		else if(Value > Len)
-			Value = Len;
-		Value *= KLen;
-		if(Value < Level)
 		{
-			int col = Value*255.0/Level;
+			*red = 0;
+			*green = 0;
+			*blue = 0;
+			return;
+		}
 
-			if(col > 255)
-				HSV.setHsv(240, 255, 255);
-			else if(col < 0)
-				HSV.setHsv(240, 255, 0);
-			else
-				HSV.setHsv(240, 255, col);
-		}
-		else if((Value-Level) < 240)
-		{
-			if((240 - (Value-Level)) > 360)
-				HSV.setHsv(360, 255, 255);
-			else if((240 - (Value-Level)) < 0)
-				HSV.setHsv(0, 255, 255);
-			else
-				HSV.setHsv(240 - (Value-Level), 255, 255);
-		}
+		int hue256x6;
+
+		if(Value > level_range)
+			hue256x6 = levels_count;
 		else
-		{
-			int col = 359 - Value-Level -240;
-			if(col > 360)
-				HSV.setHsv(360, 255, 255);
-			else if(col < 0)
-				HSV.setHsv(0, 255, 255);
-			else
-				HSV.setHsv(col, 255, 255);
+			hue256x6 = Value * level_multiplier;
+
+		int reason = hue256x6 / 256;
+		int X = hue256x6 % 256;
+
+		switch (reason){
+		case 0:
+			*red = 0;
+			*green = 0;
+			*blue = X;
+			break;
+		case 1:
+			*red = 0;
+			*green = X;
+			*blue = color_max;
+			break;
+		case 2:
+			*red = 0;
+			*green = color_max;
+			*blue = color_max - X;
+			break;
+		case 3:
+			*red = X;
+			*green = color_max;
+			*blue = 0;
+			break;
+		case 4:
+			*red = color_max;
+			*green = color_max - X;
+			*blue = 0;
+			break;
+		case 5:
+		default:
+			*red = color_max;
+			*green = 0;
+			*blue = color_max - X;
+			break;
 		}
+		return;
 	}
 	else
 	{
-		HSV = pPanOpt->pColorWFgrad->getColor();
-		int h,s,v,a;
-		HSV.getHsv(&h,&s,&v,&a);
+		Value -= level_min;
 
-		if(!pPanOpt->ui.chbStopWhenTx->isChecked() && TRxMode==TX)
-			goto txg;
-
-		double Max,Min;
-		switch((AUTO_LEVEL)pPanOpt->ui.cbAutoLevel->currentIndex())
+		if(Value < 0)
 		{
-		case WATERFALL_AUTO:
-			Max = HighDb + pPanOpt->ui.sbWfMaxOffset->value();
-			Min = LowDb + pPanOpt->ui.sbWfMinOffset->value();
-			break;
-		case MULTIHAND:
-txg:
-			Max = SaveOffsetDbm + SaveLenDbmY;
-			Min = SaveOffsetDbm;
-			break;
-		case ALL_AUTO:
-			Max = HighDb + pPanOpt->ui.sbWfMaxOffset->value();
-			Min = LowDb + pPanOpt->ui.sbWfMinOffset->value();
-			break;
-		default:
-			Max = SaveOffsetDbm + SaveLenDbmY;
-			Min = SaveOffsetDbm;
-			break;
+			*red = 0;
+			*green = 0;
+			*blue = 0;
+			return;
 		}
 
-		if((Max - Min) < 10)
-			Max = Min + 10;
+		QColor HSV = pPanOpt->pColorWFgrad->getColor();
+		int h,s,v;
+		HSV.getHsv(&h,&s,&v);
 
-		double Q = 510;
-		double Len = Max - Min;
-		double KLen = Q/Len;
-		Value -= Min;
-		if(Value < 0)
-			Value = 0;
-		else if(Value > Len)
-			Value = Len;
+		int lvl;
 
-		if(h > 360)
-			h = 360;
-		else if(h < 0)
-			h = 0;
+		if(Value > level_range)
+			lvl = levels_count;
+		else
+			lvl = Value * level_multiplier;
 
-		Value *= KLen;
-		if(Value < 0)
-			Value = 0;
-		else if(Value > 510)
-			Value = 510;
+		lvl = lvl / 3;
 
-		if(Value < 255)
-			HSV.setHsv(h, 255, Value);
+		if(lvl < 256)
+			HSV.setHsv(h, 255, lvl);
 		else
 		{
-			int col = Q-Value;
-			if(col > 255)
-				col = 255;
-			else if(col < 0)
-				col = 0;
-			HSV.setHsv(h,col, 255);
+			int col = (lvl - 256);
+			HSV.setHsv(h, col, 255);
 		}
+		int r, g, b;
+
+		HSV.getRgb(&r, &g, &b);
+		*red = r;
+		*green = g;
+		*blue = b;
+		return;
 	}
-	return HSV;
 }
 
 void Panarama::MakeSubTexture()
 {
-	QColor color;
-	int RedW, GreenW, BlueW, Alpha;
-	for (int i=0;i<IMAGE_SUB_HEIGHT;i++)
+	for (int j = 0; j < IMAGE_LEN * 8; j++)
 	{
-		for (int j=0;j<IMAGE_LEN;j++)
-		{
-			color = GetRGB(BufWf[j]);
-			color.getRgb(&RedW,&GreenW,&BlueW,&Alpha);
-			pSubImage1[i][j][0]=(GLubyte)RedW;
-			pSubImage1[i][j][1]=(GLubyte)GreenW;
-			pSubImage1[i][j][2]=(GLubyte)BlueW;
-			pSubImage1[i][j][3]=(GLubyte)Alpha;
-
-			color = GetRGB(BufWf[j + IMAGE_LEN]);
-			color.getRgb(&RedW,&GreenW,&BlueW,&Alpha);
-			pSubImage2[i][j][0]=(GLubyte)RedW;
-			pSubImage2[i][j][1]=(GLubyte)GreenW;
-			pSubImage2[i][j][2]=(GLubyte)BlueW;
-			pSubImage2[i][j][3]=(GLubyte)Alpha;
-
-			color = GetRGB(BufWf[j + 2*IMAGE_LEN]);
-			color.getRgb(&RedW,&GreenW,&BlueW,&Alpha);
-			pSubImage3[i][j][0]=(GLubyte)RedW;
-			pSubImage3[i][j][1]=(GLubyte)GreenW;
-			pSubImage3[i][j][2]=(GLubyte)BlueW;
-			pSubImage3[i][j][3]=(GLubyte)Alpha;
-
-			color = GetRGB(BufWf[j + 3*IMAGE_LEN]);
-			color.getRgb(&RedW,&GreenW,&BlueW,&Alpha);
-			pSubImage4[i][j][0]=(GLubyte)RedW;
-			pSubImage4[i][j][1]=(GLubyte)GreenW;
-			pSubImage4[i][j][2]=(GLubyte)BlueW;
-			pSubImage4[i][j][3]=(GLubyte)Alpha;
-
-			color = GetRGB(BufWf[j + 4*IMAGE_LEN]);
-			color.getRgb(&RedW,&GreenW,&BlueW,&Alpha);
-			pSubImage5[i][j][0]=(GLubyte)RedW;
-			pSubImage5[i][j][1]=(GLubyte)GreenW;
-			pSubImage5[i][j][2]=(GLubyte)BlueW;
-			pSubImage5[i][j][3]=(GLubyte)Alpha;
-
-			color = GetRGB(BufWf[j + 5*IMAGE_LEN]);
-			color.getRgb(&RedW,&GreenW,&BlueW,&Alpha);
-			pSubImage6[i][j][0]=(GLubyte)RedW;
-			pSubImage6[i][j][1]=(GLubyte)GreenW;
-			pSubImage6[i][j][2]=(GLubyte)BlueW;
-			pSubImage6[i][j][3]=(GLubyte)Alpha;
-
-			color = GetRGB(BufWf[j + 6*IMAGE_LEN]);
-			color.getRgb(&RedW,&GreenW,&BlueW,&Alpha);
-			pSubImage7[i][j][0]=(GLubyte)RedW;
-			pSubImage7[i][j][1]=(GLubyte)GreenW;
-			pSubImage7[i][j][2]=(GLubyte)BlueW;
-			pSubImage7[i][j][3]=(GLubyte)Alpha;
-
-			color = GetRGB(BufWf[j + 7*IMAGE_LEN]);
-			color.getRgb(&RedW,&GreenW,&BlueW,&Alpha);
-			pSubImage8[i][j][0]=(GLubyte)RedW;
-			pSubImage8[i][j][1]=(GLubyte)GreenW;
-			pSubImage8[i][j][2]=(GLubyte)BlueW;
-			pSubImage8[i][j][3]=(GLubyte)Alpha;
-		}
+		GetRGB(BufWf[j], &pNewLineImage[j][0], &pNewLineImage[j][1], &pNewLineImage[j][2]);
+		pNewLineImage[j][3]=255;
 	}
 }
 
@@ -4758,8 +3832,6 @@ void Panarama::SetSpectrumBuffer(float *pBuffer, int Size)
 	if(++CntUpdateBuff > CIRCLE_BUFF_SIZE)
 		CntUpdateBuff = CIRCLE_BUFF_SIZE;
 
-	memcpy(pBuff, pCircleBuff[CircleCnt], BUFF_SIZE*sizeof(float));
-
 	if(!IsChangedFilter)
 	{
 		memset(pBuff, 0, BUFF_SIZE*sizeof(float));
@@ -4770,6 +3842,9 @@ void Panarama::SetSpectrumBuffer(float *pBuffer, int Size)
 			pBuff[i] /= MeanBuff;
 		}
 	}
+	else
+		memcpy(pBuff, pCircleBuff[CircleCnt], BUFF_SIZE*sizeof(float));
+
 	if((++TrxCnt>=TX_TO_RX_TIME && TRxMode==RX) || !pPanOpt->ui.chbStopWhenTx->isChecked())
 		memcpy(BufWf, pCircleBuff[CircleCnt], BUFF_SIZE*sizeof(float));
 

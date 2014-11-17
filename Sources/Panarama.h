@@ -36,6 +36,7 @@
 #include "PanoramOpt.h"
 #include "DttSP.h"
 #include "Timer/Timer.h"
+#include "GLFont/glfont.h"
 
 #define SIZE 512
 #define RULE_HEIGH 20.0f
@@ -119,7 +120,9 @@ class Panarama : public QGLWidget
     bool isUpdate;
     bool IsWindow;
     bool IsCrossF1;
-    QFont Font1, Font2, fontDb, fontBand, fontInfo;
+	GLFont *info_font;
+	GLFont *dbm_font;
+	GLFont *band_font;
     QPixmap *pRulePixmap;
     GLuint RuleTexture;
     QPixmap *pLeftRange;
@@ -231,6 +234,7 @@ class Panarama : public QGLWidget
 	GLfloat LineSpBuff[BUFF_SIZE][2];
 	QColor ColorTop, ColorBot, ColorLine, ColorSp, ColorFilter;
 	GLfloat ArrayV[BUFF_SIZE*3];
+	GLfloat ArrayV2[BUFF_SIZE*3];
 	GLfloat ColorV[BUFF_SIZE*4];
 
 	GLdouble BeginGrid;
@@ -268,6 +272,14 @@ class Panarama : public QGLWidget
 	GLfloat PosYNum, PosYNumTx;
 	double offsetDbm, scaleDbm;
 
+	float level_min;
+	float level_max;
+	int level_range;
+	float level_multiplier;
+	static const int levels_count = 256 * 6;
+	int last_update;
+	int waterfall_mode;
+
 	GLdouble SaveOffsetDbm;
 	GLdouble SaveLenDbmY;
 
@@ -277,68 +289,12 @@ class Panarama : public QGLWidget
 	int CntLineSpeed;
 	double LineSpeedMax;
 
-	GLubyte pImage11[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage12[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage13[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage14[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage15[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage16[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage17[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage18[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
+	static const int WF_TEXTURE_WIDTH = 4096;
+	static const int WF_TEXTURE_HEIGHT = 1024;
 
-	GLubyte pImage21[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage22[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage23[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage24[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage25[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage26[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage27[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage28[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-
-	GLubyte pImage31[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage32[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage33[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage34[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage35[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage36[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage37[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-	GLubyte pImage38[IMAGE_LEN][IMAGE_LEN][NUM_COLOR];
-
-	GLubyte	pSubImage1[IMAGE_SUB_HEIGHT][IMAGE_LEN][NUM_COLOR];
-	GLubyte	pSubImage2[IMAGE_SUB_HEIGHT][IMAGE_LEN][NUM_COLOR];
-	GLubyte	pSubImage3[IMAGE_SUB_HEIGHT][IMAGE_LEN][NUM_COLOR];
-	GLubyte	pSubImage4[IMAGE_SUB_HEIGHT][IMAGE_LEN][NUM_COLOR];
-	GLubyte	pSubImage5[IMAGE_SUB_HEIGHT][IMAGE_LEN][NUM_COLOR];
-	GLubyte	pSubImage6[IMAGE_SUB_HEIGHT][IMAGE_LEN][NUM_COLOR];
-	GLubyte	pSubImage7[IMAGE_SUB_HEIGHT][IMAGE_LEN][NUM_COLOR];
-	GLubyte	pSubImage8[IMAGE_SUB_HEIGHT][IMAGE_LEN][NUM_COLOR];
-
-	GLuint WFTexture11;
-	GLuint WFTexture12;
-	GLuint WFTexture13;
-	GLuint WFTexture14;
-	GLuint WFTexture15;
-	GLuint WFTexture16;
-	GLuint WFTexture17;
-	GLuint WFTexture18;
-
-	GLuint WFTexture21;
-	GLuint WFTexture22;
-	GLuint WFTexture23;
-	GLuint WFTexture24;
-	GLuint WFTexture25;
-	GLuint WFTexture26;
-	GLuint WFTexture27;
-	GLuint WFTexture28;
-
-	GLuint WFTexture31;
-	GLuint WFTexture32;
-	GLuint WFTexture33;
-	GLuint WFTexture34;
-	GLuint WFTexture35;
-	GLuint WFTexture36;
-	GLuint WFTexture37;
-	GLuint WFTexture38;
+	GLubyte pImage[WF_TEXTURE_WIDTH][WF_TEXTURE_HEIGHT][NUM_COLOR];
+	GLubyte	pNewLineImage[WF_TEXTURE_WIDTH][NUM_COLOR];
+	GLuint WFTexture[2];
 
 	ACTION_OBJECT ActionObject;
 
@@ -397,7 +353,6 @@ class Panarama : public QGLWidget
     int ritLimLow, ritLimHigh;
     float glRitLimLow, glRitLimHigh;
     int currentFilter1Freq;
-    QFont ritFont;
     float alphaRitLim;
     QTimer timerAlphaColor;
     int fps;
@@ -501,8 +456,9 @@ private:
     void DrawInfo(GLdouble X, GLdouble Y, QString Str, QColor color);
     void SetStepGrid();
     void SetStepDbm();
-    void CreatTexture();
-    QColor GetRGB(float Value);
+    void CreateTexture();
+    void UpdateLevels();
+    void GetRGB(float Value, GLubyte *red, GLubyte *green, GLubyte *blue);
     void MakeSubTexture();
     float GetMin(float *pBuff, int Size);
     float GetMax(float *pBuff, int Size);
