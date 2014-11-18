@@ -414,6 +414,7 @@ void DttSP::ProcessScope(float *pBuf, int Param)
 
 float DttSP::CalculateMeters(METERTYPE Meter)
 {
+	pDsp->SetRXListen(RX1_CHANNEL);
     return(pDsp->Calculate_Meters(Meter));
 }
 
