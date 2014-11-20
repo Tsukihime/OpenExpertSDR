@@ -24,24 +24,21 @@
 
 #define GL_CLAMP_TO_EDGE 0x812F
 
-int GLFont::calc_texture_side(const QFont &fnt)
+int GLFont::calc_texture_side()
 {
-	QFontMetrics fmetrics(fnt);
 	QString str;
 
 	int rect_w = 0;
-	int rect_h = fmetrics.height() * 16;
+	int rect_h = (font_metrics->height() + 2) * 16;
 
 	for(int i = 0; i < 16; i++)
 	{
 		str.clear();
 		for(int k = 0; k < 16; k++)
-		{
 			str.append(QChar::fromAscii(16 * i + k));
-			int w = fmetrics.width(str);
-			if(rect_w < w)
-				rect_w = w;
-		}
+		int w = font_metrics->width(str) + 2 * 16;
+		if(rect_w < w)
+			rect_w = w;
 	}
 
 	int texture_side = (rect_h > rect_w) ? rect_h : rect_w;
@@ -64,19 +61,17 @@ QImage GLFont::create_font_img(const QFont &fnt, int texture_side)
 	p.setBackground(QBrush(QColor(0, 0, 0, 0)));
 	p.eraseRect(img.rect());
 
-	QFontMetrics fm(fnt);
-
 	int pos_y = 0;
 	for(int i = 0; i < 16; i++)
 	{
-		pos_y += fm.height() + 2;
+		pos_y += font_metrics->height() + 2;
 		int pos_x = 0;
 		for(int k = 0; k < 16; k++)
 		{
 			unsigned char idx = 16 * i + k;
 			QChar ch(idx);
-			int ch_w = fm.width(ch) + 2; // -1..1 px outline
-			int ch_h = fm.height() + 2; // -1..1 px outline
+			int ch_w = font_metrics->width(ch) + 2; // -1..1 px outline
+			int ch_h = font_metrics->height() + 2; // -1..1 px outline
 
 			QRectF r;
 			r.setTop(pos_y - ch_h);
@@ -87,7 +82,7 @@ QImage GLFont::create_font_img(const QFont &fnt, int texture_side)
 
 
 			int txt_x = pos_x;
-			int txt_y = pos_y - fm.descent() - fm.underlinePos() - 1;
+			int txt_y = pos_y - font_metrics->descent() - font_metrics->underlinePos() - 1;
 
 			// 1 px outline
 			p.setPen(QPen(Qt::black));
@@ -106,7 +101,7 @@ QImage GLFont::create_font_img(const QFont &fnt, int texture_side)
 	}
 	p.end();
 
-	//img.save("lo.png", "PNG");
+	img.save("lo.png", "PNG");
 
 	return img;
 }
@@ -153,7 +148,7 @@ void GLFont::fill_call_lists(int tex_side)
 		glTexCoord2d(ch_x2, ch_y1); glVertex2d(px_w, 0);
 		glEnd();
 
-		glTranslated(px_w - 2, 0, 0); // -2 = outline hack
+		glTranslated(px_w, 0, 0);
 
 		glEndList();
 	}
@@ -164,10 +159,11 @@ GLFont::GLFont(QGLWidget *parent, const QFont &fnt)
 	this->parent = parent;
 	tex_fnt = fnt;
 
-	QFontMetrics fm(fnt);
-	px_font_descent = fm.descent() + 1;
+	font_metrics = new QFontMetrics(tex_fnt);
 
-	int texture_side = calc_texture_side(fnt);
+	px_font_descent = font_metrics->descent() + 1;
+
+	int texture_side = calc_texture_side();
 	QImage img = create_font_img(fnt, texture_side);
 	font_texture = create_font_texture(img);
 	fill_call_lists(texture_side);
@@ -180,6 +176,7 @@ GLFont::~GLFont()
 	{
 		glDeleteLists(glyphs[i].list, 1);
 	}
+	delete font_metrics;
 }
 
 void GLFont::draw(GLfloat x, GLfloat y, GLfloat z, const QString &str)
@@ -241,7 +238,12 @@ void GLFont::draw(GLfloat x, GLfloat y, GLfloat z, const QString &str, const QCo
 	glColor4dv(&old_col[0]);
 }
 
-QFont GLFont::font() const
+int GLFont::width(const QString &str)
 {
-	return tex_fnt;
+	return font_metrics->width(str) + str.length() * 2;
+}
+
+int GLFont::height()
+{
+	return font_metrics->height();
 }

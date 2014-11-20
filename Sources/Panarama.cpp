@@ -407,7 +407,7 @@ void Panarama::initializeGL()
 	posRule = 1.0 - sPosRule*2.0/height();
 	lenRule = RULE_HEIGH*2.0f/height();
 
-	info_font = new GLFont(this, QFont("Calibri", 11));
+	info_font = new GLFont(this, QFont("Calibri", 9));
 	dbm_font = new GLFont(this, QFont("Arial", 9));
 	band_font = new GLFont(this, QFont("Calibri", 12, QFont::Bold));
 }
@@ -1972,7 +1972,6 @@ void Panarama::DrawRule()
 	qglColor(QColor(2, 84, 212,255));
 	float Min;
 	float Max;
-	QFontMetrics fm(this->font());
 	int pixelsWide;
 	float WidthImgL = pLeftRange->width()*ScaleWindowX/(sScaleRuleX + dScaleRuleX);
 	float WidthImgR = pRightRange->width()*ScaleWindowX/(sScaleRuleX + dScaleRuleX);
@@ -1991,7 +1990,7 @@ void Panarama::DrawRule()
 		Max = (BandFreq[1][i] - SampleRate/2)*2.0f/SampleRate + (sDDSFreq + dDDSFreq);
 		if(Max >= BeginX && Min < EndX)
 		{
-			pixelsWide = fm.width(BandStr[i]);
+			pixelsWide = band_font->width(BandStr[i]);
 			FpixelsWide = pixelsWide*ScaleWindowX/(sScaleRuleX + dScaleRuleX);
 			if(Max >= EndX && Min <= (BeginX + Fox20))
 			{
@@ -2082,7 +2081,6 @@ void Panarama::DrawGrid()
 	glColor4d(1.0, 1.0, 1.0, 1.0);
 	BeginGrid -= CntD*GridStep;
 	QString StrNum;
-	QFontMetrics fm(info_font->font());
 	double Num = qAbs((CntStepGrid)*StepNum);
 	while((BeginGrid - 1.0) <= BeginX)
 	{
@@ -2094,7 +2092,7 @@ void Panarama::DrawGrid()
 	for(GLdouble i = BeginGrid - 1.0; i < (EndX - 2*ox30/(sScaleRuleX + dScaleRuleX)); i += GridStep)
 	{
         StrNum = freqToStr(qRound(Num*1000000));
-		OffsetNum = fm.width(StrNum)/(double)width()/(sScaleRuleX + dScaleRuleX);
+		OffsetNum = info_font->width(StrNum)/(double)width()/(sScaleRuleX + dScaleRuleX);
 
 		info_font->draw(i - OffsetNum -(sPosZoomPan + dPosZoomPan), posRule -oy10-oy5, 0.02, StrNum);
 		Num += StepNum;
@@ -2151,8 +2149,7 @@ void Panarama::DrawFilter()
 			glVertex3d(tmpPosX2, tmpY1, -0.38);
 		}
 		glEnd();
-		QFontMetrics fm(info_font->font());
-		int pixelsWide = fm.width("TX");
+		int pixelsWide = info_font->width("TX");
 		float tmpxx = tmpPosX1 + (BandTxHigh*2.0/SampleRate - BandTxLow*2.0/SampleRate)/2.0;
 		if(Mode == CWL || Mode == CWU)
 			info_font->draw(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX");
@@ -2193,8 +2190,7 @@ void Panarama::DrawFilter()
 			glVertex3d(tmpPosX2, tmpY1, -0.38);
 		}
 		glEnd();
-		QFontMetrics fm(info_font->font());
-		int pixelsWide = fm.width("TX");
+		int pixelsWide = info_font->width("TX");
 		float tmpxx = tmpPosX1 + (BandTxHigh*2.0/SampleRate - BandTxLow*2.0/SampleRate)/2.0;
 		if(Mode == CWL || Mode == CWU)
 			info_font->draw(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX");
@@ -2235,8 +2231,7 @@ void Panarama::DrawFilter()
 				glVertex3d(tmpPosX2, tmpY1, -0.38);
 			}
 		glEnd();
-		QFontMetrics fm(info_font->font());
-		int pixelsWide = fm.width("TX");
+		int pixelsWide = info_font->width("TX");
 		float tmpxx = tmpPosX1 + (BandTxHigh*2.0/SampleRate - BandTxLow*2.0/SampleRate)/2.0;
 		if(Mode == CWL || Mode == CWU)
 			info_font->draw(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX");
@@ -2277,8 +2272,7 @@ void Panarama::DrawFilter()
 				glVertex3d(tmpPosX2, tmpY1, -0.35);
 			}
 		glEnd();
-		QFontMetrics fm(info_font->font());
-		int pixelsWide = fm.width("TX");
+		int pixelsWide = info_font->width("TX");
 		float tmpxx = tmpPosX1 + (BandTxHigh*2.0/SampleRate - BandTxLow*2.0/SampleRate)/2.0;
 		if(Mode == CWL || Mode == CWU)
 			info_font->draw(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX");
@@ -2286,10 +2280,9 @@ void Panarama::DrawFilter()
 			info_font->draw(tmpxx - pixelsWide*ScaleWindowX/2.0, 1.0 - 1.8*oy20/(1.0 - posRule), -0.45, "TX");
 		glPopMatrix();
 		double Num = ((sFilter2+dFilter2)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
-		QString str;
-        str = "B: " + freqToStr(Num) + " Hz";
-        pixelsWide = fm.width(str);
-        int pixH = fm.height();
+		QString str = "B: " + freqToStr(Num) + " Hz";
+		pixelsWide = info_font->width(str);
+		int pixH = info_font->height();
 
         int padding = 7;
         GLdouble filter_centerX = ((sFilter2+ dFilter2) - (sPosZoomPan + dPosZoomPan))*(tmpS) + (sPosZoomPan + dPosZoomPan);
@@ -2364,11 +2357,9 @@ void Panarama::DrawFilter()
 		glEnd();
 		glPopMatrix();
 		double Num = ((sFilter2+dFilter2)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
-        QString str;
-        str = "B: " + freqToStr(Num) + " Hz";
-		QFontMetrics fm(info_font->font());
-        int pixelsWide = fm.width(str);
-        int pixH = fm.height();
+		QString str = "B: " + freqToStr(Num) + " Hz";
+		int pixelsWide = info_font->width(str);
+		int pixH = info_font->height();
 
         int padding = 7;
         GLdouble filter_centerX = ((sFilter2+ dFilter2) - (sPosZoomPan + dPosZoomPan))*(tmpS) + (sPosZoomPan + dPosZoomPan);
@@ -2479,11 +2470,9 @@ void Panarama::DrawFilter()
 		glVertex3d(-1.0 + ox30 + ox5, 1.0, -0.55);
 	glEnd();
 	double Num = ((sFilter+dFilter)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
-	QString str;
-    str = "A: " + freqToStr(Num) + " Hz";
-	QFontMetrics fm(info_font->font());
-    int pixelsWide = fm.width(str);
-    int pixH = fm.height();
+	QString str = "A: " + freqToStr(Num) + " Hz";
+	int pixelsWide = info_font->width(str);
+	int pixH = info_font->height();
 
     int padding = 7;
     GLdouble filter_centerX = ((sFilter+ dFilter) - (sPosZoomPan + dPosZoomPan))*(tmpS) + (sPosZoomPan + dPosZoomPan);
@@ -2703,8 +2692,7 @@ void Panarama::DrawDbm()
 	glEnd();
 	int Num = -200 - x;
 	QString str;
-	QFontMetrics fm(dbm_font->font());
-	GLfloat numH = (fm.height()*3.2/height()*(1.0/(1.0 - posRule))*(sLenDbmY+dLenDbmY))*0.15f;
+	GLfloat numH = (dbm_font->height()*3.2/height()*(1.0/(1.0 - posRule))*(sLenDbmY+dLenDbmY))*0.15f;
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 	for(float i = Num; i < (SaveOffsetDbm + SaveLenDbmY); i += StepDbm)
 	{
@@ -3176,8 +3164,7 @@ void Panarama::SetStepDbm()
 	int font_height;
 	if(dbm_font)
 	{
-		QFontMetrics fm(dbm_font->font());
-		font_height = fm.height();
+		font_height = dbm_font->height();
 	}
 	else
 	{

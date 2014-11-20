@@ -39,9 +39,10 @@ private:
 	GLuint font_texture;
 	GL_glyph glyphs[256];
 	QFont tex_fnt;
+	QFontMetrics *font_metrics;
 	int px_font_descent;
 
-	int calc_texture_side(const QFont &fnt);
+	int calc_texture_side();
 	QImage create_font_img(const QFont &fnt, int texture_side);
 	GLuint create_font_texture(QImage &font_img);
 	void fill_call_lists(int tex_side);
@@ -51,7 +52,8 @@ public:
 	~GLFont();
 	void draw(GLfloat x, GLfloat y, GLfloat z, const QString &str);
 	void draw(GLfloat x, GLfloat y, GLfloat z, const QString &str, const QColor &col);
-	QFont font() const;
+	int width(const QString &str);
+	int height();
 };
 
 #endif // GLFONT_H
