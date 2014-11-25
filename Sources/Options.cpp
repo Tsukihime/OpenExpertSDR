@@ -178,7 +178,7 @@ void Options::setWaveFilesDirLocation(QString path)
 		int ret = msgBox.exec();
 		if(ret == QMessageBox::Yes)
 		{
-			if(!dir.mkpath(path));
+			if(!dir.mkpath(path))
 			{
 				QMessageBox msgBox1;
 				msgBox1.setText("I can't create directory!");
@@ -214,7 +214,7 @@ void Options::SetupPluginList()
 	QString plugin_dir = QDir::currentPath() + "/device";
 	QDir plug_dir(plugin_dir, "*.dll", QDir::Name, QDir::Files | QDir::Hidden | QDir::System);
 
-	for(int i = 0; i < plug_dir.count(); i++)
+	for(uint i = 0; i < plug_dir.count(); i++)
 	{
 		QString libpath = plugin_dir + "/" + plug_dir[i];
 		QString InfoStr = "";

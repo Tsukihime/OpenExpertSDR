@@ -123,6 +123,7 @@ class Panarama : public QGLWidget
 	GLFont *info_font;
 	GLFont *dbm_font;
 	GLFont *band_font;
+	GLFont *cursor_font;
     QPixmap *pRulePixmap;
     GLuint RuleTexture;
     QPixmap *pLeftRange;

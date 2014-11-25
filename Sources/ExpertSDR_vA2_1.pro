@@ -119,7 +119,8 @@ SOURCES += CalibrateSC/Calibrator/CalibrProc.cpp \
     SdrPlugin/extioplugin.cpp \
     dttsplibrary.cpp \
     GLFont/glfont.cpp
-RESOURCES += images.qrc
+RESOURCES += images.qrc \
+    bg.qrc
 FORMS += CalibrateSC/Calibrator/Calibrator.ui \
     Wav/fileList.ui \
     Wav/wavSample.ui \

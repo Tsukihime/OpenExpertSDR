@@ -166,10 +166,10 @@ Panarama::Panarama(QWidget *pOpt, QWidget *parent)
 	LimitMinLowBand = -20000*2.0/SampleRate;
 	LimitMaxHighBand = 20000*2.0/SampleRate;
 	pRulePixmap = new QPixmap(":images/rule.png");
-	pBackgroundPixmap = new QPixmap(":images/3.bmp");
-	pBackgroundPixmap2 = new QPixmap(":images/4.bmp");
-	pBackgroundPixmap3 = new QPixmap(":images/5.bmp");
-	pBackgroundPixmap4 = new QPixmap(":images/www.bmp");
+	pBackgroundPixmap = new QPixmap(":images/Panorama/bg/3.png");
+	pBackgroundPixmap2 = new QPixmap(":images/Panorama/bg/4.png");
+	pBackgroundPixmap3 = new QPixmap(":images/Panorama/bg/5.png");
+	pBackgroundPixmap4 = new QPixmap(":images/Panorama/bg/www.png");
 	pLeftRange = new QPixmap(":images/Panorama/agt_back-3.png");
 	pRightRange = new QPixmap(":images/Panorama/agt_forward-5.png");
 	BackgroundType = IMAGE;
@@ -312,6 +312,7 @@ Panarama::~Panarama()
 	delete info_font;
 	delete dbm_font;
 	delete band_font;
+	delete cursor_font;
 }
 
 void Panarama::SetBand(int band)
@@ -407,8 +408,9 @@ void Panarama::initializeGL()
 	posRule = 1.0 - sPosRule*2.0/height();
 	lenRule = RULE_HEIGH*2.0f/height();
 
-	info_font = new GLFont(this, QFont("Calibri", 9));
-	dbm_font = new GLFont(this, QFont("Arial", 9));
+	info_font = new GLFont(this, QFont("Verdana", 8));
+	dbm_font = new GLFont(this, QFont("Verdana", 8));
+	cursor_font = new GLFont(this, QFont("Verdana", 10));
 	band_font = new GLFont(this, QFont("Calibri", 12, QFont::Bold));
 }
 
@@ -2765,10 +2767,10 @@ void Panarama::DrawCursor()
 					Num = ((MovePosX - sPosZoomPan - dPosZoomPan)*SampleRate/2.0)/(sScaleRuleX + dScaleRuleX) - (sDDSFreq + dDDSFreq - sPosZoomPan - dPosZoomPan)*SampleRate/2.0 + SampleRate/2.0;
                     StrNum = freqToStr(Num);
 
-                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "VFO: "+StrNum+" Hz", Qt::white);
+					cursor_font->draw(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, 0, "VFO: "+StrNum+" Hz", Qt::white);
 					Num = (MovePosY-(posRule))*(sLenDbmY+dLenDbmY)/(1.0 - (posRule)) + (sOffsetDbm+dOffsetDbm);
                     StrNum = QString("%1").arg(Num, 0, 'f', 1);
-                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 15*ScaleWindowY, StrNum + " dBm", Qt::white);
+					cursor_font->draw(MovePosX + 10*ScaleWindowX, MovePosY - 15*ScaleWindowY, 0, StrNum + " dBm", Qt::white);
 				}
 			}
 			glColor4d(1.0, 1.0, 1.0, 0.3);
@@ -2876,7 +2878,7 @@ void Panarama::DrawCursor()
 				{
 					Num = ((MovePosX - sPosZoomPan - dPosZoomPan)*SampleRate/2.0)/(sScaleRuleX + dScaleRuleX) - (sDDSFreq + dDDSFreq - sPosZoomPan - dPosZoomPan)*SampleRate/2.0 + SampleRate/2.0;
                     StrNum = freqToStr(Num);
-                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "VFO: "+StrNum+" Hz", Qt::white);
+					cursor_font->draw(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, 0, "VFO: "+StrNum+" Hz", Qt::white);
 				}
 			}
 
@@ -2939,12 +2941,12 @@ void Panarama::DrawCursor()
 				{
 					Num = ((MovePosX - sPosZoomPan - dPosZoomPan)*SampleRate/2.0)/(sScaleRuleX + dScaleRuleX) - (sDDSFreq + dDDSFreq - sPosZoomPan - dPosZoomPan)*SampleRate/2.0 + SampleRate/2.0;
                     StrNum = freqToStr(Num);
-                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "VFO: "+StrNum+" Hz", Qt::white);
+					cursor_font->draw(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, 0, "VFO: "+StrNum+" Hz", Qt::white);
 					if(MovePosY > (posRule))
 					{
 						Num = (MovePosY-(posRule))*(sLenDbmY+dLenDbmY)/(1.0 - (posRule)) + (sOffsetDbm+dOffsetDbm);
 						StrNum = QString("%1").arg(Num, 0, 'f', 1);
-                        DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 15*ScaleWindowY, StrNum + " dBm", Qt::white);
+						cursor_font->draw(MovePosX + 10*ScaleWindowX, MovePosY - 15*ScaleWindowY, 0, StrNum + " dBm", Qt::white);
 					}
 				}
 			}
@@ -2983,12 +2985,12 @@ void Panarama::DrawCursor()
 				{
 					Num = ((MovePosX - sPosZoomPan - dPosZoomPan)*SampleRate/2.0)/(sScaleRuleX + dScaleRuleX) - (sDDSFreq + dDDSFreq - sPosZoomPan - dPosZoomPan)*SampleRate/2.0 + SampleRate/2.0;
                     StrNum = freqToStr(Num);
-                    DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, "VFO: "+StrNum+" Hz", Qt::white);
+					cursor_font->draw(MovePosX + 10*ScaleWindowX, MovePosY + 15*ScaleWindowY, 0, "VFO: "+StrNum+" Hz", Qt::white);
 					if(MovePosY > (posRule))
 					{
 						Num = (MovePosY-(posRule))*(sLenDbmY+dLenDbmY)/(1.0 - (posRule)) + (sOffsetDbm+dOffsetDbm);
 						StrNum = QString("%1").arg(Num, 0, 'f', 1);
-                        DrawInfo(MovePosX + 10*ScaleWindowX, MovePosY - 15*ScaleWindowY, StrNum + " dBm", Qt::white);
+						cursor_font->draw(MovePosX + 10*ScaleWindowX, MovePosY - 15*ScaleWindowY, 0, StrNum + " dBm", Qt::white);
 					}
 				}
 			}

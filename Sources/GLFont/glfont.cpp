@@ -70,11 +70,11 @@ QImage GLFont::create_font_img(const QFont &fnt, int texture_side)
 		{
 			unsigned char idx = 16 * i + k;
 			QChar ch(idx);
-			int ch_w = font_metrics->width(ch) + 2; // -1..1 px outline
-			int ch_h = font_metrics->height() + 2; // -1..1 px outline
+			int ch_w = font_metrics->width(ch); // -1..1 px outline
+			int ch_h = font_metrics->height(); // -1..1 px outline
 
 			QRectF r;
-			r.setTop(pos_y - ch_h);
+			r.setTop(pos_y - ch_h + 1);
 			r.setLeft(pos_x);
 			r.setWidth(ch_w);
 			r.setHeight(ch_h);
@@ -82,16 +82,16 @@ QImage GLFont::create_font_img(const QFont &fnt, int texture_side)
 
 
 			int txt_x = pos_x;
-			int txt_y = pos_y - font_metrics->descent() - font_metrics->underlinePos() - 1;
+			int txt_y = pos_y - font_metrics->descent();
 
 			// 1 px outline
 			p.setPen(QPen(Qt::black));
-			for(int a = 0; a < 3; a++)
-				for(int b = 0; b < 3; b++)
+			for(int a = -1; a < 2; a++)
+				for(int b = -1; b < 2; b++)
 					p.drawText(txt_x + a, txt_y + b, ch);
 
 			p.setPen(QPen(Qt::white));
-			p.drawText(txt_x + 1, txt_y + 1, ch);
+			p.drawText(txt_x, txt_y, ch);
 
 			//p.setPen(QPen(Qt::red));
 			//p.drawRect(r);
@@ -101,7 +101,7 @@ QImage GLFont::create_font_img(const QFont &fnt, int texture_side)
 	}
 	p.end();
 
-	img.save("lo.png", "PNG");
+	//img.save("lo.png", "PNG");
 
 	return img;
 }
@@ -134,7 +134,7 @@ void GLFont::fill_call_lists(int tex_side)
 
 		GLdouble ch_x1 = r.left() / tex_side;
 		GLdouble ch_y1 = 1 - r.bottom() / tex_side; // 1- means convert y coord from top = 0 to bottom = 0
-		GLdouble ch_x2 = r.right() / tex_side;
+		GLdouble ch_x2 = (r.right() + 1) / tex_side; // +1 means pix per pix tex magic
 		GLdouble ch_y2 = 1 - r.top() / tex_side;
 
 		glyphs[i].list = glGenLists(1);
@@ -184,6 +184,24 @@ void GLFont::draw(GLfloat x, GLfloat y, GLfloat z, const QString &str)
 	draw(x, y, z, str, Qt::white);
 }
 
+inline double trunc_delta(double val)
+{
+	double o = val - (int)val;
+
+	if(o >= 0.5)
+	{
+		return 1 - o;
+	}
+	else if(o <= -0.5)
+	{
+		return -1 - o;
+	}
+	else
+	{
+		return -o;
+	}
+}
+
 void GLFont::draw(GLfloat x, GLfloat y, GLfloat z, const QString &str, const QColor &col)
 {
 	GLdouble old_col[4];
@@ -218,9 +236,20 @@ void GLFont::draw(GLfloat x, GLfloat y, GLfloat z, const QString &str, const QCo
 	GLdouble scale_x = screen_scale_x/current_scale_x;
 	GLdouble scale_y = screen_scale_y/current_scale_y;
 
-	glScaled(scale_x, scale_y, 0);
+	glScaled(scale_x, scale_y, 1);
 
 	glTranslated(0, -px_font_descent, 0);
+
+	// pixel padding
+	glGetDoublev(GL_MODELVIEW_MATRIX, &matrix[0][0]);
+	GLdouble px_x = matrix[3][0] / matrix[0][0];
+	GLdouble px_y = matrix[3][1] / matrix[1][1];
+
+	GLdouble dx = trunc_delta(px_x);
+	GLdouble dy = trunc_delta(px_y);
+
+	glTranslated(dx, dy, 0);
+	// end pix pad
 
 	glDisable(GL_DEPTH_TEST);
 	for(int i = 0; i < str.size(); i++)
@@ -240,7 +269,7 @@ void GLFont::draw(GLfloat x, GLfloat y, GLfloat z, const QString &str, const QCo
 
 int GLFont::width(const QString &str)
 {
-	return font_metrics->width(str) + str.length() * 2;
+	return font_metrics->width(str);
 }
 
 int GLFont::height()
