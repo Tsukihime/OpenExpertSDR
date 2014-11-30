@@ -192,6 +192,8 @@ void DttSP::SetNB(bool Status)
     pDsp->SetNB(Status);
     pDsp->SetRXListen(RX2_CHANNEL);
     pDsp->SetNB(Status);
+	pDsp->SetRXListen(RX_PANARAMA_CHANNEL);
+	pDsp->SetNB(Status);
 }
 
 void DttSP::SetNBvals(double Val)
@@ -200,6 +202,8 @@ void DttSP::SetNBvals(double Val)
     pDsp->SetNBvals(Val);
     pDsp->SetRXListen(RX2_CHANNEL);
     pDsp->SetNBvals(Val);
+	pDsp->SetRXListen(RX_PANARAMA_CHANNEL);
+	pDsp->SetNBvals(Val);
 }
 
 void DttSP::SetSdrOm(bool Status)
@@ -208,6 +212,8 @@ void DttSP::SetSdrOm(bool Status)
     pDsp->SetSDROM(Status);
     pDsp->SetRXListen(RX2_CHANNEL);
     pDsp->SetSDROM(Status);
+	pDsp->SetRXListen(RX_PANARAMA_CHANNEL);
+	pDsp->SetSDROM(Status);
 }
 
 void DttSP::SetSdrOmvals(double Val)
@@ -216,6 +222,8 @@ void DttSP::SetSdrOmvals(double Val)
     pDsp->SetSDROMvals(Val);
     pDsp->SetRXListen(RX2_CHANNEL);
     pDsp->SetSDROMvals(Val);
+	pDsp->SetRXListen(RX_PANARAMA_CHANNEL);
+	pDsp->SetSDROMvals(Val);
 }
 
 void DttSP::SetBin(bool Status)
