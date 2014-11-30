@@ -390,16 +390,23 @@ void Panarama::initializeGL()
 	Len = BeginX + 1;
 	StepCount = ((int)(Len/Step));
 
-	for(int i = 0; i < 2; i++)
-	{
-		glGenTextures(1,&WFTexture[i]);
-		glBindTexture(GL_TEXTURE_2D,WFTexture[i]);
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WF_TEXTURE_WIDTH, WF_TEXTURE_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImage);
-	}
+	size_t img_sz = IMAGE_LEN * IMAGE_LEN * NUM_COLOR;
+	GLvoid *pImg = malloc(img_sz);
+	memset(pImg, 0xFF000000, img_sz);
+
+	for(int i = 0; i < WF_TEX_H_CNT; i++)
+		for(int k = 0; k < WF_TEX_W_CNT; k++)
+		{
+			glGenTextures(1, &WFTextures[i][k]);
+			glBindTexture(GL_TEXTURE_2D, WFTextures[i][k]);
+			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMAGE_LEN, IMAGE_LEN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImg);
+		}
+
+	free(pImg);
 
 	glEnable(GL_MULTISAMPLE);
 	StepMoveGrid = 0;
@@ -3380,57 +3387,56 @@ void Panarama::DrawInfo(GLdouble X, GLdouble Y, QString Str, QColor color)
 	glPopMatrix();
 }
 
-void Panarama::CreateTexture()
-{
-	memset(pImage, 0xFF000000, WF_TEXTURE_WIDTH * WF_TEXTURE_HEIGHT * NUM_COLOR);
-}
-
 void Panarama::DrawWaterfall()
 {
 	glPushMatrix();
 	glEnable(GL_TEXTURE_2D);
 	MakeSubTexture();
 	GLdouble Zero = 0.0;
-	GLdouble LenH = -WF_TEXTURE_HEIGHT*ScaleWindowY;
+	GLdouble LenH = -IMAGE_LEN*ScaleWindowY;
 	GLdouble dx = -1.0 - (sPosZoomPan + dPosZoomPan);
-	GLdouble OffsetWf = (WF_TEXTURE_HEIGHT - IndxSubTexture - ((double)CntLineSpeed)/LineSpeedMax)*ScaleWindowY;
+	GLdouble OffsetWf = (IMAGE_LEN - IndxSubTexture - ((double)CntLineSpeed)/LineSpeedMax)*ScaleWindowY;
 	glColor4f(1,1,1,1);
 	glTranslatef(sPosZoomPan + dPosZoomPan - ox1, posRule - (RULE_HEIGH-1)*ScaleWindowY, 0.0);
 	glScaled(sScaleRuleX + dScaleRuleX, 1.15, 1.0);
 	glTranslatef(0.0, OffsetWf, 0.0);
 	glPushMatrix();
 
-	GLuint cur_tex, old_tex;
+	// update textures
+	GLubyte *pLine = (GLubyte *)pNewLineImage;
 
-	switch(NumLineTextures){
-	case 0:
-		cur_tex = WFTexture[0];
-		old_tex = WFTexture[1];
-		break;
-	case 1:
-	default:
-		cur_tex = WFTexture[1];
-		old_tex = WFTexture[0];
-		break;
+	for(int i = 0; i < WF_TEX_W_CNT; i++)
+	{
+		glBindTexture(GL_TEXTURE_2D, WFTextures[NumLineTextures][i]);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, IndxSubTexture, IMAGE_LEN, 1, GL_RGBA, GL_UNSIGNED_BYTE, pLine);
+		pLine += IMAGE_LEN * NUM_COLOR;
 	}
 
-	glBindTexture(GL_TEXTURE_2D, cur_tex);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (WF_TEXTURE_HEIGHT - 1)&IndxSubTexture, WF_TEXTURE_WIDTH, 1, GL_RGBA, GL_UNSIGNED_BYTE, pNewLineImage);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0, 0.0); glVertex3f(dx, LenH, 0.0);
-	glTexCoord2f(0.0, 1.0); glVertex3f(dx, Zero, 0.0);
-	glTexCoord2f(1.0, 1.0); glVertex3f(dx + 2.0, Zero, 0.0);
-	glTexCoord2f(1.0, 0.0); glVertex3f(dx + 2.0, LenH, 0.0);
-	glEnd();
+	// draw quads
+	for(int i = 0; i < WF_TEX_H_CNT; i++)
+	{
+		int num_line_not_negative = NumLineTextures + WF_TEX_H_CNT;
+		int row = (-i + num_line_not_negative) % WF_TEX_H_CNT;
 
-	glTranslated(0.0, -WF_TEXTURE_HEIGHT*ScaleWindowY, 0.0);
-	glBindTexture(GL_TEXTURE_2D, old_tex);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0, 0.0); glVertex3f(dx, LenH, 0.0);
-	glTexCoord2f(0.0, 1.0); glVertex3f(dx, Zero, 0.0);
-	glTexCoord2f(1.0, 1.0); glVertex3f(dx + 2.0, Zero, 0.0);
-	glTexCoord2f(1.0, 0.0); glVertex3f(dx + 2.0, LenH, 0.0);
-	glEnd();
+		GLdouble x = dx;
+		GLdouble tex_w = 2.0/WF_TEX_W_CNT;
+
+		for(int col = 0; col < WF_TEX_W_CNT; col++)
+		{
+			glBindTexture(GL_TEXTURE_2D, WFTextures[row][col]);
+
+			glBegin(GL_QUADS);
+			glTexCoord2f(0.0, 0.0); glVertex3f(x, LenH, 0.0);
+			glTexCoord2f(0.0, 1.0); glVertex3f(x, Zero, 0.0);
+			glTexCoord2f(1.0, 1.0); glVertex3f(x + tex_w, Zero, 0.0);
+			glTexCoord2f(1.0, 0.0); glVertex3f(x + tex_w, LenH, 0.0);
+			glEnd();
+
+			x += tex_w;
+		}
+		glTranslated(0.0, -IMAGE_LEN*ScaleWindowY, 0.0);
+	}
+
 	glPopMatrix();
 
 
@@ -3444,15 +3450,16 @@ void Panarama::DrawWaterfall()
 		if(++CntLineSpeed >= LineSpeedMax)
 		{
 			CntLineSpeed = 0;
-			CntLinesTexture++;
-
-			if(CntLinesTexture >= WF_TEXTURE_HEIGHT*2)
-				CntLinesTexture = 0;
 
 			IndxSubTexture++;
-			if(IndxSubTexture >= WF_TEXTURE_HEIGHT)
+			if(IndxSubTexture >= IMAGE_LEN)
 				IndxSubTexture = 0;
-			NumLineTextures = CntLinesTexture/WF_TEXTURE_HEIGHT;
+
+			CntLinesTexture++;
+			if(CntLinesTexture >= IMAGE_LEN * WF_TEX_H_CNT)
+				CntLinesTexture = 0;
+
+			NumLineTextures = CntLinesTexture / IMAGE_LEN;
 		}
 	}
 }

@@ -290,12 +290,11 @@ class Panarama : public QGLWidget
 	int CntLineSpeed;
 	double LineSpeedMax;
 
-	static const int WF_TEXTURE_WIDTH = 4096;
-	static const int WF_TEXTURE_HEIGHT = 1024;
+	static const int WF_TEX_W_CNT = 8;
+	static const int WF_TEX_H_CNT = 3;
 
-	GLubyte pImage[WF_TEXTURE_WIDTH][WF_TEXTURE_HEIGHT][NUM_COLOR];
-	GLubyte	pNewLineImage[WF_TEXTURE_WIDTH][NUM_COLOR];
-	GLuint WFTexture[2];
+	GLubyte	pNewLineImage[WF_TEX_W_CNT * IMAGE_LEN][NUM_COLOR];
+	GLuint WFTextures[WF_TEX_H_CNT][WF_TEX_W_CNT];
 
 	ACTION_OBJECT ActionObject;
 
@@ -457,7 +456,6 @@ private:
     void DrawInfo(GLdouble X, GLdouble Y, QString Str, QColor color);
     void SetStepGrid();
     void SetStepDbm();
-    void CreateTexture();
     void UpdateLevels();
     void GetRGB(float Value, GLubyte *red, GLubyte *green, GLubyte *blue);
     void MakeSubTexture();
