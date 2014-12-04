@@ -337,10 +337,8 @@ class Panarama : public QGLWidget
     QTimer TimerMousePos;
     int CntLenMove;
     int pitchVal;
-    int TxVfo;
-    bool IsOnIndicateTxFilter;
+	int TxVfo;
     int FreqVfoB;
-    bool Filter2OnPanoram;
     SDRMODE Mode;
     int TrxCnt;
     int bandNum;
@@ -420,8 +418,7 @@ public slots:
     void SetSpectrRate(int Val);
     void SetWaterfallRate(int Val);
     void SpectrumEnable(bool State);
-    void SetSetupFilterMaxLevel();
-    void TxFilterEnable(bool state);
+	void SetSetupFilterMaxLevel();
     void SetTxVfo(int val);
     void SetStepFilter(int index);
     void SetStepDDS(int index);
@@ -465,6 +462,9 @@ private:
     int getBandNum();
     void updateDbmState();
     QString freqToStr(double freq);
+	void draw_filter_rect(int freq, int low, int high, QColor color, bool draw_edge, QColor edge_color, GLdouble z_pos);
+	void draw_filter_center(int freq, QColor color, QColor higlight_color, GLdouble z_pos);
+	void draw_filter_info(int vfo, int freq, int low, int high, bool show_rxtx_mark, bool is_tx, bool visible_filter_info, bool draw_on_left_side, QString vfo_name);
 
 private slots:
 	void MeanTimer();

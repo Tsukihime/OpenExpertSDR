@@ -56,9 +56,6 @@ Panarama::Panarama(QWidget *pOpt, QWidget *parent)
 	isUpdate = false;
 	TrxCnt = 1000;
 
-	IsOnIndicateTxFilter = false;
-	Filter2OnPanoram = false;
-
 	currentBand = 13;
 	DbmTxState.offset = -120;
 	DbmTxState.scale = 100;
@@ -440,9 +437,10 @@ void Panarama::paintGL()
 
 	DrawZoomer();
 	DrawGrid();
-	DrawFilter();
 	if((1.0-posRule)/ScaleWindowY > 50)
 		DrawDbm();
+
+	DrawFilter();
 	DrawWaterfall();
 	if(IsWindow)
 		DrawCursor();
@@ -2096,7 +2094,7 @@ void Panarama::DrawGrid()
 		BeginGrid += GridStep;
 		Num += StepNum;
 	}
-	glPointSize(3);
+	glPointSize(4);
 	glEnable(GL_POINT_SMOOTH);
 	for(GLdouble i = BeginGrid - 1.0; i < (EndX - 2*ox30/(sScaleRuleX + dScaleRuleX)); i += GridStep)
 	{
@@ -2115,418 +2113,294 @@ void Panarama::DrawGrid()
 	glPopMatrix();
 }
 
-void Panarama::DrawFilter()
+void Panarama::draw_filter_rect(int freq, int low, int high, QColor color, bool draw_edge, QColor edge_color, GLdouble z_pos)
 {
-    double vfob = ((sFilter2+dFilter2)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
-    double vfoa = ((sFilter+dFilter)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
-    bool vfo_ab = vfoa < vfob;
+	GLdouble scale_x = sScaleRuleX + dScaleRuleX;
+	GLdouble filter_x_offset = freq * 2.0 / SampleRate - (sPosZoomPan + dPosZoomPan);
 
-	int r,g,b,a;
-	float tmpS = sScaleRuleX + dScaleRuleX;
-	float tmp2 = sFilter+ dFilter-sPosZoomPan - dPosZoomPan;
-	GLfloat tmpPosX1, tmpPosX2, tmpY1;
-	if((TxVfo == 0 && (IsOnIndicateTxFilter || isRitOn)))
-	{
-		Filter2OnPanoram = false;
-		glPushMatrix();
-		glTranslated(sPosZoomPan + dPosZoomPan, posRule, 0.0);
-		glScaled(tmpS, 1.0 - ( posRule), 1.0);
-		tmp2 = sFilter+dFilter-sPosZoomPan-dPosZoomPan;
-		tmpPosX1 = tmp2 + BandTxLow*2.0/SampleRate;
-		tmpPosX2 = tmp2 + BandTxHigh*2.0/SampleRate;
-		tmpY1 = 1.0 - 2*oy20/(1.0 - (posRule));
-		glColor4d(1.0, 0.0, 0.0, 1.0);
-		glBegin(GL_LINES);
-		if(Mode == CWL || Mode == CWU)
-		{
-			glVertex3d(tmp2, 1.0, -0.38);
-			glVertex3d(tmp2, 0.0, -0.38);
-			glVertex3d(tmp2 + sPich, tmpY1, -0.38);
-			glVertex3d(tmp2 + sPich, 0.0, -0.38);
-			glVertex3d(tmp2 + sPich - ox5/tmpS, tmpY1, -0.45);
-			glVertex3d(tmp2 + sPich + ox5/tmpS, tmpY1, -0.45);
-		}
-		else
-		{
-			glVertex3d(tmp2, 1.0, -0.38);
-			glVertex3d(tmp2, 0.0, -0.38);
-			glVertex3d(tmpPosX1, tmpY1, -0.38);
-			glVertex3d(tmpPosX1, 0.0, -0.38);
-			glVertex3d(tmpPosX2, 0.0, -0.38);
-			glVertex3d(tmpPosX2, tmpY1, -0.38);
-			glVertex3d(tmpPosX1, tmpY1, -0.38);
-			glVertex3d(tmpPosX2, tmpY1, -0.38);
-		}
-		glEnd();
-		int pixelsWide = info_font->width("TX");
-		float tmpxx = tmpPosX1 + (BandTxHigh*2.0/SampleRate - BandTxLow*2.0/SampleRate)/2.0;
-		if(Mode == CWL || Mode == CWU)
-			info_font->draw(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX");
-		else
-			info_font->draw(tmpxx - pixelsWide*ScaleWindowX/2.0, 1.0 - 1.8*oy20/(1.0 - posRule), -0.45, "TX");
-		glPopMatrix();
-	}
-	else if(TxVfo == 0 && !IsOnIndicateTxFilter && IsFilter2)
-	{
-		Filter2OnPanoram = false;
-		glPushMatrix();
-		glTranslated(sPosZoomPan + dPosZoomPan, posRule, 0.0);
-		glScaled(tmpS, 1.0 - (posRule), 1.0);
-		tmp2 = sFilter+dFilter-sPosZoomPan-dPosZoomPan;
-		tmpPosX1 = tmp2 + BandTxLow*2.0/SampleRate;
-		tmpPosX2 = tmp2 + BandTxHigh*2.0/SampleRate;
-		tmpY1 = 1.0 - 2*oy20/(1.0 - (posRule));
-		glColor4d(1.0, 0.0, 0.0, 1.0);
-		glBegin(GL_LINES);
-		if(Mode == CWL || Mode == CWU)
-		{
-			glVertex3d(tmp2, 1.0, -0.38);
-			glVertex3d(tmp2, 0.0, -0.38);
-			glVertex3d(tmp2 + sPich, tmpY1, -0.38);
-			glVertex3d(tmp2 + sPich, 0.0, -0.38);
-			glVertex3d(tmp2 + sPich - ox5/tmpS, tmpY1, -0.45);
-			glVertex3d(tmp2 + sPich + ox5/tmpS, tmpY1, -0.45);
-		}
-		else
-		{
-			glVertex3d(tmp2, 1.0, -0.38);
-			glVertex3d(tmp2, 0.0, -0.38);
-			glVertex3d(tmpPosX1, tmpY1, -0.38);
-			glVertex3d(tmpPosX1, 0.0, -0.38);
-			glVertex3d(tmpPosX2, 0.0, -0.38);
-			glVertex3d(tmpPosX2, tmpY1, -0.38);
-			glVertex3d(tmpPosX1, tmpY1, -0.38);
-			glVertex3d(tmpPosX2, tmpY1, -0.38);
-		}
-		glEnd();
-		int pixelsWide = info_font->width("TX");
-		float tmpxx = tmpPosX1 + (BandTxHigh*2.0/SampleRate - BandTxLow*2.0/SampleRate)/2.0;
-		if(Mode == CWL || Mode == CWU)
-			info_font->draw(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX");
-		else
-			info_font->draw(tmpxx - pixelsWide*ScaleWindowX/2.0, 1.0 - 1.8*oy20/(1.0 - posRule), -0.45, "TX");
-		glPopMatrix();
-	}
-	else if((TxVfo != 0) && ((sFilter2+dFilter2) > 1.0 || (sFilter2+dFilter2) < -1.0) && (TRxMode == TX))
-	{
-		Filter2OnPanoram = true;
-		glPushMatrix();
-		glTranslated(sPosZoomPan + dPosZoomPan, posRule, 0.0);
-		glScaled(tmpS, 1.0 - (posRule), 1.0);
-		tmp2 = sFilter+dFilter-sPosZoomPan-dPosZoomPan;
-		tmpPosX1 = tmp2 + BandTxLow*2.0/SampleRate;
-		tmpPosX2 = tmp2 + BandTxHigh*2.0/SampleRate;
-		tmpY1 = 1.0 - 2*oy20/(1.0 - (posRule));
-		glColor4d(1.0, 0.0, 0.0, 1.0);
-		glBegin(GL_LINES);
-			if(Mode == CWL || Mode == CWU)
-			{
-				glVertex3d(tmp2, 1.0, -0.38);
-				glVertex3d(tmp2, 0.0, -0.38);
-				glVertex3d(tmp2 + sPich, tmpY1, -0.38);
-				glVertex3d(tmp2 + sPich, 0.0, -0.38);
-				glVertex3d(tmp2 + sPich - ox5/tmpS, tmpY1, -0.45);
-				glVertex3d(tmp2 + sPich + ox5/tmpS, tmpY1, -0.45);
-			}
-			else
-			{
-				glVertex3d(tmp2, 1.0, -0.38);
-				glVertex3d(tmp2, 0.0, -0.38);
-				glVertex3d(tmpPosX1, tmpY1, -0.38);
-				glVertex3d(tmpPosX1, 0.0, -0.38);
-				glVertex3d(tmpPosX2, 0.0, -0.38);
-				glVertex3d(tmpPosX2, tmpY1, -0.38);
-				glVertex3d(tmpPosX1, tmpY1, -0.38);
-				glVertex3d(tmpPosX2, tmpY1, -0.38);
-			}
-		glEnd();
-		int pixelsWide = info_font->width("TX");
-		float tmpxx = tmpPosX1 + (BandTxHigh*2.0/SampleRate - BandTxLow*2.0/SampleRate)/2.0;
-		if(Mode == CWL || Mode == CWU)
-			info_font->draw(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX");
-		else
-			info_font->draw(tmpxx - pixelsWide*ScaleWindowX/2.0, 1.0 - 1.8*oy20/(1.0 - posRule), -0.45, "TX");
-		glPopMatrix();
-	}
-	else if(TxVfo != 0 )
-	{
-		Filter2OnPanoram = false;
-		glPushMatrix();
-		glTranslated(sPosZoomPan + dPosZoomPan, posRule, 0.0);
-		glScaled(tmpS, 1.0 - (posRule), 1.0);
-		tmp2 = sFilter2+ dFilter2-sPosZoomPan - dPosZoomPan;
-		tmpPosX1 = tmp2 + BandTxLow*2.0/SampleRate;
-		tmpPosX2 = tmp2 + BandTxHigh*2.0/SampleRate;
-		tmpY1 = 1.0 - 2*oy20/(1.0 - (posRule));
-		glColor4d(1.0, 0.0, 0.0, 1.0);
-		glBegin(GL_LINES);
-			if(Mode == CWL || Mode == CWU)
-			{
-				glVertex3d(tmp2, 1.0, -0.35);
-				glVertex3d(tmp2, 0.0, -0.35);
-				glVertex3d(tmp2 + sPich, tmpY1, -0.35);
-				glVertex3d(tmp2 + sPich, 0.0, -0.35);
-				glVertex3d(tmp2 + sPich - ox5/tmpS, tmpY1, -0.45);
-				glVertex3d(tmp2 + sPich + ox5/tmpS, tmpY1, -0.45);
-			}
-			else
-			{
-				glVertex3d(tmp2, 1.0, -0.35);
-				glVertex3d(tmp2, 0.0, -0.35);
-				glVertex3d(tmpPosX1, tmpY1, -0.35);
-				glVertex3d(tmpPosX1, 0.0, -0.35);
-				glVertex3d(tmpPosX2, 0.0, -0.35);
-				glVertex3d(tmpPosX2, tmpY1, -0.35);
-				glVertex3d(tmpPosX1, tmpY1, -0.35);
-				glVertex3d(tmpPosX2, tmpY1, -0.35);
-			}
-		glEnd();
-		int pixelsWide = info_font->width("TX");
-		float tmpxx = tmpPosX1 + (BandTxHigh*2.0/SampleRate - BandTxLow*2.0/SampleRate)/2.0;
-		if(Mode == CWL || Mode == CWU)
-			info_font->draw(tmp2 + sPich - pixelsWide*1.5/width()/tmpS, 1.0 - 1.8*oy20/(1.0 - (posRule)), -0.45, "TX");
-		else
-			info_font->draw(tmpxx - pixelsWide*ScaleWindowX/2.0, 1.0 - 1.8*oy20/(1.0 - posRule), -0.45, "TX");
-		glPopMatrix();
-		double Num = ((sFilter2+dFilter2)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
-		QString str = "B: " + freqToStr(Num) + " Hz";
-		pixelsWide = info_font->width(str);
-		int pixH = info_font->height();
+	GLfloat tmpPosX1 = filter_x_offset + low * 2.0 / SampleRate;
+	GLfloat tmpPosX2 = filter_x_offset + high * 2.0 / SampleRate;
 
-        int padding = 7;
-        GLdouble filter_centerX = ((sFilter2+ dFilter2) - (sPosZoomPan + dPosZoomPan))*(tmpS) + (sPosZoomPan + dPosZoomPan);
-        GLdouble shift = 0;
-
-        bool right_end = (filter_centerX + (pixelsWide + padding)*ScaleWindowX) > 1;
-        bool left_end = (filter_centerX - (pixelsWide + padding)*ScaleWindowX) < -1;
-        bool text_left = (!vfo_ab || right_end) && !left_end;
-
-        if(text_left) {
-            shift = -(pixelsWide + padding)*ScaleWindowX;
-        } else {
-            shift = padding*ScaleWindowX;
-        }
-
-		if(!IsFilter2)
-            DrawInfo(filter_centerX + shift, 1.0 - pixH*ScaleWindowY/2.0, str, Qt::red);
-		else
-            DrawInfo(filter_centerX + shift, 1.0 - pixH*ScaleWindowY/2.0, str, ColorFilter2);
-	}
-	if(IsFilter2)
-	{
-		glPushMatrix();
-		glTranslated(sPosZoomPan + dPosZoomPan, posRule, 0.0);
-		glScaled(tmpS, 1.0 - (posRule), 1.0);
-		float tmp1 = sFilter2+ dFilter2-sPosZoomPan - dPosZoomPan;
-		glColor4d(1.0, 1.0, 1.0, AlphaColorCF2);
-		glBegin(GL_QUADS);
-			glVertex3d(tmp1 + 2*ox1/(tmpS), 1.0, -0.37);
-			glVertex3d(tmp1 + 2*ox1/(tmpS), 0.0, -0.37);
-			glVertex3d(tmp1 -2*ox1/(tmpS), 0.0, -0.37);
-			glVertex3d(tmp1 -2*ox1/(tmpS), 1.0, -0.37);
-		glEnd();
-		qglColor(pPanOpt->pColorFilter2->getColor());
-		glBegin(GL_LINES);
-			glVertex3d(tmp1, 1.0, -0.38);
-			glVertex3d(tmp1, 0.0, -0.38);
-		glEnd();
-		glLineWidth(1.0);
-		pPanOpt->pColorBandFilter2->getColor().getRgb(&r, &g, &b, &a);
-		qglColor(QColor(r,g,b, pPanOpt->ui.hslTransparentFilter2->value()));
-		glBegin(GL_QUADS);
-			glVertex3d(tmp1 + sBandPassLow + dBandPassLow, 1.0, -0.33);
-			glVertex3d(tmp1 + sBandPassLow + dBandPassLow, 0.0, -0.33);
-			glVertex3d(tmp1 + sBandPassHigh + dBandPassHigh, 0.0, -0.33);
-			glVertex3d(tmp1 + sBandPassHigh + dBandPassHigh, 1.0, -0.33);
-		glEnd();
-		if(IsDrawFilterEdges2)
-		{
-			glLineWidth(1.0);
-			qglColor(QColor(194, 252, 200, AlphaColor2));
-			glBegin(GL_LINES);
-				glVertex3d(tmp1 + sBandPassLow + dBandPassLow, 1.0, -0.34);
-				glVertex3d(tmp1 + sBandPassLow + dBandPassLow, 0.0, -0.34);
-
-				glVertex3d(tmp1 + sBandPassHigh + dBandPassHigh, 0.0, -0.34);
-				glVertex3d(tmp1 + sBandPassHigh + dBandPassHigh, 1.0, -0.34);
-			glEnd();
-		}
-		glColor4d(1.0, 1.0, 1.0, AlphaColorPich2/255.0);
-		glBegin(GL_QUADS);
-			glVertex3d(tmp1 + sPich + 2*ox1/(tmpS), 1.0, -0.35);
-			glVertex3d(tmp1 + sPich + 2*ox1/(tmpS), 0.0, -0.35);
-			glVertex3d(tmp1 + sPich - 2*ox1/(tmpS), 0.0, -0.35);
-			glVertex3d(tmp1 + sPich - 2*ox1/(tmpS), 1.0, -0.35);
-		glEnd();
-		qglColor(pPanOpt->pColorPitch2->getColor());
-		glLineWidth(1.5);
-		glBegin(GL_LINES);
-			glVertex3d(tmp1 + sPich, 1.0, -0.37);
-			glVertex3d(tmp1 + sPich, 0.0, -0.37);
-		glEnd();
-		glPopMatrix();
-		double Num = ((sFilter2+dFilter2)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
-		QString str = "B: " + freqToStr(Num) + " Hz";
-		int pixelsWide = info_font->width(str);
-		int pixH = info_font->height();
-
-        int padding = 7;
-        GLdouble filter_centerX = ((sFilter2+ dFilter2) - (sPosZoomPan + dPosZoomPan))*(tmpS) + (sPosZoomPan + dPosZoomPan);
-        GLdouble shift = 0;
-
-        bool right_end = (filter_centerX + (pixelsWide + padding)*ScaleWindowX) > 1;
-        bool left_end = (filter_centerX - (pixelsWide + padding)*ScaleWindowX) < -1;
-        bool text_left = (!vfo_ab || right_end) && !left_end;
-
-        if(text_left) {
-            shift = -(pixelsWide + padding)*ScaleWindowX;
-        } else {
-            shift = padding*ScaleWindowX;
-        }
-
-        GLdouble text_height = pixH*ScaleWindowY;
-        GLdouble y_pos = 1.0 - text_height/2;
-
-        DrawInfo(filter_centerX + shift, y_pos, str, ColorFilter2);
-
-        QString StrNum;
-        if(
-                    (ActionObject == PRESS_LEFT_CF2) ||
-                    (ActionObject == PRESS_LEFT_BF_LEFT) ||
-                    (ActionObject == PRESS_LEFT_BF_RIGHT) ||
-                    (LastPosObject == BAND_FILTER2) ||
-                    (LastPosObject == LEFT_BAND2) ||
-                    (LastPosObject == RIGHT_BAND2)
-        )
-        {
-            if(IsVisibleInfo && IsWindow)
-            {
-                Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0);
-                StrNum = freqToStr(Num);
-                DrawInfo(filter_centerX + shift, y_pos - text_height*2, "L: "+StrNum+" Hz", Qt::white);
-
-                Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0);
-                StrNum = freqToStr(Num);
-                DrawInfo(filter_centerX + shift, y_pos - text_height*3, "H: "+StrNum+" Hz", Qt::white);
-
-                Num = ((sFilter2 + dFilter2)*SampleRate/2.0);
-                StrNum = freqToStr(Num);
-                DrawInfo(filter_centerX + shift, y_pos - text_height*4, "F: "+StrNum+" Hz", Qt::white);
-            }
-        }
-	}
 	glPushMatrix();
 	glTranslated(sPosZoomPan + dPosZoomPan, posRule, 0.0);
-	glScaled(tmpS, 1.0 - (posRule), 1.0);
-	tmp2 = sFilter+ dFilter-sPosZoomPan - dPosZoomPan;
-	if(isRitOn)
-		tmp2 += sRit + dRit;
+	glScaled(scale_x, 1.0 - (posRule), 1.0);
 
-	glColor4d(1.0, 1.0, 1.0, AlphaColorCF);
+	qglColor(color);
+
 	glBegin(GL_QUADS);
-		glVertex3d(tmp2 + 2*ox1/(tmpS), 1.0, -0.4);
-		glVertex3d(tmp2 + 2*ox1/(tmpS), 0.0, -0.4);
-		glVertex3d(tmp2 - 2*ox1/(tmpS), 0.0, -0.4);
-		glVertex3d(tmp2 - 2*ox1/(tmpS), 1.0, -0.4);
+	glVertex3d(tmpPosX1, 1.0, z_pos);
+	glVertex3d(tmpPosX1, 0.0, z_pos);
+	glVertex3d(tmpPosX2, 0.0, z_pos);
+	glVertex3d(tmpPosX2, 1.0, z_pos);
 	glEnd();
-	glLineWidth(1.5);
-	qglColor(pPanOpt->pColorFilter1->getColor());
-	glBegin(GL_LINES);
-		glVertex3d(tmp2, 1.0, -0.45);
-		glVertex3d(tmp2, 0.0, -0.45);
-	glEnd();
-	glColor4d(1.0, 1.0, 1.0, AlphaColorPich/255.0);
-	glBegin(GL_QUADS);
-		glVertex3d(tmp2 + sPich + 2*ox1/(tmpS), 1.0, -0.4);
-		glVertex3d(tmp2 + sPich + 2*ox1/(tmpS), 0.0, -0.4);
-		glVertex3d(tmp2 + sPich - 2*ox1/(tmpS), 0.0, -0.4);
-		glVertex3d(tmp2 + sPich - 2*ox1/(tmpS), 1.0, -0.4);
-	glEnd();
-	qglColor(pPanOpt->pColorPitch1->getColor());
-	glBegin(GL_LINES);
-		glVertex3d(tmp2 + sPich, 1.0, -0.45);
-		glVertex3d(tmp2 + sPich, 0.0, -0.45);
-	glEnd();
-	glLineWidth(1.0);
-	pPanOpt->pColorBandFilter1->getColor().getRgb(&r, &g, &b, &a);
-	qglColor(QColor(r,g,b, pPanOpt->ui.hslTransparentFilter1->value()));
-	glBegin(GL_QUADS);
-		glVertex3d(tmp2 + sBandPassLow + dBandPassLow, 1.0, -0.4);
-		glVertex3d(tmp2 + sBandPassLow + dBandPassLow, 0.0, -0.4);
-		glVertex3d(tmp2 + sBandPassHigh + dBandPassHigh, 0.0, -0.4);
-		glVertex3d(tmp2 + sBandPassHigh + dBandPassHigh, 1.0, -0.4);
-	glEnd();
-	if(IsDrawFilterEdges)
+
+	if(draw_edge && edge_color.alpha() != 0)
 	{
-		glLineWidth(1.0);
-		qglColor(QColor(194, 252, 200,AlphaColor));
-		glBegin(GL_LINES);
-			glVertex3d(tmp2 + sBandPassLow + dBandPassLow, 1.0, -0.42);
-			glVertex3d(tmp2 + sBandPassLow + dBandPassLow, 0.0, -0.42);
+		qglColor(edge_color);
 
-			glVertex3d(tmp2 + sBandPassHigh + dBandPassHigh, 0.0, -0.42);
-			glVertex3d(tmp2 + sBandPassHigh + dBandPassHigh, 1.0, -0.42);
+		glLineWidth(1.5);
+		glBegin(GL_LINES);
+		glVertex3d(tmpPosX1, 1.0, z_pos);
+		glVertex3d(tmpPosX1, 0.0, z_pos);
+		glVertex3d(tmpPosX2, 0.0, z_pos);
+		glVertex3d(tmpPosX2, 1.0, z_pos);
 		glEnd();
 	}
-	glLineWidth(1.5);
+
 	glPopMatrix();
-	glLineWidth(1.0);
-	glColor4d(0.5, 0.5, 0.5, AlphaColorDbm);
-	glBegin(GL_QUADS);
-		glVertex3d(-1.0, 1.0, -0.55);
-		glVertex3d(-1.0, posRule, -0.55);
-		glVertex3d(-1.0 + ox30 + ox5, posRule, -0.55);
-		glVertex3d(-1.0 + ox30 + ox5, 1.0, -0.55);
+}
+
+void Panarama::draw_filter_center(int freq, QColor color, QColor higlight_color, GLdouble z_pos)
+{
+	GLdouble scale_x = sScaleRuleX + dScaleRuleX;
+	GLdouble pans = sPosZoomPan + dPosZoomPan;
+	GLdouble filter_x_offset = freq * 2.0 / SampleRate - pans;
+
+	glLineWidth(2);
+	glPushMatrix();
+	glTranslated(sPosZoomPan + dPosZoomPan, posRule, 0.0);
+	glScaled(scale_x, 1.0 - (posRule), 1.0);
+	qglColor(color);
+	glBegin(GL_LINES);
+		glVertex3d(filter_x_offset, 1.0, z_pos);
+		glVertex3d(filter_x_offset, 0.0, z_pos);
 	glEnd();
-	double Num = ((sFilter+dFilter)-(sDDSFreq+dDDSFreq) + 1.0)*SampleRate/2.0;
-	QString str = "A: " + freqToStr(Num) + " Hz";
-	int pixelsWide = info_font->width(str);
-	int pixH = info_font->height();
 
-    int padding = 7;
-    GLdouble filter_centerX = ((sFilter+ dFilter) - (sPosZoomPan + dPosZoomPan))*(tmpS) + (sPosZoomPan + dPosZoomPan);
-    GLdouble shift = 0;
+	if(higlight_color.alpha() != 0)
+	{
+		qglColor(higlight_color);
+		GLdouble shift = 2 * ScaleWindowX / scale_x; // 2px
+		glBegin(GL_QUADS);
+		glVertex3d(filter_x_offset + shift, 1.0, z_pos);
+		glVertex3d(filter_x_offset + shift, 0.0, z_pos);
+		glVertex3d(filter_x_offset - shift, 0.0, z_pos);
+		glVertex3d(filter_x_offset - shift, 1.0, z_pos);
+		glEnd();
+	}
+	glPopMatrix();
+}
 
-    bool right_end = (filter_centerX + (pixelsWide + padding)*ScaleWindowX) > 1;
-    bool left_end = (filter_centerX - (pixelsWide + padding)*ScaleWindowX) < -1;
-    bool text_left = ((vfo_ab && ((TxVfo != 0) || IsFilter2)) || right_end) && !left_end;
+void Panarama::draw_filter_info(int vfo, int freq, int low, int high, bool show_rxtx_mark, bool is_tx, bool visible_filter_info, bool draw_on_left_side, QString vfo_name)
+{
+	GLdouble z_pos = -0.75;
+	QString head_str;
+	QColor h_color;
+	QString vfo_str = vfo_name + ": " + freqToStr(vfo) + " Hz";
 
-    if(text_left) {
-        shift = -(pixelsWide + padding)*ScaleWindowX;
-    } else {
-        shift = padding*ScaleWindowX;
-    }
+	if(is_tx)
+	{
+		head_str = "TX";
+		h_color = QColor(255, 0, 0, 255);
+	}
+	else
+	{
+		head_str = "RX";
+		h_color = QColor(150, 150, 150, 255);
+	}
 
-    GLdouble text_height = pixH*ScaleWindowY;
-    GLdouble y_pos = 1.0 - text_height/2;
+	GLdouble x_pos;
+	GLdouble y_pos = 1; // top max
 
-    DrawInfo(filter_centerX + shift, y_pos, str, QColor(255,255,255,255));
+	GLdouble filters = freq * 2.0 / SampleRate;
+	GLdouble pans = (sPosZoomPan + dPosZoomPan);
+	GLdouble scale_x = sScaleRuleX + dScaleRuleX;
+	GLdouble filter_x_offset = (filters - pans) * scale_x + pans;
 
-    QString StrNum;
-    if(
-                (ActionObject == PRESS_LEFT_CF) ||
-                (ActionObject == PRESS_LEFT_BF_LEFT) ||
-                (ActionObject == PRESS_LEFT_BF_RIGHT) ||
-                (LastPosObject == BAND_FILTER) ||
-                (LastPosObject == LEFT_BAND) ||
-                (LastPosObject == RIGHT_BAND)
-    )
-    {
-        if(IsVisibleInfo && IsWindow)
-        {
-            Num = ((sBandPassLow + dBandPassLow)*SampleRate/2.0);
-            StrNum = freqToStr(Num);
-            DrawInfo(filter_centerX + shift, y_pos - text_height*2, "L: "+StrNum+" Hz", Qt::white);
+	GLdouble vfo_text_width = info_font->width(vfo_str) * ScaleWindowX;
 
-            Num = ((sBandPassHigh + dBandPassHigh)*SampleRate/2.0);
-            StrNum = freqToStr(Num);
-            DrawInfo(filter_centerX + shift, y_pos - text_height*3, "H: "+StrNum+" Hz", Qt::white);
+	GLdouble from_center_padding = 7 * ScaleWindowX; // 7px
+	GLdouble left_padding = from_center_padding + vfo_text_width;
+	GLdouble right_padding = from_center_padding;
 
-            Num = ((sFilter + dFilter)*SampleRate/2.0);
-            StrNum = freqToStr(Num);
-            DrawInfo(filter_centerX + shift, y_pos - text_height*4, "F: "+StrNum+" Hz", Qt::white);
-        }
-    }
+	bool can_draw_left = (filter_x_offset - left_padding) > -1;
+	bool can_draw_right = (filter_x_offset + right_padding + vfo_text_width) < 1;
+	bool is_left_side;
+
+	if(draw_on_left_side)
+		is_left_side = can_draw_left;
+	else
+		is_left_side = !can_draw_right;
+
+	GLdouble rxtx_mark_x_pos;
+	if(is_left_side)
+	{
+		x_pos = filter_x_offset - left_padding;
+		rxtx_mark_x_pos = filter_x_offset - from_center_padding - band_font->width(head_str) * ScaleWindowX;
+	}
+	else
+	{
+		x_pos = filter_x_offset + right_padding;
+		rxtx_mark_x_pos = x_pos;
+	}
+
+	if(show_rxtx_mark)
+	{
+		y_pos -= band_font->height() * ScaleWindowY;
+		band_font->draw(rxtx_mark_x_pos, y_pos, z_pos, head_str, h_color);
+	}
+
+	GLdouble info_h = info_font->height() * ScaleWindowY;
+	y_pos -= info_h;
+	info_font->draw(x_pos, y_pos, z_pos, vfo_str);
+
+	y_pos -= info_h;
+
+	if(visible_filter_info)
+	{
+		QString low_str = "L: " + freqToStr(low) + " Hz";
+		QString high_str = "H: " + freqToStr(high) + " Hz";
+		QString freq_str = "F: " + freqToStr(freq) + " Hz";
+
+		y_pos -= info_h;
+		info_font->draw(x_pos, y_pos, z_pos, low_str);
+		y_pos -= info_h;
+		info_font->draw(x_pos, y_pos, z_pos, high_str);
+		y_pos -= info_h;
+		info_font->draw(x_pos, y_pos, z_pos, freq_str);
+	}
+}
+
+void Panarama::DrawFilter()
+{
+	double fvfob = ((sFilter2 + dFilter2) - (sDDSFreq + dDDSFreq) + 1.0) * SampleRate/2.0;
+	double fvfoa = ((sFilter + dFilter) - (sDDSFreq + dDDSFreq) + 1.0) * SampleRate/2.0;
+
+	int vfob = qRound(fvfob);
+	int vfoa = qRound(fvfoa);
+	bool vfo_ab = vfoa < vfob;
+
+	QColor tx_color(254, 0, 0, 47);
+	QColor tx_edge_color(255, 0, 0, 127);
+
+	GLdouble z_tx_f = -0.38;
+	GLdouble z_tx_c = -0.39;
+	GLdouble z_rx2_f = -0.40;
+	GLdouble z_rx2_c = -0.41;
+	GLdouble z_rx1_f = -0.42;
+	GLdouble z_rx1_c = -0.43;
+
+	bool rx1_filter_is_tx = false;
+
+	int freq = GetFilter();
+	double band_tx_low = BandTxLow;
+	double band_tx_high = BandTxHigh;
+
+	if(Mode == CWL || Mode == CWU)
+	{
+		int pitch = GetPitch();
+		band_tx_low = -10 + pitch;
+		band_tx_high = 10 + pitch;
+	}
+
+	if(TxVfo == 0)
+	{
+		draw_filter_rect(freq, band_tx_low, band_tx_high, tx_color, true, tx_edge_color, z_tx_f);
+	}
+	else
+	{
+		GLdouble filter2 = sFilter2 + dFilter2;
+
+		if((filter2 > 1.0 || filter2 < -1.0) && (TRxMode == TX))
+		{
+			draw_filter_rect(freq, band_tx_low, band_tx_high, tx_color, true, tx_edge_color, z_tx_f);
+			rx1_filter_is_tx = true;
+		}
+		else
+		{
+			int freq2 = GetFilter2();
+			draw_filter_rect(freq2, band_tx_low, band_tx_high, tx_color, true, tx_edge_color, z_tx_f);
+
+			if(!IsFilter2)
+			{
+				draw_filter_center(freq2, Qt::red, Qt::transparent, z_tx_c);
+				draw_filter_info(vfob, freq2, band_tx_low, band_tx_high, true, true, false, !vfo_ab, "B");
+			}
+		}
+	}
+
+	int rit = isRitOn ? getRitValue() : 0;
+
+	QColor filter_col = pPanOpt->pColorFilter1->getColor();
+	QColor filter_hi(Qt::white);
+	filter_hi.setAlpha(AlphaColorCF * 255);
+
+	draw_filter_center(freq + rit, filter_col, filter_hi, z_rx1_c);
+
+	if(Mode == CWL || Mode == CWU || Mode == DIGU || Mode == DIGL)
+	{
+		QColor cw_col = pPanOpt->pColorPitch1->getColor();
+		QColor cw_hi(Qt::white);
+		cw_hi.setAlpha(AlphaColorPich);
+		int pitch = GetPitch();
+		draw_filter_center(freq + rit + pitch, cw_col, cw_hi, z_rx1_c);
+	}
+
+	double bflow, bfhigh;
+	GetBandFilter(bflow, bfhigh);
+
+	QColor edge_color(194, 252, 200, AlphaColor);
+	QColor f_color = pPanOpt->pColorBandFilter1->getColor();
+	f_color.setAlpha(pPanOpt->ui.hslTransparentFilter1->value());
+
+	draw_filter_rect(freq + rit, bflow, bfhigh, f_color, IsDrawFilterEdges, edge_color, z_rx1_f);
+
+	bool show_filter_info = IsVisibleInfo && IsWindow &&
+			(
+				(ActionObject == PRESS_LEFT_CF) ||
+				(ActionObject == PRESS_LEFT_BF_LEFT) ||
+				(ActionObject == PRESS_LEFT_BF_RIGHT) ||
+				(LastPosObject == BAND_FILTER) ||
+				(LastPosObject == LEFT_BAND) ||
+				(LastPosObject == RIGHT_BAND)
+				);
+
+	bool rxtx_mark = IsFilter2 || (TxVfo == 1);
+	bool is_tx = (TxVfo == 0) || rx1_filter_is_tx;
+	draw_filter_info(vfoa, freq, bflow, bfhigh, rxtx_mark, is_tx, show_filter_info, vfo_ab, "A");
+
+
+	if(IsFilter2)
+	{
+		int freq2 = GetFilter2();
+
+		QColor filter2_col = pPanOpt->pColorFilter2->getColor();
+		QColor filter2_hi(Qt::white);
+		filter2_hi.setAlpha(AlphaColorCF2 * 255);
+
+		draw_filter_center(freq2, filter2_col, filter2_hi, z_rx2_c);
+
+		QColor rx2_edge_color(194, 252, 200, AlphaColor2);
+		QColor rx2_color = pPanOpt->pColorBandFilter2->getColor();
+		rx2_color.setAlpha(pPanOpt->ui.hslTransparentFilter2->value());
+
+		double bflow, bfhigh;
+		GetBandFilter(bflow, bfhigh);
+
+		draw_filter_rect(freq2, bflow, bfhigh, rx2_color, IsDrawFilterEdges2, rx2_edge_color, z_rx2_f);
+
+		if(Mode == CWL || Mode == CWU || Mode == DIGU || Mode == DIGL)
+		{
+			QColor cw2_col = pPanOpt->pColorPitch2->getColor();
+			QColor cw2_hi(Qt::white);
+			cw2_hi.setAlpha(AlphaColorPich2);
+			int pitch = GetPitch();
+			draw_filter_center(freq2 + pitch, cw2_col, cw2_hi, z_rx2_c);
+		}
+
+		bool show_filter_info = IsVisibleInfo && IsWindow &&
+				(
+					(ActionObject == PRESS_LEFT_CF2) ||
+					(ActionObject == PRESS_LEFT_BF_LEFT) ||
+					(ActionObject == PRESS_LEFT_BF_RIGHT) ||
+					(LastPosObject == BAND_FILTER2) ||
+					(LastPosObject == LEFT_BAND2) ||
+					(LastPosObject == RIGHT_BAND2)
+					);
+
+
+		bool is_tx = (TxVfo == 1);
+		draw_filter_info(vfob, freq2, bflow, bfhigh, true, is_tx, show_filter_info, !vfo_ab, "B");
+	}
 }
 
 void Panarama::DrawSpectr()
@@ -2543,7 +2417,7 @@ void Panarama::DrawSpectr()
 		glScaled(tmpS, 1.0 - (posRule), 1.0);
 		glColor4f(1.0, 1.0, 1.0, 0.7);
 		if(alphaRitLim <= 0.0f)
-			info_font->draw(tmpL + 1.2*ox5 + tmpF, 1.0-oy20/(1.0 - (posRule)), -0.42, tr("RIT"));
+			band_font->draw(tmpL + 1.2*ox5 + tmpF, 1.0-oy20/(1.0 - (posRule)), -0.42, tr("RIT"));
 		else
 			info_font->draw(tmpL + 1.2*ox5 + tmpF, 1.0-oy20/(1.0 - (posRule)), -1.0, tr("Out of range!"));
 		glColor4f(1.0, 1.0, 1.0, 0.2);
@@ -2611,6 +2485,7 @@ void Panarama::DrawSpectr()
 		glTranslated(0.0, -Zero, 0.0);
 
 		qglColor(ColorLine);
+		glLineWidth(1);
 		glVertexPointer(3, GL_FLOAT, 0, ArrayV);
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glDrawArrays(GL_LINE_STRIP,0, arr_sz);
@@ -2665,6 +2540,15 @@ void Panarama::MeanTimer()
 
 void Panarama::DrawDbm()
 {
+	glLineWidth(1.0);
+	glColor4d(0.5, 0.5, 0.5, AlphaColorDbm);
+	glBegin(GL_QUADS);
+	glVertex3d(-1.0, 1.0, -0.55);
+	glVertex3d(-1.0, posRule, -0.55);
+	glVertex3d(-1.0 + ox30 + ox5, posRule, -0.55);
+	glVertex3d(-1.0 + ox30 + ox5, 1.0, -0.55);
+	glEnd();
+
 	glPushMatrix();
 	glTranslated(0.0, posRule, 0.0);
 	glScaled(1.0, 1.0 - (posRule), 1.0);
@@ -2751,6 +2635,7 @@ void Panarama::DrawZoomer()
 
 void Panarama::DrawCursor()
 {
+	glLineWidth(1.0);
 	double Num = 0;
 	QString StrNum;
 	if(ActionObject == UNPRESSED)
@@ -4426,12 +4311,6 @@ void Panarama::SetTxVfo(int val)
 	isUpdate = true;
 }
 
-void Panarama::TxFilterEnable(bool state)
-{
-	IsOnIndicateTxFilter = state;
-	isUpdate = true;
-}
-
 bool Panarama::IsFilter2OnPanoram()
 {
 	if((TxVfo != 0) && ((sFilter2+dFilter2) < 1.0 && (sFilter2+dFilter2) > -1.0))
@@ -4534,7 +4413,7 @@ void Panarama::setRitValue(int value)
 
 int Panarama::getRitValue()
 {
-	return ritValue;
+	return sRitValue + dRitValue;
 }
 
 void Panarama::SlotChangedParametersFreq()
