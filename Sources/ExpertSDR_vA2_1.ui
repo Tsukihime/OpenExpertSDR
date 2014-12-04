@@ -2320,7 +2320,7 @@ border: 1px solid  #F9CEB8; /*#00B000;*/
           <rect>
            <x>3</x>
            <y>35</y>
-           <width>311</width>
+           <width>200</width>
            <height>12</height>
           </rect>
          </property>
@@ -2347,7 +2347,7 @@ color: #FFFFFF;
 }
 
 QPushButton::checked {
-background-color: #998A23;
+background-color: #007D00;
 color: #FFFFFF;
 }</string>
          </property>
@@ -2365,11 +2365,45 @@ color: #FFFFFF;
            <number>0</number>
           </property>
           <property name="horizontalSpacing">
-           <number>2</number>
+           <number>1</number>
           </property>
           <property name="verticalSpacing">
            <number>0</number>
           </property>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="pbAtoB">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>12</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>12</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Verdana</family>
+              <pointsize>7</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Copy VFO A to VFO B</string>
+            </property>
+            <property name="text">
+             <string>B&lt;-A</string>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="0">
            <widget class="QPushButton" name="pbSplit">
             <property name="minimumSize">
@@ -2404,109 +2438,7 @@ color: #FFFFFF;
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="pbAtoB">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>12</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>80</width>
-              <height>12</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Verdana</family>
-              <pointsize>7</pointsize>
-             </font>
-            </property>
-            <property name="toolTip">
-             <string>Copy VFO A to VFO B</string>
-            </property>
-            <property name="text">
-             <string> A-&gt;B </string>
-            </property>
-            <property name="checkable">
-             <bool>false</bool>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QPushButton" name="pbAfromB">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>12</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>80</width>
-              <height>12</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Verdana</family>
-              <pointsize>7</pointsize>
-             </font>
-            </property>
-            <property name="toolTip">
-             <string>Copy VFO B to VFO A</string>
-            </property>
-            <property name="text">
-             <string> A&lt;-B </string>
-            </property>
-            <property name="checkable">
-             <bool>false</bool>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="5">
-           <widget class="QPushButton" name="pbRx2">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>12</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>80</width>
-              <height>12</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Verdana</family>
-              <pointsize>7</pointsize>
-             </font>
-            </property>
-            <property name="toolTip">
-             <string>Enable second receiver</string>
-            </property>
-            <property name="text">
-             <string> Rx2 </string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
+          <item row="1" column="4">
            <widget class="QPushButton" name="pbAswapB">
             <property name="minimumSize">
              <size>
@@ -2530,7 +2462,7 @@ color: #FFFFFF;
              <string>Swap VFO A with VFO B</string>
             </property>
             <property name="text">
-             <string> A&lt;-&gt;B </string>
+             <string>B&lt;&gt;A</string>
             </property>
             <property name="checkable">
              <bool>false</bool>
@@ -2540,86 +2472,8 @@ color: #FFFFFF;
             </property>
            </widget>
           </item>
-          <item row="1" column="11">
-           <widget class="QPushButton" name="pbRitReset">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>12</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>80</width>
-              <height>12</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Verdana</family>
-              <pointsize>7</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string> Rx0 </string>
-            </property>
-            <property name="checkable">
-             <bool>false</bool>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="9">
-           <widget class="QPushButton" name="pbXitReset">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>12</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>80</width>
-              <height>12</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Verdana</family>
-              <pointsize>7</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string> Tx0 </string>
-            </property>
-            <property name="checkable">
-             <bool>false</bool>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="7">
-           <widget class="QWidget" name="widget_18" native="true">
-            <property name="minimumSize">
-             <size>
-              <width>3</width>
-              <height>14</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>3</width>
-              <height>14</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="4">
-           <widget class="QPushButton" name="pbTf">
+          <item row="1" column="3">
+           <widget class="QPushButton" name="pbAfromB">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -2639,10 +2493,44 @@ color: #FFFFFF;
              </font>
             </property>
             <property name="toolTip">
-             <string>Show transmit filter</string>
+             <string>Copy VFO B to VFO A</string>
             </property>
             <property name="text">
-             <string> TxF </string>
+             <string>B-&gt;A </string>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="pbRx2">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>12</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>12</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Verdana</family>
+              <pointsize>7</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Enable second receiver</string>
+            </property>
+            <property name="text">
+             <string>SubRX</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -5989,9 +5877,6 @@ p, li { white-space: pre-wrap; }
            <property name="text">
             <string>Bal2:</string>
            </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
            <property name="checked">
             <bool>false</bool>
            </property>
@@ -6030,7 +5915,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="0" column="2">
-          <widget class="QPushButton" name="pbBal1_2">
+          <widget class="QPushButton" name="pbRitReset">
            <property name="minimumSize">
             <size>
              <width>32</width>
@@ -6050,13 +5935,10 @@ p, li { white-space: pre-wrap; }
             </font>
            </property>
            <property name="toolTip">
-            <string>Press for centered</string>
+            <string>RIT reset</string>
            </property>
            <property name="text">
             <string>RIT:</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
            </property>
            <property name="checked">
             <bool>false</bool>
@@ -6064,7 +5946,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="0" column="0">
-          <widget class="QPushButton" name="pbBal1_3">
+          <widget class="QPushButton" name="pbXitReset">
            <property name="minimumSize">
             <size>
              <width>32</width>
@@ -6084,13 +5966,10 @@ p, li { white-space: pre-wrap; }
             </font>
            </property>
            <property name="toolTip">
-            <string>Press for centered</string>
+            <string>XIT reset</string>
            </property>
            <property name="text">
             <string>XIT:</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
            </property>
            <property name="checked">
             <bool>false</bool>
@@ -6230,9 +6109,6 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="text">
             <string>Bal1:</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
            </property>
            <property name="checked">
             <bool>false</bool>

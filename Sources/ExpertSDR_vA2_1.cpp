@@ -1295,7 +1295,6 @@ ExpertSDR_vA2_1::ExpertSDR_vA2_1(QWidget *parent) : QWidget(parent)
 	connect(pOpt, SIGNAL(TxMagRejCw(double)), this, SLOT(OnChangeTxGainRejCw(double)));
 	connect(pOpt, SIGNAL(TxPhaseRejCw(double)), this, SLOT(OnChangeTxPhaseRejCw(double)));
 	connect(pOpt->ui.sbColibrFreqNum, SIGNAL(valueChanged(double)), this, SLOT(ChangedCalibrateNum(double)));
-	connect(ui.pbTf, SIGNAL(clicked(bool)), pGraph->pGl, SLOT(TxFilterEnable(bool)));
 	connect(pOpt, SIGNAL(XvtrxEnable(bool)), this, SLOT(onXvtrxEnable(bool)));    onXvtrxEnable(false);
 	connect(pOpt->ui.cbXvtrxAntRx, SIGNAL(currentIndexChanged(int)), this, SLOT(onXvAntSwitch(int)));
 	connect(pOpt->ui.cbXvtrxAntTx, SIGNAL(currentIndexChanged(int)), this, SLOT(onXvAntSwitch(int)));
@@ -1841,7 +1840,6 @@ retry:
 		settings.setValue("Maximized", this->isMaximized());
 		settings.setValue("pbSplit", ui.pbSplit->isChecked());
 		settings.setValue("pbLock", ui.pbLock->isChecked());
-		settings.setValue("pbTxF", ui.pbTf->isChecked());
 		settings.setValue("slMonVolume", ui.slMonVol->value());
 		settings.setValue("slDrive", ui.slDrive->value());
 		settings.setValue("slMic", ui.slMic->value());
@@ -2497,9 +2495,6 @@ void ExpertSDR_vA2_1::readSettings()
 		tmpBValue = settings.value("pbLock", false).toBool();
 		ui.pbLock->setChecked(tmpBValue);
 		OnLock(tmpBValue);
-		tmpBValue = settings.value("pbTxF", false).toBool();
-		ui.pbTf->setChecked(tmpBValue);
-		pGraph->pGl->TxFilterEnable(tmpBValue);
 
 		tmpIValue = settings.value("slMonVolume", 50).toInt();
 		if(tmpIValue < 1 || tmpIValue > 60)
