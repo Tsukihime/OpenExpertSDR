@@ -277,7 +277,7 @@ void PanoramOpt::readSettings(QSettings *pSettings)
 		TrancpGradTop = pSettings->value("CustomTrancpGradTop", 255).toInt();
 		TrancpGradBot = pSettings->value("CustomTrancpGradBot", 255).toInt();
         pColorSolidBack->setColor(pSettings->value("GradBgrnColor2", QColor(88,0,0,255)).value<QColor>());
-		pColorSolidLineBack->setColor(pSettings->value("LineBackColor2", QColor(88,0,0,255)).value<QColor>());
+		pColorSolidLineBack->setColor(pSettings->value("LineBackColor2", QColor(20,20,20,255)).value<QColor>());
 		ui.cbDefaultSettingColor->setCurrentIndex(pSettings->value("StyleType", 0).toInt());
 		ui.chbGridMoving->setChecked(pSettings->value("GridMoving", false).toBool());
 		ui.chbGridSlowDown->setChecked(pSettings->value("GridSlowDown", false).toBool());
