@@ -33,11 +33,22 @@ int main(int argc, char *argv[])
     qInstallMsgHandler(logMassage);
 	qDebug("Log-clear");
 
-	if(!QGLFormat::hasOpenGL() || !(QGLFormat::openGLVersionFlags() & QGLFormat::OpenGL_Version_1_2))
-	{
-		QMessageBox::information(0, "OpenGL 1.2 ERROR!", "This system does not support OpenGL 1.2!");
-		qCritical() << "qApp: system does not support OpenGL 1.2!";
-		return -1;
+	if (!QGLFormat::hasOpenGL() || !(QGLFormat::openGLVersionFlags() & QGLFormat::OpenGL_Version_1_2)) {
+		int ret = QMessageBox::warning(0, "OpenGL 1.2 ERROR!",
+									   "This system does not support OpenGL 1.2!\nThe program can not work properly, you want to continue?",
+									   QMessageBox::Yes | QMessageBox::No,
+									   QMessageBox::No);
+
+		switch (ret) {
+			case QMessageBox::No:
+				qCritical() << "qApp: system does not support OpenGL 1.2!";
+				return -1;
+				break;
+			case QMessageBox::Yes:
+			default:
+				// run any way
+				break;
+		}
 	}
 
 	QTranslator translator(0);
