@@ -32,6 +32,7 @@
 #include <QSysInfo>
 #include "Defines.h"
 #include "Cat/ExtSerialPort/qextserialport.h"
+#include "bands/BandManager.h"
 
 class Options : public QWidget
 {
@@ -135,6 +136,7 @@ class Options : public QWidget
 		void OnAddKeyDsr(bool stat);
 		void OnAddKeyCts(bool stat);
 		void soundChanged(int val);
+		void channelsChanged(int val);
 		void soundVacChanged(int val);
 		void soundDrvChanged(int val);
 		void soundVacDrvChanged(int val);

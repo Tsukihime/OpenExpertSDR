@@ -28,6 +28,7 @@
 #include "../tmp/ui_CwMacro.h"
 #include "CwCore.h"
 #include "../Defines.h"
+#include "bands/BandManager.h"
 
 class CwMacro : public QWidget
 {

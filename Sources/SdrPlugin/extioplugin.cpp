@@ -1,3 +1,25 @@
+/*
+ * This file is part of ExpertSDR
+ *
+ * ExpertSDR is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * ExpertSDR is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with GNU Radio; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street,
+ * Boston, MA 02110-1301, USA.
+ *
+ *
+ * Copyright (C) 2014 Tsukihime
+ */
+
 #include "extioplugin.h"
 
 ExtIOPlugin* ExtIOPlugin::plugin_instance = NULL;
@@ -5,7 +27,7 @@ ExtIOPlugin* ExtIOPlugin::plugin_instance = NULL;
 ExtIOPlugin::ExtIOPlugin()
 {
     ExtIOMode = false;
-    EXtIOOpen = false;
+    ExtIOOpen = false;
     sdrmode = -1;
     IFLimitLow = 0;
     IFLimitHigh = 0;
@@ -41,7 +63,6 @@ void ExtIOPlugin::ExtIOPluginInit(QLibrary *plugin)
     routs.SetModeRxTx = (ExtIOext_SetModeRxTx)plugin->resolve("SetModeRxTx");
     routs.ActivateTx = (ExtIOext_ActivateTx)plugin->resolve("ActivateTx");
     routs.VersionInfo = (ExtIOext_VersionInfo)plugin->resolve("VersionInfo");
-    typedef __stdcall void (*ExtIOext_VersionInfo)(char *name, int ver_major, int ver_minor);
 
     if(init_hw())
     {
@@ -50,6 +71,22 @@ void ExtIOPlugin::ExtIOPluginInit(QLibrary *plugin)
     set_callback();
     activate_tx(12345678, 87654321); // random ints in first pass
     activate_tx(-1, -1); // -1 in second pass
+	/*
+	 * in the original HDSDR ExtIO plugin method ActivateTX must do some calculations
+	 * In the first call he receives two parameters MagicA and MagicB (probably a random number),
+	 * and from these numbers, it must calculate the answer using the formula:
+	 * OutA = (MagicA xor 0xA85EF5E1) + MagicB + 0x006D276F;
+	 * OutB = (MagicB xor 0x57A10A1E) + MagicA + 0x03F5005D;
+	 * These options have it should return by calling ExtIOCallback(OutA, OutB, 0.0, 0)
+	 *
+	 * the second call to the method gets the value of (-1) in the parameters MagicA and MagicB.
+	 * In this case, it does not have to do anything just ignore this call.
+	 *
+	 * also ActivateTX always returns 0.
+	 *
+	 * in our case it is needed no confirmation to activate the transmission
+	 * calls retained only for compatibility
+	 */
 }
 
 void ExtIOPlugin::ExtIOPluginDeinit()
@@ -71,7 +108,7 @@ int ExtIOPlugin::StartHW(long freq)
     if(routs.StartHW)
     {
         res = routs.StartHW(freq);
-        EXtIOOpen = true;
+        ExtIOOpen = true;
     }
 
     return res;
@@ -81,7 +118,7 @@ void ExtIOPlugin::StopHW()
 {
     if(routs.StopHW)
         routs.StopHW();
-    EXtIOOpen = false;
+    ExtIOOpen = false;
 }
 
 int ExtIOPlugin::SetHWLO(long LOfreq)
@@ -117,34 +154,37 @@ long ExtIOPlugin::GetTune()
 SDRMODE ExtIOPlugin::GetMode()
 {
     char res = 0;
-    SDRMODE mode = LSB;
     if(routs.GetMode)
         res = routs.GetMode();
 
+    SDRMODE mode;
     switch (res) {
-    case 'A':
-        mode = AM;
-        break;
+        case 'A':
+            mode = AM;
+            break;
 
-    case 'F':
-        mode = FMN;
-        break;
+        case 'F':
+            mode = FMN;
+            break;
 
-    case 'L':
-        mode = LSB;
-        break;
+        case 'L':
+            mode = LSB;
+            break;
 
-    case 'U':
-        mode = USB;
-        break;
+        case 'U':
+            mode = USB;
+            break;
 
-    case 'C':
-        mode = CWL;
-        break;
+        case 'C':
+            mode = CWL;
+            break;
 
-    case 'D':
-        mode = DRM;
-        break;
+        case 'D':
+            mode = DRM;
+            break;
+
+        default:
+            mode = LSB;
     }
 
     return mode;
@@ -163,7 +203,7 @@ bool ExtIOPlugin::IsExtIOMode()
 
 bool ExtIOPlugin::IsExtIOOpen()
 {
-    return EXtIOOpen;
+    return ExtIOOpen;
 }
 
 QString ExtIOPlugin::getInfoStr()

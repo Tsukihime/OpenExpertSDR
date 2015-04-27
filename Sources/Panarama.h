@@ -37,22 +37,24 @@
 #include "DttSP.h"
 #include "Timer/Timer.h"
 #include "GLFont/glfont.h"
+#include "bands/BandManager.h"
 
-#define SIZE 512
-#define RULE_HEIGH 20.0f
-#define TX_TO_RX_TIME 20
-#define DISTANCE -10.0
-#define APPOROACH 0.0
-#define BUFF_SIZE 4096
-#define CIRCLE_BUFF_SIZE 20
-#define PAN_UPDATE 25
-#define IMAGE_LEN 512
-#define IMAGE_SUB_HEIGHT 1
-#define NUM_COLOR 4
-#define MIN_PX_DB 10
-#define NUM_MEANE_BUFF CIRCLE_BUFF_SIZE
+// todo wtf?
+//#define SIZE 512
+const float RULE_HEIGH = 20.0f;
+const int TX_TO_RX_TIME = 20;
+const float DISTANCE = -10.0;
+const float APPOROACH = 0.0;
+const int BUFF_SIZE = 4096;
+const int CIRCLE_BUFF_SIZE = 20;
+const int PAN_UPDATE = 25;
+const int IMAGE_LEN = 512;
+const int IMAGE_SUB_HEIGHT = 1;
+const int NUM_COLOR = 4;
+const int MIN_PX_DB = 10;
+const int NUM_MEANE_BUFF = CIRCLE_BUFF_SIZE;
 
-#define FREQ_OFFSET_LIMIT 500000
+const int FREQ_OFFSET_LIMIT = 500000;
 
 
 

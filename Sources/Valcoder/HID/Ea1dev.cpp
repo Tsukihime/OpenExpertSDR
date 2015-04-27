@@ -202,9 +202,7 @@ bool Ea1dev::setLedRit(bool Status)
 
 	OutReport[0] = 0;
 	OutReport[1] = Leds;
-	if(writeBuf(OutReport, 2) == 0)
-		return false;
-	return true;
+	return writeBuf(OutReport, 2) != 0;
 }
 
 bool Ea1dev::setLedXit(bool Status)
@@ -213,9 +211,7 @@ bool Ea1dev::setLedXit(bool Status)
 
 	OutReport[0] = 0;
 	OutReport[1] = Leds;
-	if(writeBuf(OutReport, 2) == 0)
-		return false;
-	return true;
+	return writeBuf(OutReport, 2) != 0;
 }
 
 bool Ea1dev::setLedPwr(bool Status)
@@ -224,9 +220,7 @@ bool Ea1dev::setLedPwr(bool Status)
 
 	OutReport[0] = 0;
 	OutReport[1] = Leds;
-	if(writeBuf(OutReport, 2) == 0)
-		return false;
-	return true;
+	return writeBuf(OutReport, 2) != 0;
 }
 
 bool Ea1dev::setLedEnc(bool Status)
@@ -235,9 +229,7 @@ bool Ea1dev::setLedEnc(bool Status)
 
 	OutReport[0] = 0;
 	OutReport[1] = Leds;
-	if(writeBuf(OutReport, 2) == 0)
-		return false;
-	return true;
+	return writeBuf(OutReport, 2) != 0;
 }
 
 bool Ea1dev::setLedKey(bool Status)
@@ -246,9 +238,7 @@ bool Ea1dev::setLedKey(bool Status)
 
 	OutReport[0] = 0;
 	OutReport[1] = Leds;
-	if(writeBuf(OutReport, 2) == 0)
-		return false;
-	return true;
+	return writeBuf(OutReport, 2) != 0;
 }
 
 void Ea1dev::run()

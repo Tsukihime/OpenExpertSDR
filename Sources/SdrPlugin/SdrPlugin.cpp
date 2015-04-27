@@ -23,21 +23,19 @@
 
 #include "SdrPlugin.h"
 
-SdrPlugin::SdrPlugin(Options *pOpt, StreamCallback *pCallBack, StreamCallback *pCallBack4, void *UsrData, QWidget *parent) : QWidget(parent)
+SdrPlugin::SdrPlugin(Options *pOpt, StreamCallback *pCallBack, void *UsrData, QWidget *parent) : QWidget(parent)
 {
     CalibrateFreq = 1.0;
     FreqDDS = 1800000;
     isStarted = false;
     pUi = &pOpt->ui;
-    AudioCallBack = pCallBack;
-    AudioCallBack4 = pCallBack4;
+	AudioCallBack = pCallBack;
     SdrType = SUNSDR;
-    pAudio = new pa19(UsrData);
+    userData = UsrData;
+    portAudio.open();
     pSDRhw = NULL;
-    pAudio->open();
-    pUi->cbPaDriver->addItems(pAudio->driverName());
-    pUi->cbPaIn->addItems(pAudio->inDevName(0));
-    pUi->cbPaOut->addItems(pAudio->outDevName(0));
+    pUi->cbPaDriver->addItems(portAudio.driverName());
+	onPaDriverChanged(0);
     connect(pOpt, SIGNAL(driverChanged(int)), this, SLOT(onPaDriverChanged(int)));
     connect(pUi->tbSDR, SIGNAL(currentChanged(int)), this, SLOT(onSdrTypeChanged(int)));
     connect(pOpt, SIGNAL(SdrPluginChanged(QString)), this, SLOT(onSdrPluginChanged(QString)));
@@ -53,15 +51,18 @@ SdrPlugin::~SdrPlugin()
         pSDRhw->deinit();
         delete pSDRhw;
     }
-    delete pAudio;
 }
 
 void SdrPlugin::onPaDriverChanged(int Index)
 {
 	pUi->cbPaIn->clear();
-	pUi->cbPaIn->addItems(pAudio->inDevName(Index));
+	pUi->cbPaIn->addItems(portAudio.inDevName(Index));
 	pUi->cbPaOut->clear();
-	pUi->cbPaOut->addItems(pAudio->outDevName(Index));
+	pUi->cbPaOut->addItems(portAudio.outDevName(Index));
+	pUi->cbPaMic->clear();
+	pUi->cbPaMic->addItems(portAudio.inDevName(Index));
+	pUi->cbPaSpeaker->clear();
+	pUi->cbPaSpeaker->addItems(portAudio.outDevName(Index));
 }
 
 void SdrPlugin::onSdrTypeChanged(int Index)
@@ -158,7 +159,7 @@ void SdrPlugin::SetTrxMode(bool Mode)
 
 void SdrPlugin::Close()
 {
-	pAudio->close();
+    portAudio.close();
 }
 
 int SdrPlugin::Start()
@@ -169,6 +170,8 @@ int SdrPlugin::Start()
     if(pSDRhw == NULL)
         return -1;
 
+    // todo: why plugin options? it's audio options!
+    PLUGIN_OPTIONS OptPlug;
 	OptPlug.cbPaDriverIndex = pUi->cbPaDriver->currentIndex();
 	OptPlug.cbPaOutIndex = pUi->cbPaOut->currentIndex();
 	OptPlug.cbPaInIndex = pUi->cbPaIn->currentIndex();
@@ -177,17 +180,16 @@ int SdrPlugin::Start()
 	OptPlug.cbPaBufferSizeIndex = pUi->cbPaBufferSize->currentIndex();
 	OptPlug.sbPaLattency = pUi->sbPaLattency->value();
 	OptPlug.sbDdsMul = pUi->cbDdsOsc->currentIndex()+1;
-	pAudio->setParam(&OptPlug);
-	if(OptPlug.cbPaChannelsIndex == 0)
-	{
-		if(pAudio->start(AudioCallBack)!=0)
-			return -1;
-	}
-	else
-	{
-		if(pAudio->start(AudioCallBack4)!=0)
-			return -1;
-	}
+	OptPlug.cbPaMicIndex = pUi->cbPaMic->currentIndex();
+	OptPlug.cbPaSpeakerIndex = pUi->cbPaSpeaker->currentIndex();
+	OptPlug.isTwoSoundCard = pUi->cbPaChannels->currentIndex() == 2; // 2x2
+    OptPlug.userData = userData;
+
+    portAudio.setParam(OptPlug);
+
+	if(portAudio.start(AudioCallBack)!=0)
+		return -1;
+
     pSDRhw->open(0, OptPlug.sbDdsMul);
     if(pSDRhw->isOpen()==0)
 		emit sunsdrConnectInfo("SDR device is not connected.");
@@ -202,7 +204,7 @@ int SdrPlugin::Start()
 
 void SdrPlugin::Stop()
 {
-	pAudio->stop();
+    portAudio.stop();
     if(pSDRhw)
         pSDRhw->close();
 	pUi->tbSDR->setEnabled(true);

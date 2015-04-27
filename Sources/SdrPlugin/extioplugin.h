@@ -1,9 +1,32 @@
+/*
+ * This file is part of ExpertSDR
+ *
+ * ExpertSDR is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * ExpertSDR is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with GNU Radio; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street,
+ * Boston, MA 02110-1301, USA.
+ *
+ *
+ * Copyright (C) 2014 Tsukihime
+ */
+
 #ifndef EXTIOPLUGIN_H
 #define EXTIOPLUGIN_H
 
 #include <QObject>
 #include <QtGui>
 #include "Defines.h"
+#include "bands/BandManager.h"
 
 typedef __stdcall void (*ExtIO_ShowGUI)();
 typedef __stdcall bool (*ExtIO_InitHW)(char*, char*, int&);
@@ -32,7 +55,7 @@ typedef __stdcall void (*ExtIOext_VersionInfo)(const char*, int, int);
 
 //GetStatus GetHWSR, HideGUI, RawDataReady, GetFilters are not implemented
 
-typedef struct
+struct ExtIORouts
 {
     ExtIO_ShowGUI ShowGUI;
     ExtIO_InitHW InitHW;
@@ -58,7 +81,7 @@ typedef struct
     ExtIOext_SetModeRxTx SetModeRxTx;
     ExtIOext_ActivateTx ActivateTx;
     ExtIOext_VersionInfo VersionInfo;
-} ExtIORouts;
+};
 
 enum ExtIOCallbackStatus {
     // for all extIO's
@@ -84,12 +107,16 @@ enum ExtIOCallbackStatus {
     //   exciter/transmitter must wait until SetModeRxTx() is called!
 };
 
-typedef enum
+enum HwModeRxTx
 {
     hmRX  = 0,
     hmTX  = 1
-} HwModeRxTx;
+};
 
+/**
+ * @brief The ExtIOPlugin class
+ * implements interface to ExtIO to plugins
+ */
 class ExtIOPlugin : public QObject
 {
     Q_OBJECT
@@ -126,7 +153,7 @@ protected:
 
 private:
     bool ExtIOMode;
-    bool EXtIOOpen;
+    bool ExtIOOpen;
     int sdrmode;
 
     int IFLimitLow;

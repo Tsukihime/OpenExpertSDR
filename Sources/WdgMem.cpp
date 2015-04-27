@@ -22,6 +22,7 @@
  */
 
 #include "WdgMem.h"
+#include "bands/BandManager.h"
 
 WdgMem::WdgMem(int *MainFreq, QButtonGroup *pMode, QWidget *parent) : QWidget(parent)
 {
@@ -256,8 +257,6 @@ void WdgMem::OnThisMemory()
 
 void WdgMem::SetAllocateRow(int index)
 {
-	int size = ui.twMem->rowCount();
-
 	if(ui.twMem->rowCount() == 0)
 		return;
 	if(index >= ui.twMem->rowCount())

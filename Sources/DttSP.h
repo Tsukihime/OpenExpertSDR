@@ -27,7 +27,6 @@
 #include <QtGui>
 #include <QFuture>
 #include <process.h>
-#include "qt_windows.h"
 #include "Defines.h"
 #include "ThreadFunc.h"
 #include "dttsplibrary.h"
@@ -148,26 +147,26 @@ class DttSP : public QThread
 		void SetPanaramaOn(bool on);
 		void SetRx1On(bool on);
 
-		double SineWave(float* Buf, int Samples, double Phase, double Freq);
-		double CosineWave(float* Buf, int Samples, double Phase, double Freq);
-		void ScaleBuffer(float *InBuf, float *OutBuf, int Samples, float Scale);
+		double SineWave(float* Buf, unsigned long Samples, double Phase, double Freq);
+		double CosineWave(float* Buf, unsigned long Samples, double Phase, double Freq);
+		void ScaleBuffer(float *InBuf, float *OutBuf, unsigned long Samples, float Scale);
 
-		void SineWave2Tone(float* buf, int samples, double phase1, double phase2, double freq1, double freq2, double *updated_phase1, double *updated_phase2);
-		void CosineWave2Tone(float* buf, int samples, double phase1, double phase2, double freq1, double freq2, double *updated_phase1, double *updated_phase2);
+		void SineWave2Tone(float* buf, unsigned long samples, double phase1, double phase2, double freq1, double freq2, double *updated_phase1, double *updated_phase2);
+		void CosineWave2Tone(float* buf, unsigned long samples, double phase1, double phase2, double freq1, double freq2, double *updated_phase1, double *updated_phase2);
 
 		bool use_last;
 		double Boxmuller(double m,double s);
-		void Noise(float* buf, int samples);
+		void Noise(float* buf, unsigned long samples);
 
 		int tri_direction;
 		double tri_val;
-		void Triangle(float* buf, int samples, double freq);
+		void Triangle(float* buf, unsigned long samples, double freq);
 
 		double saw_val;
 		int saw_direction;
-		void Sawtooth(float* buf, int samples, double freq);
+		void Sawtooth(float* buf, unsigned long samples, double freq);
 
-		void ClearBuffer(float *buf, int samples);
+		void ClearBuffer(float *buf, unsigned long samples);
 
 public slots:
 		void OnGlitchCompChanged(QByteArray p);

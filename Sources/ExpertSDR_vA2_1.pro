@@ -4,6 +4,7 @@ TARGET = ExpertSDR
 VERSION = 2.1.4.21
 
 TRANSLATIONS = ExpertSDR_ru.ts
+
 QT += core \
     gui \
     network \
@@ -64,7 +65,10 @@ HEADERS += CalibrateSC/Calibrator/CalibrProc.h \
     SdrPlugin/PluginCtrl.h \
     SdrPlugin/extioplugin.h \
     dttsplibrary.h \
-    GLFont/glfont.h
+    GLFont/glfont.h \
+    bands/BandManager.h \
+    bands/ModeOptions.h
+
 SOURCES += CalibrateSC/Calibrator/CalibrProc.cpp \
     CalibrateSC/Calibrator/Calibrator.cpp \
     Wav/fileList.cpp \
@@ -118,7 +122,10 @@ SOURCES += CalibrateSC/Calibrator/CalibrProc.cpp \
     SdrPlugin/PluginCtrl.cpp \
     SdrPlugin/extioplugin.cpp \
     dttsplibrary.cpp \
-    GLFont/glfont.cpp
+    GLFont/glfont.cpp \
+    bands/BandManager.cpp \
+    bands/ModeOptions.cpp
+
 RESOURCES += images.qrc \
     bg.qrc
 FORMS += CalibrateSC/Calibrator/Calibrator.ui \

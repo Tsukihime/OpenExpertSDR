@@ -23,10 +23,6 @@
 
 #include "Resampler.h"
 
-float buffI[4096];
-float buffQ[4096];
-float ph = 0;
-
 Resampler::Resampler()
 {
 	InSampleRate  = 0.0f;

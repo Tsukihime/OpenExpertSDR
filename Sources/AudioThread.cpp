@@ -21,6 +21,7 @@
  * The authors can be reached by email at maksimus1210@gmail.com
  */
 #include "AudioThread.h"
+#include "bands/BandManager.h"
 
 AudioThread::AudioThread(void *UsrData, QObject *parent): QThread(parent)
 {
@@ -187,57 +188,12 @@ void AudioThread::run()
      				}
      			}
      			pExpSdr->pVac->writeBuf(outL, outR, bufSize);
-     			switch((BAND_MODE)pExpSdr->BandModeChecked)
-     			{
-     			case BAND160M:
-     				pDsp->ScaleBuffer(outL, outL, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val160);
-     				pDsp->ScaleBuffer(outR, outR, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val160);
-     				break;
-     			case BAND80M:
-     				pDsp->ScaleBuffer(outL , outL , bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val80);
-     				pDsp->ScaleBuffer(outR, outR, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val80);
-     				break;
-     			case BAND60M:
-     				pDsp->ScaleBuffer(outL , outL , bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val60);
-     				pDsp->ScaleBuffer(outR, outR, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val60);
-     				break;
-     			case BAND40M:
-     				pDsp->ScaleBuffer(outL , outL , bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val40);
-     				pDsp->ScaleBuffer(outR, outR, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val40);
-     				break;
-     			case BAND30M:
-     				pDsp->ScaleBuffer(outL , outL , bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val30);
-     				pDsp->ScaleBuffer(outR, outR, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val30);
-     				break;
-     			case BAND20M:
-     				pDsp->ScaleBuffer(outL , outL , bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val20);
-     				pDsp->ScaleBuffer(outR, outR, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val20);
-     				break;
-     			case BAND17M:
-     				pDsp->ScaleBuffer(outL , outL , bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val17);
-     				pDsp->ScaleBuffer(outR, outR, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val17);
-     				break;
-     			case BAND15M:
-     				pDsp->ScaleBuffer(outL , outL , bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val15);
-     				pDsp->ScaleBuffer(outR, outR, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val15);
-     				break;
-     			case BAND12M:
-     				pDsp->ScaleBuffer(outL , outL , bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val12);
-     				pDsp->ScaleBuffer(outR, outR, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val12);
-     				break;
-     			case BAND10M:
-     				pDsp->ScaleBuffer(outL , outL , bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val10);
-     				pDsp->ScaleBuffer(outR, outR, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val10);
-     				break;
-     			case BAND6M:
-     				pDsp->ScaleBuffer(outL , outL , bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val6);
-     				pDsp->ScaleBuffer(outR, outR, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*pExpSdr->Val6);
-     				break;
-     			default:
-     				pDsp->ScaleBuffer(outL , outL , bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard);
-     				pDsp->ScaleBuffer(outR, outR, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard);
-     				break;
-     			}
+
+				double correction = pExpSdr->bandManager.getCurrentBandPowerCorrection();
+
+				pDsp->ScaleBuffer(outL, outL, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*correction);
+				pDsp->ScaleBuffer(outR, outR, bufSize, pExpSdr->DriveScale*pExpSdr->ScaleOutBuffSCard*correction);
+
      			pExpSdr->rxGlCnt = 0;
      		}
      		else

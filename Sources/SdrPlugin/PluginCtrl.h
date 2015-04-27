@@ -24,7 +24,6 @@
 #define PLUGINCTRL_H
 
 #include <QtGui>
-#include "qt_windows.h"
 #include "extioplugin.h"
 
 enum StateChgReason {
@@ -44,7 +43,7 @@ typedef __cdecl void (*PluginFunc_open)(int, int);
 typedef __cdecl void (*PluginFunc_close)();
 typedef __cdecl bool (*PluginFunc_isOpen)();
 typedef __cdecl void (*PluginFunc_setPreamp)(int);
-typedef __cdecl void (*PluginFunc_setExtCtrl)(DWORD);
+typedef __cdecl void (*PluginFunc_setExtCtrl)(quint32);
 typedef __cdecl void (*PluginFunc_setDdsFreq)(int);
 typedef __cdecl void (*PluginFunc_setTrxMode)(bool);
 typedef __cdecl void (*PluginFunc_setMute)(bool);
@@ -88,7 +87,7 @@ public:
     void close();
     bool isOpen();
     void setPreamp(int Preamp);
-    void setExtCtrl(DWORD ExtData);
+    void setExtCtrl(quint32 ExtData);
     void setDdsFreq(int Freq);
     void setTrxMode(bool Mode);
     void setMute(bool Status);

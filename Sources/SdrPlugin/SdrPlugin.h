@@ -25,7 +25,6 @@
 #define SDRPLUGIN_H
 
 #include <QtGui/QWidget>
-#include <qt_windows.h>
 #include "../tmp/ui_Options.h"
 #include "../Options.h"
 #include "../Defines.h"
@@ -46,10 +45,9 @@ class SdrPlugin : public QWidget
 		double FreqDDS;
 
 	public:
-        SdrPlugin(Options *pOpt, StreamCallback *pCallBack, StreamCallback *pCallBack4, void *UsrData = 0, QWidget *parent = 0);
+		SdrPlugin(Options *pOpt, StreamCallback *pCallBack, void *UsrData = 0, QWidget *parent = 0);
 		~SdrPlugin();
 
-		PLUGIN_OPTIONS OptPlug;
 		void SetSdrType(SDR_DEVICE Type);
 		SDR_DEVICE GetSdrType();
 
@@ -75,10 +73,10 @@ class SdrPlugin : public QWidget
 		bool isStarted;
 		SDR_DEVICE SdrType;
 		StreamCallback *AudioCallBack;
-		StreamCallback *AudioCallBack4;
+		void* userData;
 
     public:
-		pa19 *pAudio;
+		pa19 portAudio;
         pluginCtrl   *pSDRhw;
 
     public slots:

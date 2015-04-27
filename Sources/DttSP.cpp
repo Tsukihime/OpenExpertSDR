@@ -453,7 +453,7 @@ void DttSP::SetPanaramaOn(bool on)
     }
 }
 
-double DttSP::SineWave(float* Buf, int Samples, double Phase, double Freq)
+double DttSP::SineWave(float* Buf, unsigned long Samples, double Phase, double Freq)
 {
 	double phase_step = Freq/DspSamleRate*2*DSP_PI;
 	double cosval = cos(Phase);
@@ -462,7 +462,7 @@ double DttSP::SineWave(float* Buf, int Samples, double Phase, double Freq)
 	double sindelta = sin(phase_step);
 	double tmpval;
 
-	for(int i = 0; i < Samples; i++ )
+	for(unsigned long i = 0; i < Samples; i++ )
 	{
 		tmpval = cosval*cosdelta - sinval*sindelta;
 		sinval = cosval*sindelta + sinval*cosdelta;
@@ -474,7 +474,7 @@ double DttSP::SineWave(float* Buf, int Samples, double Phase, double Freq)
 	return Phase;
 }
 
-double DttSP::CosineWave(float* Buf, int Samples, double Phase, double Freq)
+double DttSP::CosineWave(float* Buf, unsigned long Samples, double Phase, double Freq)
 {
 	double phase_step = Freq/DspSamleRate*2*DSP_PI;
 	double cosval = cos(Phase);
@@ -483,7 +483,7 @@ double DttSP::CosineWave(float* Buf, int Samples, double Phase, double Freq)
 	double sindelta = sin(phase_step);
 	double tmpval;
 
-	for(int i = 0; i < Samples; i++ )
+	for(unsigned long i = 0; i < Samples; i++ )
 	{
 		tmpval = cosval*cosdelta - sinval*sindelta;
 		sinval = cosval*sindelta + sinval*cosdelta;
@@ -497,13 +497,13 @@ double DttSP::CosineWave(float* Buf, int Samples, double Phase, double Freq)
 	return Phase;
 }
 
-void DttSP::ScaleBuffer(float *InBuf, float *OutBuf, int Samples, float Scale)
+void DttSP::ScaleBuffer(float *InBuf, float *OutBuf, unsigned long Samples, float Scale)
 {
-	for(int i = 0; i < Samples; i++)
+	for(unsigned long i = 0; i < Samples; i++)
 		OutBuf[i] = InBuf[i] * Scale;
 }
 
-void DttSP::SineWave2Tone(float* buf, int samples, double phase1, double phase2, double freq1, double freq2, double *updated_phase1, double *updated_phase2)
+void DttSP::SineWave2Tone(float* buf, unsigned long samples, double phase1, double phase2, double freq1, double freq2, double *updated_phase1, double *updated_phase2)
 {
 	double phase_step1 = freq1/DspSamleRate*2*DSP_PI;
 	double cosval1 = cos(phase1);
@@ -518,7 +518,7 @@ void DttSP::SineWave2Tone(float* buf, int samples, double phase1, double phase2,
 	double sindelta2 = sin(phase_step2);
 	double tmpval;
 
-	for(int i = 0; i < samples; i++ )
+	for(unsigned long i = 0; i < samples; i++ )
 	{
 		tmpval = cosval1*cosdelta1 - sinval1*sindelta1;
 		sinval1 = cosval1*sindelta1 + sinval1*cosdelta1;
@@ -538,7 +538,7 @@ void DttSP::SineWave2Tone(float* buf, int samples, double phase1, double phase2,
 	(*updated_phase2) = phase2;
 }
 
-void DttSP::CosineWave2Tone(float* buf, int samples, double phase1, double phase2, double freq1, double freq2, double *updated_phase1, double *updated_phase2)
+void DttSP::CosineWave2Tone(float* buf, unsigned long samples, double phase1, double phase2, double freq1, double freq2, double *updated_phase1, double *updated_phase2)
 {
 	double phase_step1 = freq1/DspSamleRate*2*DSP_PI;
 	double cosval1 = cos(phase1);
@@ -553,7 +553,7 @@ void DttSP::CosineWave2Tone(float* buf, int samples, double phase1, double phase
 	double sindelta2 = sin(phase_step2);
 	double tmpval;
 
-	for(int i=0; i<samples; i++ )
+	for(unsigned long i=0; i<samples; i++ )
 	{
 		tmpval = cosval1*cosdelta1 - sinval1*sindelta1;
 		sinval1 = cosval1*sindelta1 + sinval1*cosdelta1;
@@ -599,18 +599,18 @@ double DttSP::Boxmuller(double m,double s)
 	return( m + y1 * s );
 }
 
-void DttSP::Noise(float* buf, int samples)
+void DttSP::Noise(float* buf, unsigned long samples)
 {
-	for(int i=0; i<samples; i++)
+	for(unsigned long i=0; i<samples; i++)
 	{
 		buf[i] = (float)Boxmuller(0.0,0.2);
 	}
 }
 
-void DttSP::Triangle(float* buf, int samples, double freq)
+void DttSP::Triangle(float* buf, unsigned long samples, double freq)
 {
 	double step = freq/DspSamleRate*2*tri_direction;
-	for(int i=0; i<samples; i++)
+	for(unsigned long i=0; i<samples; i++)
 	{
 		buf[i] = (float)tri_val;
 		tri_val += step;
@@ -626,10 +626,10 @@ void DttSP::Triangle(float* buf, int samples, double freq)
 	}
 }
 
-void DttSP::Sawtooth(float* buf, int samples, double freq)
+void DttSP::Sawtooth(float* buf, unsigned long samples, double freq)
 {
 	double step = freq/DspSamleRate*saw_direction;
-	for(int i=0; i<samples; i++)
+	for(unsigned long i=0; i<samples; i++)
 	{
 		buf[i] = (float)saw_val;
 		saw_val += step;
@@ -641,7 +641,7 @@ void DttSP::Sawtooth(float* buf, int samples, double freq)
 	}
 }
 
-void DttSP::ClearBuffer(float *buf, int samples)
+void DttSP::ClearBuffer(float *buf, unsigned long samples)
 {
 	memset(buf, 0, samples*sizeof(float));
 }

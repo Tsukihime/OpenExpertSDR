@@ -29,6 +29,7 @@ Options::Options(QWidget *parent) : QWidget(parent)
 	ui.setupUi(this);
 
 	SetupPluginList();
+	channelsChanged(0);
 
 	ui.sbPaTxDelayValue->setVisible(false);
 	ui.sbVoiceRepeatTime->setVisible(false);
@@ -131,6 +132,7 @@ Options::Options(QWidget *parent) : QWidget(parent)
 	connect(ui.cbPaBufferSize, SIGNAL(currentIndexChanged(int)), this, SLOT(soundChanged(int)));
 	connect(ui.cbPaSampleRate, SIGNAL(currentIndexChanged(int)), this, SLOT(soundChanged(int)));
 	connect(ui.cbPaChannels, SIGNAL(currentIndexChanged(int)), this, SLOT(soundChanged(int)));
+	connect(ui.cbPaChannels, SIGNAL(currentIndexChanged(int)), this, SLOT(channelsChanged(int)));
 	connect(ui.sbPaLattency, SIGNAL(valueChanged(int)), this, SLOT(soundChanged(int)));
 	connect(ui.cbPaVacDriver, SIGNAL(currentIndexChanged(int)), this, SLOT(soundVacDrvChanged(int)));
 	connect(ui.cbPaVacIn, SIGNAL(currentIndexChanged(int)), this, SLOT(soundVacChanged(int)));
@@ -839,6 +841,28 @@ void Options::OnPttCts(bool stat)
 		emit PttChanged(stat);
 }
 
+void Options::channelsChanged(int val)
+{
+	if(val == 2)
+	{
+		ui.cbPaMic->setVisible(true);
+		ui.cbPaSpeaker->setVisible(true);
+		ui.label_38->setVisible(true);
+		ui.label_48->setVisible(true);
+		ui.label_2->setText("Trx Out:");
+		ui.label_3->setText("Trx In:");
+	}
+	else
+	{
+		ui.cbPaMic->setVisible(false);
+		ui.cbPaSpeaker->setVisible(false);
+		ui.label_38->setVisible(false);
+		ui.label_48->setVisible(false);
+		ui.label_2->setText("Output:");
+		ui.label_3->setText("Input:");
+	}
+}
+
 void Options::soundChanged(int val)
 {
 	emit SoundCardOptChanged();
@@ -1076,7 +1100,6 @@ void Options::OnAddKeyCts(bool stat)
 void Options::OnSdrType(int Type)
 {
 	ui.cbSdrType->setCurrentIndex(Type);
-	//ui.swSdrType->setCurrentIndex(Type);
 }
 
 void Options::openWaveDir()

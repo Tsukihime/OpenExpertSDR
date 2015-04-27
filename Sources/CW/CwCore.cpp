@@ -347,12 +347,12 @@ void CwCore::onTimer()
 	if(pBufI->writeCount() < ((int)(96*sampleRateIndex)))
 		return;
 
-	if(dashStat == false)
+	if(!dashStat)
 	{
 		if(dashQueue.size() > 0)
 		{
 			while(dashQueue.size() > 0) dashStat  = dashQueue.dequeue();
-			if(dashStat == false)
+			if(!dashStat)
 			{
 				dashStat = true;
 				dashQueue.enqueue(false);
@@ -363,12 +363,12 @@ void CwCore::onTimer()
 	{
 		while(dashQueue.size() > 0) dashStat  = dashQueue.dequeue();
 	}
-	if(dotStat == false)
+	if(!dotStat)
 	{
 		if(dotQueue.size() > 0)
 		{
 			while(dotQueue.size() > 0) dotStat  = dotQueue.dequeue();
-			if(dotStat == false)
+			if(!dotStat)
 			{
 				dotStat = true;
 				dotQueue.enqueue(false);
@@ -379,12 +379,12 @@ void CwCore::onTimer()
 	{
 		while(dotQueue.size() > 0) dotStat  = dotQueue.dequeue();
 	}
-	if(keyStatus == false)
+	if(!keyStatus)
 	{
 		if(keyQueue.size() > 0)
 		{
 			while(keyQueue.size() > 0) keyStatus  = keyQueue.dequeue();
-			if(keyStatus == false)
+			if(!keyStatus)
 			{
 				keyStatus = true;
 				keyQueue.enqueue(false);

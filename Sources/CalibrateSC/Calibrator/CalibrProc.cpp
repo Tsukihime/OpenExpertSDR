@@ -22,6 +22,7 @@
  */
 
 #include "CalibrProc.h"
+#include "bands/BandManager.h"
 
 CalibrProc::CalibrProc(QWidget *parent) : QThread(parent)
 {

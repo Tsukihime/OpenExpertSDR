@@ -711,555 +711,371 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
-         <string>Options</string>
+         <string>Sound Card</string>
         </attribute>
-        <widget class="QGroupBox" name="swSdrType">
+        <widget class="QComboBox" name="cbPaSpeaker">
          <property name="geometry">
           <rect>
-           <x>330</x>
-           <y>5</y>
-           <width>220</width>
-           <height>221</height>
+           <x>78</x>
+           <y>125</y>
+           <width>231</width>
+           <height>22</height>
           </rect>
          </property>
-         <property name="title">
-          <string>SunSDR Options:</string>
-         </property>
-         <property name="currentIndex" stdset="0">
-          <number>0</number>
-         </property>
-         <widget class="QGroupBox" name="gbXvtrxOpt">
-          <property name="geometry">
-           <rect>
-            <x>9</x>
-            <y>75</y>
-            <width>201</width>
-            <height>131</height>
-           </rect>
-          </property>
-          <property name="title">
-           <string/>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_4">
-           <property name="leftMargin">
-            <number>5</number>
-           </property>
-           <property name="topMargin">
-            <number>5</number>
-           </property>
-           <property name="rightMargin">
-            <number>5</number>
-           </property>
-           <property name="bottomMargin">
-            <number>5</number>
-           </property>
-           <property name="spacing">
-            <number>2</number>
-           </property>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_103">
-             <property name="maximumSize">
-              <size>
-               <width>150</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Tx Antenna (2M):</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1" colspan="2">
-            <widget class="QComboBox" name="cbXvtrxAntTx">
-             <property name="currentIndex">
-              <number>0</number>
-             </property>
-             <item>
-              <property name="text">
-               <string>A2</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>A3</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_104">
-             <property name="maximumSize">
-              <size>
-               <width>100</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Rx Antenna (2M):</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1" colspan="2">
-            <widget class="QComboBox" name="cbXvtrxAntRx">
-             <property name="currentIndex">
-              <number>0</number>
-             </property>
-             <item>
-              <property name="text">
-               <string>A2</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>A3</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="2" column="0" colspan="2">
-            <widget class="QLabel" name="label_105">
-             <property name="maximumSize">
-              <size>
-               <width>100</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>2M Loc. Osc.:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0" colspan="2">
-            <widget class="QLabel" name="label_107">
-             <property name="maximumSize">
-              <size>
-               <width>75</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>0.7M Loc. Osc.:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="QDoubleSpinBox" name="sbUhfOsc">
-             <property name="decimals">
-              <number>6</number>
-             </property>
-             <property name="minimum">
-              <double>390.000000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>420.000000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>0.000010000000000</double>
-             </property>
-             <property name="value">
-              <double>409.600000000000023</double>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="QDoubleSpinBox" name="sbVhfOsc">
-             <property name="decimals">
-              <number>6</number>
-             </property>
-             <property name="minimum">
-              <double>100.000000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>140.000000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>0.000010000000000</double>
-             </property>
-             <property name="value">
-              <double>120.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QCheckBox" name="chbXvtrxEnable">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>49</y>
-            <width>91</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Enable XVTRX</string>
-          </property>
-         </widget>
-         <widget class="QComboBox" name="cbDdsOsc">
-          <property name="geometry">
-           <rect>
-            <x>69</x>
-            <y>26</y>
-            <width>100</width>
-            <height>22</height>
-           </rect>
-          </property>
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>200 MHz</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>100 MHz</string>
-           </property>
-          </item>
-         </widget>
-         <widget class="QLabel" name="label_16">
-          <property name="geometry">
-           <rect>
-            <x>9</x>
-            <y>26</y>
-            <width>51</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="autoFillBackground">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>DDS Osc:</string>
-          </property>
-         </widget>
         </widget>
-        <widget class="QGroupBox" name="swSdrType2">
+        <widget class="QLabel" name="label_3">
          <property name="geometry">
           <rect>
-           <x>5</x>
-           <y>5</y>
-           <width>320</width>
-           <height>221</height>
+           <x>14</x>
+           <y>67</y>
+           <width>61</width>
+           <height>21</height>
           </rect>
          </property>
-         <property name="title">
-          <string>SoundCard Options:</string>
+         <property name="text">
+          <string>Input:</string>
          </property>
-         <property name="currentIndex" stdset="0">
+        </widget>
+        <widget class="QLabel" name="label_11">
+         <property name="geometry">
+          <rect>
+           <x>457</x>
+           <y>38</y>
+           <width>61</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Latency:</string>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="cbPaIn">
+         <property name="geometry">
+          <rect>
+           <x>78</x>
+           <y>67</y>
+           <width>231</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="cbPaBufferSize">
+         <property name="geometry">
+          <rect>
+           <x>387</x>
+           <y>38</y>
+           <width>61</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="currentIndex">
+          <number>4</number>
+         </property>
+         <item>
+          <property name="text">
+           <string>256</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>512</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1024</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>2048</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>4096</string>
+          </property>
+         </item>
+        </widget>
+        <widget class="QLabel" name="label_59">
+         <property name="geometry">
+          <rect>
+           <x>317</x>
+           <y>67</y>
+           <width>61</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Line in Gain:</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_65">
+         <property name="geometry">
+          <rect>
+           <x>457</x>
+           <y>67</y>
+           <width>61</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Mic in Gain:</string>
+         </property>
+        </widget>
+        <widget class="QSpinBox" name="sbMicInGain">
+         <property name="geometry">
+          <rect>
+           <x>527</x>
+           <y>67</y>
+           <width>61</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="suffix">
+          <string> dB</string>
+         </property>
+         <property name="minimum">
           <number>0</number>
          </property>
-         <widget class="QComboBox" name="cbPaOut">
-          <property name="geometry">
-           <rect>
-            <x>78</x>
-            <y>53</y>
-            <width>231</width>
-            <height>21</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_59">
-          <property name="geometry">
-           <rect>
-            <x>14</x>
-            <y>169</y>
-            <width>61</width>
-            <height>21</height>
-           </rect>
-          </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="value">
+          <number>0</number>
+         </property>
+        </widget>
+        <widget class="QSpinBox" name="sbLineInGain">
+         <property name="geometry">
+          <rect>
+           <x>387</x>
+           <y>67</y>
+           <width>61</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="suffix">
+          <string>%</string>
+         </property>
+         <property name="minimum">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="value">
+          <number>100</number>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_48">
+         <property name="geometry">
+          <rect>
+           <x>14</x>
+           <y>125</y>
+           <width>46</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Speaker:</string>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="cbPaOut">
+         <property name="geometry">
+          <rect>
+           <x>78</x>
+           <y>38</y>
+           <width>231</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_13">
+         <property name="geometry">
+          <rect>
+           <x>317</x>
+           <y>38</y>
+           <width>61</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Buffer size:</string>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="cbPaDriver">
+         <property name="geometry">
+          <rect>
+           <x>78</x>
+           <y>9</y>
+           <width>231</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="cbPaMic">
+         <property name="geometry">
+          <rect>
+           <x>78</x>
+           <y>96</y>
+           <width>231</width>
+           <height>22</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label">
+         <property name="geometry">
+          <rect>
+           <x>14</x>
+           <y>9</y>
+           <width>61</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Driver:</string>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="chbSwapLineIn">
+         <property name="geometry">
+          <rect>
+           <x>317</x>
+           <y>100</y>
+           <width>131</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Swap line in channels</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_2">
+         <property name="geometry">
+          <rect>
+           <x>14</x>
+           <y>38</y>
+           <width>61</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Output:</string>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="chbSwapLineOut">
+         <property name="geometry">
+          <rect>
+           <x>457</x>
+           <y>100</y>
+           <width>135</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Swap line out channels</string>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="cbPaSampleRate">
+         <property name="geometry">
+          <rect>
+           <x>527</x>
+           <y>9</y>
+           <width>61</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <item>
           <property name="text">
-           <string>Line in Gain:</string>
+           <string>48000</string>
           </property>
-         </widget>
-         <widget class="QSpinBox" name="sbPaLattency">
-          <property name="geometry">
-           <rect>
-            <x>248</x>
-            <y>140</y>
-            <width>61</width>
-            <height>22</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label">
-          <property name="geometry">
-           <rect>
-            <x>14</x>
-            <y>24</y>
-            <width>61</width>
-            <height>21</height>
-           </rect>
-          </property>
+         </item>
+         <item>
           <property name="text">
-           <string>Driver:</string>
+           <string>96000</string>
           </property>
-         </widget>
-         <widget class="QComboBox" name="cbPaBufferSize">
-          <property name="geometry">
-           <rect>
-            <x>78</x>
-            <y>140</y>
-            <width>61</width>
-            <height>22</height>
-           </rect>
-          </property>
-          <property name="currentIndex">
-           <number>4</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>256</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>512</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>1024</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>2048</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>4096</string>
-           </property>
-          </item>
-         </widget>
-         <widget class="QCheckBox" name="chbSwapLineOut">
-          <property name="geometry">
-           <rect>
-            <x>177</x>
-            <y>195</y>
-            <width>135</width>
-            <height>20</height>
-           </rect>
-          </property>
+         </item>
+         <item>
           <property name="text">
-           <string>Swap line out channels</string>
+           <string>192000</string>
           </property>
-         </widget>
-         <widget class="QComboBox" name="cbPaChannels">
-          <property name="geometry">
-           <rect>
-            <x>78</x>
-            <y>111</y>
-            <width>61</width>
-            <height>22</height>
-           </rect>
-          </property>
-          <item>
-           <property name="text">
-            <string>2</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>4</string>
-           </property>
-          </item>
-         </widget>
-         <widget class="QCheckBox" name="chbSwapLineIn">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>195</y>
-            <width>131</width>
-            <height>21</height>
-           </rect>
-          </property>
+         </item>
+        </widget>
+        <widget class="QLabel" name="label_4">
+         <property name="geometry">
+          <rect>
+           <x>457</x>
+           <y>9</y>
+           <width>61</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Sample rate:</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_12">
+         <property name="geometry">
+          <rect>
+           <x>317</x>
+           <y>9</y>
+           <width>61</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Channels:</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_38">
+         <property name="geometry">
+          <rect>
+           <x>14</x>
+           <y>96</y>
+           <width>46</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Mic:</string>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="cbPaChannels">
+         <property name="geometry">
+          <rect>
+           <x>387</x>
+           <y>9</y>
+           <width>61</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <item>
           <property name="text">
-           <string>Swap line in channels</string>
+           <string>2</string>
           </property>
-         </widget>
-         <widget class="QLabel" name="label_13">
-          <property name="geometry">
-           <rect>
-            <x>14</x>
-            <y>140</y>
-            <width>61</width>
-            <height>21</height>
-           </rect>
-          </property>
+         </item>
+         <item>
           <property name="text">
-           <string>Buffer size:</string>
+           <string>4</string>
           </property>
-         </widget>
-         <widget class="QLabel" name="label_11">
-          <property name="geometry">
-           <rect>
-            <x>180</x>
-            <y>140</y>
-            <width>61</width>
-            <height>21</height>
-           </rect>
-          </property>
+         </item>
+         <item>
           <property name="text">
-           <string>Latency:</string>
+           <string>2x2</string>
           </property>
-         </widget>
-         <widget class="QComboBox" name="cbPaIn">
-          <property name="geometry">
-           <rect>
-            <x>78</x>
-            <y>82</y>
-            <width>231</width>
-            <height>21</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_12">
-          <property name="geometry">
-           <rect>
-            <x>14</x>
-            <y>111</y>
-            <width>61</width>
-            <height>22</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Channels:</string>
-          </property>
-         </widget>
-         <widget class="QComboBox" name="cbPaDriver">
-          <property name="geometry">
-           <rect>
-            <x>78</x>
-            <y>24</y>
-            <width>231</width>
-            <height>21</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_2">
-          <property name="geometry">
-           <rect>
-            <x>14</x>
-            <y>53</y>
-            <width>61</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Output:</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_65">
-          <property name="geometry">
-           <rect>
-            <x>180</x>
-            <y>169</y>
-            <width>61</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Mic in Gain:</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_4">
-          <property name="geometry">
-           <rect>
-            <x>180</x>
-            <y>111</y>
-            <width>71</width>
-            <height>22</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Sample rate:</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_3">
-          <property name="geometry">
-           <rect>
-            <x>14</x>
-            <y>82</y>
-            <width>61</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Input:</string>
-          </property>
-         </widget>
-         <widget class="QComboBox" name="cbPaSampleRate">
-          <property name="geometry">
-           <rect>
-            <x>248</x>
-            <y>111</y>
-            <width>61</width>
-            <height>22</height>
-           </rect>
-          </property>
-          <item>
-           <property name="text">
-            <string>48000</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>96000</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>192000</string>
-           </property>
-          </item>
-         </widget>
-         <widget class="QSpinBox" name="sbMicInGain">
-          <property name="geometry">
-           <rect>
-            <x>248</x>
-            <y>169</y>
-            <width>61</width>
-            <height>22</height>
-           </rect>
-          </property>
-          <property name="suffix">
-           <string> dB</string>
-          </property>
-          <property name="minimum">
-           <number>0</number>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="value">
-           <number>0</number>
-          </property>
-         </widget>
-         <widget class="QSpinBox" name="sbLineInGain">
-          <property name="geometry">
-           <rect>
-            <x>78</x>
-            <y>169</y>
-            <width>61</width>
-            <height>22</height>
-           </rect>
-          </property>
-          <property name="suffix">
-           <string>%</string>
-          </property>
-          <property name="minimum">
-           <number>0</number>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="value">
-           <number>100</number>
-          </property>
-         </widget>
+         </item>
+        </widget>
+        <widget class="QSpinBox" name="sbPaLattency">
+         <property name="geometry">
+          <rect>
+           <x>527</x>
+           <y>38</y>
+           <width>61</width>
+           <height>22</height>
+          </rect>
+         </property>
         </widget>
        </widget>
        <widget class="QWidget" name="tab_2">
@@ -1690,6 +1506,233 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
           </property>
           <property name="value">
            <number>30</number>
+          </property>
+         </widget>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="tab_3">
+        <attribute name="title">
+         <string>SunSDR</string>
+        </attribute>
+        <widget class="QGroupBox" name="swSdrType">
+         <property name="geometry">
+          <rect>
+           <x>5</x>
+           <y>5</y>
+           <width>220</width>
+           <height>221</height>
+          </rect>
+         </property>
+         <property name="title">
+          <string>SunSDR Options:</string>
+         </property>
+         <property name="currentIndex" stdset="0">
+          <number>0</number>
+         </property>
+         <widget class="QGroupBox" name="gbXvtrxOpt">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>75</y>
+            <width>201</width>
+            <height>131</height>
+           </rect>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <property name="leftMargin">
+            <number>5</number>
+           </property>
+           <property name="topMargin">
+            <number>5</number>
+           </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
+            <number>5</number>
+           </property>
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_103">
+             <property name="maximumSize">
+              <size>
+               <width>150</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Tx Antenna (2M):</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1" colspan="2">
+            <widget class="QComboBox" name="cbXvtrxAntTx">
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>A2</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>A3</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_104">
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Rx Antenna (2M):</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" colspan="2">
+            <widget class="QComboBox" name="cbXvtrxAntRx">
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>A2</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>A3</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="2">
+            <widget class="QLabel" name="label_105">
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>2M Loc. Osc.:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0" colspan="2">
+            <widget class="QLabel" name="label_107">
+             <property name="maximumSize">
+              <size>
+               <width>75</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>0.7M Loc. Osc.:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="QDoubleSpinBox" name="sbUhfOsc">
+             <property name="decimals">
+              <number>6</number>
+             </property>
+             <property name="minimum">
+              <double>390.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>420.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.000010000000000</double>
+             </property>
+             <property name="value">
+              <double>409.600000000000023</double>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QDoubleSpinBox" name="sbVhfOsc">
+             <property name="decimals">
+              <number>6</number>
+             </property>
+             <property name="minimum">
+              <double>100.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>140.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.000010000000000</double>
+             </property>
+             <property name="value">
+              <double>120.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QCheckBox" name="chbXvtrxEnable">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>49</y>
+            <width>91</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Enable XVTRX</string>
+          </property>
+         </widget>
+         <widget class="QComboBox" name="cbDdsOsc">
+          <property name="geometry">
+           <rect>
+            <x>69</x>
+            <y>26</y>
+            <width>100</width>
+            <height>22</height>
+           </rect>
+          </property>
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <item>
+           <property name="text">
+            <string>200 MHz</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>100 MHz</string>
+           </property>
+          </item>
+         </widget>
+         <widget class="QLabel" name="label_16">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>26</y>
+            <width>51</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>DDS Osc:</string>
           </property>
          </widget>
         </widget>

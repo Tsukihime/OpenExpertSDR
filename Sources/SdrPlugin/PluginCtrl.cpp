@@ -21,10 +21,8 @@
  */
 
 #include "PluginCtrl.h"
-#include "extioplugin.h"
 
-pluginCtrl::pluginCtrl(QString libpath)
-{
+pluginCtrl::pluginCtrl(QString libpath) {
     SampleRate = 48000;
     DdsFreq = 0;
     rxtx_mode = hmRX;
@@ -32,46 +30,42 @@ pluginCtrl::pluginCtrl(QString libpath)
     pluginLoaded = false;
     pPlugLib = new QLibrary(libpath);
     pPlugLib->load();
-    if(!pPlugLib->isLoaded())
+    if (!pPlugLib->isLoaded())
         return;
 
-    routs.getInfo = (PluginFunc_getInfo)pPlugLib->resolve("getInfo");
-    if(routs.getInfo == NULL)
-    {
-        if(ExtIOPlugin::IsExtIO(pPlugLib))
-        {
+    routs.getInfo = (PluginFunc_getInfo) pPlugLib->resolve("getInfo");
+    if (routs.getInfo == NULL) {
+        if (ExtIOPlugin::IsExtIO(pPlugLib)) {
+            // switch to extio mode
             connect(this, SIGNAL(Ptt(bool)), this, SIGNAL(PttChanged(bool)));
             ExtIOPluginInit(pPlugLib);
-        }
-        else
-        {
-            pPlugLib->unload();
+            pluginLoaded = true;
             return;
         }
+
+        pPlugLib->unload();
+        return;
     }
 
-    if(!IsExtIOMode())
-    {
-        QByteArray bname(MAX_PATH, 0);
-        routs.getInfo(bname.data());
-        InfoStr = QString::fromLatin1(bname.data());
+    QByteArray bname(MAX_PATH, 0);
+    routs.getInfo(bname.data());
+    InfoStr = QString::fromLatin1(bname.data());
 
-        routs.init = (PluginFunc_init)pPlugLib->resolve("init");
-        routs.deinit = (PluginFunc_deinit)pPlugLib->resolve("deinit");
-        routs.open = (PluginFunc_open)pPlugLib->resolve("open");
-        routs.close = (PluginFunc_close)pPlugLib->resolve("close");
-        routs.isOpen = (PluginFunc_isOpen)pPlugLib->resolve("isOpen");
-        routs.setPreamp = (PluginFunc_setPreamp)pPlugLib->resolve("setPreamp");
-        routs.setExtCtrl = (PluginFunc_setExtCtrl)pPlugLib->resolve("setExtCtrl");
-        routs.setDdsFreq = (PluginFunc_setDdsFreq)pPlugLib->resolve("setDdsFreq");
-        routs.setTrxMode = (PluginFunc_setTrxMode)pPlugLib->resolve("setTrxMode");
-        routs.setMute = (PluginFunc_setMute)pPlugLib->resolve("setMute");
-        routs.setVhfOsc = (PluginFunc_setVhfOsc)pPlugLib->resolve("setVhfOsc");
-        routs.setUhfOsc = (PluginFunc_setUhfOsc)pPlugLib->resolve("setUhfOsc");
-        routs.setCalGen = (PluginFunc_setCalGen)pPlugLib->resolve("setCalGen");
-        routs.setXvAnt = (PluginFunc_setXvAnt)pPlugLib->resolve("setXvAnt");
-        routs.showPluginGui = (PluginFunc_showPluginGui)pPlugLib->resolve("showPluginGui");
-    }
+    routs.init = (PluginFunc_init) pPlugLib->resolve("init");
+    routs.deinit = (PluginFunc_deinit) pPlugLib->resolve("deinit");
+    routs.open = (PluginFunc_open) pPlugLib->resolve("open");
+    routs.close = (PluginFunc_close) pPlugLib->resolve("close");
+    routs.isOpen = (PluginFunc_isOpen) pPlugLib->resolve("isOpen");
+    routs.setPreamp = (PluginFunc_setPreamp) pPlugLib->resolve("setPreamp");
+    routs.setExtCtrl = (PluginFunc_setExtCtrl) pPlugLib->resolve("setExtCtrl");
+    routs.setDdsFreq = (PluginFunc_setDdsFreq) pPlugLib->resolve("setDdsFreq");
+    routs.setTrxMode = (PluginFunc_setTrxMode) pPlugLib->resolve("setTrxMode");
+    routs.setMute = (PluginFunc_setMute) pPlugLib->resolve("setMute");
+    routs.setVhfOsc = (PluginFunc_setVhfOsc) pPlugLib->resolve("setVhfOsc");
+    routs.setUhfOsc = (PluginFunc_setUhfOsc) pPlugLib->resolve("setUhfOsc");
+    routs.setCalGen = (PluginFunc_setCalGen) pPlugLib->resolve("setCalGen");
+    routs.setXvAnt = (PluginFunc_setXvAnt) pPlugLib->resolve("setXvAnt");
+    routs.showPluginGui = (PluginFunc_showPluginGui) pPlugLib->resolve("showPluginGui");
 
     pluginLoaded = true;
 }
@@ -140,7 +134,7 @@ void pluginCtrl::setPreamp(int Preamp)
         routs.setPreamp(Preamp);
 }
 
-void pluginCtrl::setExtCtrl(DWORD ExtData)
+void pluginCtrl::setExtCtrl(quint32 ExtData)
 {
     if(routs.setExtCtrl && pluginLoaded)
         routs.setExtCtrl(ExtData);

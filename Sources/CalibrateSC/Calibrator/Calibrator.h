@@ -25,7 +25,7 @@
 #define CALIBRATOR_H
 
 #include <QtGui>
-#include "../../tmp/ui_Calibrator.h"
+#include "ui_Calibrator.h"
 #include "CalibrProc.h"
 
 class Calibrator : public QDialog

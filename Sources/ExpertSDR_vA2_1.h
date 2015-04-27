@@ -25,12 +25,11 @@
 #define EXPERTSDR_VA2_1_H
 
 #include <search.h>
-#include <qt_windows.h>
 #include <QtGui>
 #include <QList>
 #include <QtGui/QWidget>
 #include <QActionGroup>
-#include "tmp/ui_ExpertSDR_vA2_1.h"
+#include "ui_ExpertSDR_vA2_1.h"
 #include "DttSP.h"
 #include "Options.h"
 #include "WdgGraph.h"
@@ -54,6 +53,7 @@
 #include "CalibrateSC/Calibrator/Calibrator.h"
 #include "Wav/VoiceRecorderWave.h"
 #include "Timer/Timer.h"
+#include "bands/BandManager.h"
 
 using namespace QtConcurrent;
 
@@ -69,21 +69,23 @@ using namespace QtConcurrent;
 
 #define MUTE_TX_RX 5
 
+typedef enum {
+	CH2 = 0,
+	CH4 = 1,
+	CH2x2 = 2
+} CbFormat;
+
 class QextSerialPort;
 class CatManager;
 class QThread;
 class AudioThread;
 
-void DspCallBack(const void *In, void *Out, unsigned long FrameCount, void *UserData);
-void audioCallBack4(const void *In, void *Out, unsigned long FrameCount, void *UserData);
 void VacCallBack(const void *In, void *Out, unsigned long FrameCount, void *UserData);
 
 class ExpertSDR_vA2_1 : public QWidget
 {
 	Q_OBJECT
 
-	friend void DspCallBack(const void *In, void *Out, unsigned long FrameCount, void *UserData);
-	friend void audioCallBack4(const void *In, void *Out, unsigned long FrameCount, void *UserData);
 	friend void VacCallBack(const void *In, void *Out, unsigned long FrameCount, void *UserData);
 	friend class AudioThread;
 	friend class Vac;
@@ -117,6 +119,8 @@ class ExpertSDR_vA2_1 : public QWidget
 	public:
 		ExpertSDR_vA2_1(QWidget *parent = 0);
 		~ExpertSDR_vA2_1();
+		void audioCallBack(float **In, float **Out, unsigned long FrameCount, CbFormat format);
+		CbFormat getAudioCardMode();
 	private:
 
 		int flagLock;
@@ -156,26 +160,11 @@ class ExpertSDR_vA2_1 : public QWidget
 		bool bSwapLineIn;
 		bool bSwapLineOut;
 		TRXMODE TrxMode;
-		int BandModeChecked;
 		bool StateTone;
 		bool DspMute;
 		int indexAgc;
-		double Val160;
-		double Val80;
-		double Val60;
-		double Val40;
-		double Val30;
-		double Val20;
-		double Val17;
-		double Val15;
-		double Val12;
-		double Val10;
-		double Val6;
-		double Val2;
-		double Val07;
 		Scale	*pVfoB;
 		bool    VacEnable;
-		PLUGIN_OPTIONS VacOpt;
 		pa19	*pPaVac;
 		bool winEvent(MSG *msg, long *result);
 		int  UpdatesTimerID;
@@ -184,8 +173,7 @@ class ExpertSDR_vA2_1 : public QWidget
 		QextSerialPort 	*pPort;
 		S_Meter 		*pSM;
 		QButtonGroup 	*pTxSplitPb;
-		OPT_BAND	OptBands[NUM_BANDS];
-		int 		CurrentBandIndex;
+		BandManager bandManager;
 		int			FilterPosFreq;
 		QTimer *pTimerTxOutKeyer;
 		Options *pOpt;
@@ -313,19 +301,6 @@ class ExpertSDR_vA2_1 : public QWidget
 		void SMeterClosed();
 		void onSm2mCorr(double val);
 		void onSm07mCorr(double val);
-		void PowerCorrect160(int Val);
-		void PowerCorrect80(int Val);
-		void PowerCorrect60(int Val);
-		void PowerCorrect40(int Val);
-		void PowerCorrect30(int Val);
-		void PowerCorrect20(int Val);
-		void PowerCorrect17(int Val);
-		void PowerCorrect15(int Val);
-		void PowerCorrect12(int Val);
-		void PowerCorrect10(int Val);
-		void PowerCorrect6(int Val);
-		void PowerCorrect2(int Val);
-		void PowerCorrect07(int Val);
 		void IsKeyTrue(bool State);
 		void OnTune();
 		void ChangedCWMon(int State);
@@ -369,7 +344,7 @@ class ExpertSDR_vA2_1 : public QWidget
 		void OnStepChanged(QAction * Action);
 		void OnStepChanged(int val);
 		void OnChangeMode(int Mode);
-		void OnChangeBand(int Mode);
+		void OnChangeBand(int mode);
 		void OnChangeFilter(int Filter);
 		void OnEqOn(bool IsOn);
 		void OnEqModeChanged(int Number);
