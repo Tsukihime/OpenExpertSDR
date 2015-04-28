@@ -422,6 +422,7 @@ void BandManager::setMainFreqExperimental(int Freq, int DdsFreq) {
             }
         }
     }
+    optBands[currentBand].MainFreq = Freq;
 }
 
 BAND_MODE BandManager::getCurrentBand() {
