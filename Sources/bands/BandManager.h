@@ -66,18 +66,6 @@ const int BPF2_END = 146000000;
 const int BPF07_START = 430000000;
 const int BPF07_END = 440000000;
 
-const int BPF160_F = 2500000;
-const int BPF80_F = 4000000;
-const int BPF60_F = 6000000;
-const int BPF40_F = 7300000;
-const int BPF30_F = 12000000;
-const int BPF20_F = 14500000;
-const int BPF17_F = 19000000;
-const int BPF15_F = 21500000;
-const int BPF12_F = 25200000;
-const int BPF10_F = 30000000;
-const int BPF6_F = 65000000;
-
 const int NUM_BANDS = 14;
 const int NUM_MODES = 12;
 
@@ -115,7 +103,7 @@ typedef enum {
 
 struct BandOptions {
     SDRMODE CurrentMode;
-    int MainFreq;
+    int Frequency;
     int Pitch;
     int Volume;
     int RfGain;
@@ -137,9 +125,10 @@ public:
     void writeSettings(QSettings &settings);
     void readSettings(QSettings &settings);
 
-    void setMainFreqExperimental(int Freq, int DdsFreq);
+    void setFrequency(int Frequency);
 
     BAND_MODE getCurrentBand();
+    static BAND_MODE getBandByFrequency(int Frequency);
     void setCurrentBand(BAND_MODE Mode);
 
     SDRMODE getCurrentBandMode();
@@ -148,8 +137,8 @@ public:
     ModeOptions &getCurrentBandModOptions();
 
     double getCurrentBandPowerCorrection();
-    int getCurrentBandMainFrequency();
-    void setCurrentBandMainFrequency(int Freq);
+    int getCurrentBandFrequency();
+
     int getCurrentBandVolume();
     void setCurrentBandVolume(int value);
     int getCurrentBandRfGain();

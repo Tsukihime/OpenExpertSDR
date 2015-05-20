@@ -112,10 +112,6 @@ void ExpertSDR_vA2_1::audioCallBack(float **In, float **Out, unsigned long Frame
 			}
 
 			break;
-
-//		default:
-			// it rout never be called
-	//		return;
 	}
 
 	if(bSwapLineOut){
@@ -1201,13 +1197,13 @@ void ExpertSDR_vA2_1::onCalibrationGen(bool status)
 void ExpertSDR_vA2_1::SetVhfOsc(double MHz)
 {
 	pSdrCtrl->setVhfOsc(MHz*1000000);
-	pSdrCtrl->SetDdsFreq(bandManager.getCurrentBandMainFrequency() - FilterPosFreq);
+	pSdrCtrl->SetDdsFreq(bandManager.getCurrentBandFrequency() - FilterPosFreq);
 }
 
 void ExpertSDR_vA2_1::SetUhfOsc(double MHz)
 {
 	pSdrCtrl->setUhfOsc(MHz*1000000);
-	pSdrCtrl->SetDdsFreq(bandManager.getCurrentBandMainFrequency() - FilterPosFreq);
+	pSdrCtrl->SetDdsFreq(bandManager.getCurrentBandFrequency() - FilterPosFreq);
 }
 
 void ExpertSDR_vA2_1::pushState()
@@ -3136,9 +3132,9 @@ void ExpertSDR_vA2_1::OnChangeBand(int mode)
 	{
 		SetFreqMin(BPF2_START);
 		SetFreqMax(BPF2_END);
-		SetFreq(bandManager.getCurrentBandMainFrequency());
-		pGraph->pGl->SetDDSFreq(bandManager.getCurrentBandMainFrequency() - FilterPosFreq);
-		pSdrCtrl->SetDdsFreq(bandManager.getCurrentBandMainFrequency() - FilterPosFreq);
+		SetFreq(bandManager.getCurrentBandFrequency());
+		pGraph->pGl->SetDDSFreq(bandManager.getCurrentBandFrequency() - FilterPosFreq);
+		pSdrCtrl->SetDdsFreq(bandManager.getCurrentBandFrequency() - FilterPosFreq);
 		pSmeter->SetVHF(true);
 		onXvAntSwitch(0);
 	}
@@ -3146,9 +3142,9 @@ void ExpertSDR_vA2_1::OnChangeBand(int mode)
 	{
 		SetFreqMin(BPF07_START);
 		SetFreqMax(BPF07_END);
-		SetFreq(bandManager.getCurrentBandMainFrequency());
-		pGraph->pGl->SetDDSFreq(bandManager.getCurrentBandMainFrequency() - FilterPosFreq);
-		pSdrCtrl->SetDdsFreq(bandManager.getCurrentBandMainFrequency() - FilterPosFreq);
+		SetFreq(bandManager.getCurrentBandFrequency());
+		pGraph->pGl->SetDDSFreq(bandManager.getCurrentBandFrequency() - FilterPosFreq);
+		pSdrCtrl->SetDdsFreq(bandManager.getCurrentBandFrequency() - FilterPosFreq);
 		pSmeter->SetVHF(true);
 		onXvAntSwitch(0);
 	}
@@ -3156,9 +3152,9 @@ void ExpertSDR_vA2_1::OnChangeBand(int mode)
 	{
 		SetFreqMin(100000);
 		SetFreqMax(65000000);
-		SetFreq(bandManager.getCurrentBandMainFrequency());
-		pGraph->pGl->SetDDSFreq(bandManager.getCurrentBandMainFrequency() - FilterPosFreq);
-		pSdrCtrl->SetDdsFreq(bandManager.getCurrentBandMainFrequency() - FilterPosFreq);
+		SetFreq(bandManager.getCurrentBandFrequency());
+		pGraph->pGl->SetDDSFreq(bandManager.getCurrentBandFrequency() - FilterPosFreq);
+		pSdrCtrl->SetDdsFreq(bandManager.getCurrentBandFrequency() - FilterPosFreq);
 		pSmeter->SetVHF(false);
 	}
 	pModeBut->button(bandManager.getCurrentBandMode())->setChecked(true);
@@ -5133,8 +5129,7 @@ void ExpertSDR_vA2_1::MainFreqChange(int Freq)
 	int DdsFreq = Freq - FilterPosFreq;
 	pSdrCtrl->SetDdsFreq(DdsFreq);
 	pMem->setCentralFreq(DdsFreq);
-	// todo: refactor this
-	bandManager.setMainFreqExperimental(Freq, DdsFreq);
+	bandManager.setFrequency(Freq);
 
 	emit TuneChanged(Freq);
 }

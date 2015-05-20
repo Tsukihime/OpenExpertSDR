@@ -251,13 +251,16 @@ void GLFont::draw(GLfloat x, GLfloat y, GLfloat z, const QString &str, const QCo
 	glTranslated(dx, dy, 0);
 	// end pix pad
 
+	GLboolean dt;
+	glGetBooleanv(GL_DEPTH_TEST, &dt);
 	glDisable(GL_DEPTH_TEST);
 	for(int i = 0; i < str.size(); i++)
 	{
 		int ch = (int)str.toAscii().at(i);
 		glCallList(glyphs[ch].list);
 	}
-	glEnable(GL_DEPTH_TEST);
+
+	if (dt) { glEnable(GL_DEPTH_TEST); }
 
 	//----------------------
 	glDisable(GL_ALPHA_TEST);

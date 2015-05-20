@@ -39,27 +39,23 @@
 #include "GLFont/glfont.h"
 #include "bands/BandManager.h"
 
-// todo wtf?
-//#define SIZE 512
 const float RULE_HEIGH = 20.0f;
 const int TX_TO_RX_TIME = 20;
-const float DISTANCE = -10.0;
-const float APPOROACH = 0.0;
 const int BUFF_SIZE = 4096;
 const int CIRCLE_BUFF_SIZE = 20;
 const int PAN_UPDATE = 25;
 const int IMAGE_LEN = 512;
-const int IMAGE_SUB_HEIGHT = 1;
 const int NUM_COLOR = 4;
-const int MIN_PX_DB = 10;
 const int NUM_MEANE_BUFF = CIRCLE_BUFF_SIZE;
 
-const int FREQ_OFFSET_LIMIT = 500000;
+const GLdouble GL_WINDOW_TOP = 1;
+const GLdouble GL_WINDOW_BOTTOM = -1;
+const GLdouble GL_WINDOW_LEFT = -1;
+const GLdouble GL_WINDOW_RIGHT = 1;
+const GLdouble GL_WINDOW_WIDTH = 2;
+const GLdouble GL_WINDOW_HEIGHT = 2;
 
-
-
-
- #ifndef GL_MULTISAMPLE
+#ifndef GL_MULTISAMPLE
  #define GL_MULTISAMPLE  0x809D
  #endif
 
@@ -99,6 +95,14 @@ typedef struct
 	float scale;
 }DBM_TRX_STATE;
 
+typedef struct {
+    GLfloat x, y;
+} GLpoint2f;
+
+typedef struct {
+    GLfloat r, g, b, a;
+} GLcolor4f;
+
 class Panarama : public QGLWidget
 {
     Q_OBJECT
@@ -114,51 +118,33 @@ class Panarama : public QGLWidget
     OBJECTS Object;
     OBJECTS LastPosObject;
     QCursor cursor;
-    QPoint LastPos;
-    QPoint ReleasePos;
-    RANGE RangeFreq;
     CURSOR Cursor;
     TRXMODE TRxMode, TRxModeOld;
     bool isUpdate;
     bool IsWindow;
     bool IsCrossF1;
-	GLFont *info_font;
-	GLFont *dbm_font;
-	GLFont *band_font;
-	GLFont *cursor_font;
-    QPixmap *pRulePixmap;
+	QSharedPointer<GLFont> info_font;
+    QSharedPointer<GLFont> dbm_font;
+    QSharedPointer<GLFont> band_font;
+    QSharedPointer<GLFont> cursor_font;
     GLuint RuleTexture;
-    QPixmap *pLeftRange;
-    GLuint LeftRange;
-    QPixmap *pRightRange;
-    GLuint RightRange;
-    QPixmap *pBackgroundPixmap;
-    QPixmap *pBackgroundPixmap2;
-    QPixmap *pBackgroundPixmap3;
-    QPixmap *pBackgroundPixmap4;
     GLuint BackgroundTexture;
     GLuint BackgroundTexture2;
     GLuint BackgroundTexture3;
     GLuint BackgroundTexture4;
-    QPixmap *pGlassPixmap;
-    GLuint GlassTexture;
     double HeighRule;
     GLdouble PresPosX;
     GLdouble PresPosY;
     GLdouble MovePosX;
     GLdouble MovePosY;
     GLdouble PresPosX2;
-    GLdouble PresPosY2;
     GLdouble MovePosX2;
-    GLdouble MovePosY2;
     int sPosRule, dPosRule;
     GLfloat posRule;
     GLfloat lenRule;
     GLdouble sRuleYPos, dRuleYPos;
-    GLdouble sRuleYPosTx, dRuleYPosTx;
     GLdouble ScaleWindowX;
     GLdouble ScaleWindowY;
-    BACKGROUND BackgroundType;
     int sFreqDDS, dFreqDDS;
     int sFreqFilter1, dFreqFilter1;
     int numStepGridDDS;
@@ -168,8 +154,7 @@ class Panarama : public QGLWidget
     GLdouble sFilter, dFilter;
     GLdouble sBandPassLow, dBandPassLow;
     GLdouble sBandPassHigh, dBandPassHigh;
-    GLdouble sPich, dPich;
-    GLdouble sPich2, dPich2;
+    GLdouble sPich;
     int BandLow, BandHigh;
     int BandLow2, BandHigh2;
     int BandTxLow, BandTxHigh;
@@ -180,27 +165,13 @@ class Panarama : public QGLWidget
     GLdouble sBandPassHigh2, dBandPassHigh2;
     QColor ColorFilter2;
     GLdouble sPosZoomPan, dPosZoomPan;
-    GLdouble LimitMinDDSFreq;
-    GLdouble LimitMaxDDSFreq;
     GLdouble LimitMinLowBand;
     GLdouble LimitMaxHighBand;
-    GLdouble oy1;
-    GLdouble oy2_5;
-    GLdouble oy5;
-    GLdouble oy10;
-    GLdouble oy20;
-    GLdouble oy30;
-    GLdouble ox1;
-    GLdouble ox2_5;
-    GLdouble ox5;
-    GLdouble ox10;
-    GLdouble ox20;
-    GLdouble ox30;
-    float *pBuff;
+    float Buff[BUFF_SIZE];
     float **pCircleBuff;
     float MedianTimeBuff[7][BUFF_SIZE];
-    float *BufWf;
-    float *pSpBuff;
+    float BufWf[BUFF_SIZE];
+    float pSpBuff[BUFF_SIZE];
     int SizeSpBuff;
     int MeanBuff;
     int CntUpdateBuff;
@@ -215,18 +186,10 @@ class Panarama : public QGLWidget
     QTimer TimerPichPos;
     QTimer TimerPichPos2;
     QTimer TimerAutosetDbm;
-    QTimer TimerPeriodAutosetDbm;
     QTimer TimerPeriodGetMax;
     QTimer TimerTxToRx;
 
-    bool IsPeriodGetMax;
-    float minDbm;
-    float maxDbm;
-    bool IsChangedDbmLevel;
-    GLdouble ScaleXPanoram;
     GLdouble sScaleRuleX, dScaleRuleX;
-    GRID_SCALE_TYPE GridScaleType;
-    GLdouble ValLenStep;
 
     GLdouble BeginX;
     GLdouble EndX;
@@ -234,27 +197,14 @@ class Panarama : public QGLWidget
 	GLdouble Len;
 	GLdouble Step;
 
-	GLfloat LineSpBuff[BUFF_SIZE][2];
-	QColor ColorTop, ColorBot, ColorLine, ColorSp, ColorFilter;
-	GLfloat ArrayV[BUFF_SIZE*3];
-	GLfloat ArrayV2[BUFF_SIZE*3];
-	GLfloat ColorV[BUFF_SIZE*4];
+    QColor ColorTop, ColorBot, ColorLine, ColorSp;
 
-	GLdouble BeginGrid;
+    GLdouble BeginGrid;
 	GLdouble GridStep;
-	int CountGridStep;
-	int CntStepGrid;
-	double StepNum;
-	int PrecisionNum;
-	GLdouble OffsetNum;
+    double StepNum;
+    GLdouble OffsetNum;
 
-	QPoint LastPosPress;
-	QPoint LastPosRelease;
-
-	double LowRange;
-	double HighRange;
-
-	bool IsDrawFilterEdges;
+    bool IsDrawFilterEdges;
 	bool IsPressFilterEdges;
 	bool IsDrawFilterEdges2;
 	bool IsPressFilterEdges2;
@@ -272,8 +222,7 @@ class Panarama : public QGLWidget
 	int stepDb;
 	int LowDb;
 	int HighDb;
-	GLfloat PosYNum, PosYNumTx;
-	double offsetDbm, scaleDbm;
+    double offsetDbm, scaleDbm;
 
 	float level_min;
 	float level_max;
@@ -300,13 +249,6 @@ class Panarama : public QGLWidget
 
 	ACTION_OBJECT ActionObject;
 
-    GLfloat Vis;
-    GLuint Texture;
-    GLfloat rotationX;
-    GLfloat rotationY;
-    GLfloat rotationZ;
-    QPoint lastPos;
-
     bool IsVisibleInfo;
     double SignalDds;
     double SignalFilter;
@@ -317,12 +259,8 @@ class Panarama : public QGLWidget
     double SignalBandHigh2;
 
     QTimer TimerSignalDds;
-    QTimer TimerSignalFilter;
-    QTimer TimerSignalBandLow;
-    QTimer TimerSignalBandHigh;
     QTimer TimerChangedFilter;
 
-    PAN_OPTION PanOption;
     float CalibrateLevel;
     int CntMeaneBuff;
     int CntBegin;
@@ -331,16 +269,11 @@ class Panarama : public QGLWidget
     bool IsStart;
     bool IsGridChanged;
     bool IsMoveGrid;
-    bool IsDamping;
     double StepMoveGrid;
-    double StepDamping;
     QPoint FirstPos;
-    QPoint SecondPos;
     QTimer TimerMousePos;
-    int CntLenMove;
     int pitchVal;
 	int TxVfo;
-    int FreqVfoB;
     SDRMODE Mode;
     int TrxCnt;
     int bandNum;
@@ -351,8 +284,6 @@ class Panarama : public QGLWidget
     int sRitValue, dRitValue;
     float sRit, dRit;
     int ritLimLow, ritLimHigh;
-    float glRitLimLow, glRitLimHigh;
-    int currentFilter1Freq;
     float alphaRitLim;
     QTimer timerAlphaColor;
     int fps;
@@ -410,10 +341,8 @@ public:
     bool LockFilter;
     bool IsChangedFilter;
     bool IsEnableSp;
-    int MeanVal;
     QPoint posPress, posMove;
     int getFps() {return fps;};
-    bool IsXvrt;
 
 public slots:
 	void SetVisibleInfo(int state);
@@ -443,20 +372,20 @@ private:
     void MedianFilter(float *pIn, int size);
     int faceAtPosition(const QPoint &pos);
     void DrawBaseElement();
-    void DrawBackground();
-    void DrawSpectr();
-    void DrawRule();
-    void DrawGrid();
-    void DrawFilter();
-    void DrawCursor();
-    void DrawDbm();
-    void DrawWaterfall();
+    void drawSpectrBackground();
+    void drawSpectr();
+    void drawBandLimiter();
+    void drawBandScaleAndGrid();
+    void drawFilter();
+    void drawCursor();
+    void drawDbm();
+    void drawWaterfall();
     void DrawZoomer();
     void DrawInfo(GLdouble X, GLdouble Y, QString Str, QColor color);
     void SetStepGrid();
     void SetStepDbm();
     void UpdateLevels();
-    void GetRGB(float Value, GLubyte *red, GLubyte *green, GLubyte *blue);
+	void GetRGB(float Value, GLubyte &red, GLubyte &green, GLubyte &blue, GLubyte &alpha);
     void MakeSubTexture();
     float GetMin(float *pBuff, int Size);
     float GetMax(float *pBuff, int Size);
@@ -464,10 +393,16 @@ private:
     int getBandNum();
     void updateDbmState();
     QString freqToStr(double freq);
-	void draw_filter_rect(int freq, int low, int high, QColor color, bool draw_edge, QColor edge_color, GLdouble z_pos);
-	void draw_filter_center(int freq, QColor color, QColor higlight_color, GLdouble z_pos);
+	void draw_filter_rect(int freq, int low, int high, QColor color, bool draw_edge, QColor edge_color);
+	void draw_filter_center(int freq, QColor color, QColor hilight_color);
 	void draw_filter_info(int vfo, int freq, int low, int high, bool show_rxtx_mark, bool is_tx, bool visible_filter_info, bool draw_on_left_side, QString vfo_name);
 
+    GLdouble getScaleRuleX();
+    GLdouble getPosZoomPan();
+    GLuint bindTextureFromResource(QString const & fileName);
+    GLdouble oxs(int pixels);
+    GLdouble ox(float pixels);
+    GLdouble oy(float pixels);
 private slots:
 	void MeanTimer();
 	void FilterEdges();

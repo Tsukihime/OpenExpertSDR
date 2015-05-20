@@ -24,6 +24,30 @@
 #include "qmath.h"
 #include <QDebug>
 
+struct BandLimit {
+    int start;
+    int end;
+    BAND_MODE band;
+};
+
+const int bandLimitsCount = NUM_BANDS - 1; // exclude BANDGEN
+const BandLimit bandLimits[bandLimitsCount] =
+        {
+                {BPF160_START, BPF160_END, BAND160M},
+                {BPF80_START,  BPF80_END,  BAND80M},
+                {BPF60_START,  BPF60_END,  BAND60M},
+                {BPF40_START,  BPF40_END,  BAND40M},
+                {BPF30_START,  BPF30_END,  BAND30M},
+                {BPF20_START,  BPF20_END,  BAND20M},
+                {BPF17_START,  BPF17_END,  BAND17M},
+                {BPF15_START,  BPF15_END,  BAND15M},
+                {BPF12_START,  BPF12_END,  BAND12M},
+                {BPF10_START,  BPF10_END,  BAND10M},
+                {BPF6_START,   BPF6_END,   BAND6M},
+                {BPF2_START,   BPF2_END,   BAND2M},
+                {BPF07_START,  BPF07_END,  BAND07M}
+        };
+
 double BandManager::DbToVal(double Db) {
     return (qPow(10.0, 0.1 * (48 - Db)));
 }
@@ -38,20 +62,20 @@ BandManager::BandManager() {
         optBands[iBand].PowerCorrection = 0.1;
     }
 
-    optBands[BAND160M].MainFreq = BPF160_START;
-    optBands[BAND80M].MainFreq = BPF80_START;
-    optBands[BAND60M].MainFreq = BPF60_START;
-    optBands[BAND40M].MainFreq = BPF40_START;
-    optBands[BAND30M].MainFreq = BPF30_START;
-    optBands[BAND20M].MainFreq = BPF20_START;
-    optBands[BAND17M].MainFreq = BPF17_START;
-    optBands[BAND15M].MainFreq = BPF15_START;
-    optBands[BAND12M].MainFreq = BPF12_START;
-    optBands[BAND10M].MainFreq = BPF10_START;
-    optBands[BAND6M].MainFreq = BPF6_START;
-    optBands[BAND2M].MainFreq = 144000000;
-    optBands[BAND07M].MainFreq = 433000000;
-    optBands[BANDGEN].MainFreq = 1800000;
+    optBands[BAND160M].Frequency = BPF160_START;
+    optBands[BAND80M].Frequency = BPF80_START;
+    optBands[BAND60M].Frequency = BPF60_START;
+    optBands[BAND40M].Frequency = BPF40_START;
+    optBands[BAND30M].Frequency = BPF30_START;
+    optBands[BAND20M].Frequency = BPF20_START;
+    optBands[BAND17M].Frequency = BPF17_START;
+    optBands[BAND15M].Frequency = BPF15_START;
+    optBands[BAND12M].Frequency = BPF12_START;
+    optBands[BAND10M].Frequency = BPF10_START;
+    optBands[BAND6M].Frequency = BPF6_START;
+    optBands[BAND2M].Frequency = BPF2_START;
+    optBands[BAND07M].Frequency = BPF07_START;
+    optBands[BANDGEN].Frequency = BPF160_START;
 }
 
 void BandManager::writeSettings(QSettings &settings) {
@@ -62,7 +86,7 @@ void BandManager::writeSettings(QSettings &settings) {
         Str.setNum(iBand);
         settings.beginGroup("Band" + Str);
         settings.setValue("CurrentMode", optBands[iBand].CurrentMode);
-        settings.setValue("BandFreq", optBands[iBand].MainFreq);
+        settings.setValue("BandFreq", optBands[iBand].Frequency);
         settings.setValue("Pitch", optBands[iBand].Pitch);
         settings.setValue("slVolume", optBands[iBand].Volume);
         settings.setValue("slAgc", optBands[iBand].RfGain);
@@ -81,144 +105,53 @@ void BandManager::readSettings(QSettings &settings) {
     int tmpIValue;
     settings.beginGroup("BandOptions");
     tmpIValue = settings.value("CurrentBand", BAND160M).toInt();
-    if (tmpIValue < 0 || tmpIValue > 13) {
+    if (tmpIValue < 0 || tmpIValue > NUM_BANDS - 1) {
         qWarning() << "ExpertSDR: readSettings(): CurrentBand = " << tmpIValue;
         tmpIValue = 0;
     }
     currentBand = (BAND_MODE) tmpIValue;
-    for (int iBand = 0; iBand < NUM_BANDS; iBand++) {
-        int TmpBandFreq = 0;
-        if (iBand == BAND160M) TmpBandFreq = BPF160_START;
-        if (iBand == BAND80M) TmpBandFreq = BPF80_START;
-        if (iBand == BAND60M) TmpBandFreq = BPF60_START;
-        if (iBand == BAND40M) TmpBandFreq = BPF40_START;
-        if (iBand == BAND30M) TmpBandFreq = BPF30_START;
-        if (iBand == BAND20M) TmpBandFreq = BPF20_START;
-        if (iBand == BAND17M) TmpBandFreq = BPF17_START;
-        if (iBand == BAND15M) TmpBandFreq = BPF15_START;
-        if (iBand == BAND12M) TmpBandFreq = BPF12_START;
-        if (iBand == BAND10M) TmpBandFreq = BPF10_START;
-        if (iBand == BAND6M) TmpBandFreq = BPF6_START;
-        if (iBand == BAND2M) TmpBandFreq = BPF2_START;
-        if (iBand == BAND07M) TmpBandFreq = BPF07_START;
-        if (iBand == BANDGEN) TmpBandFreq = BPF160_START;
 
-        QString Str;
-        Str.setNum(iBand);
-        settings.beginGroup("Band" + Str);
-        tmpIValue = settings.value("CurrentMode", 0).toInt();
-        if (tmpIValue < 0 || tmpIValue > 11) {
-            qWarning() << "ExpertSDR: readSettings(): Band" + Str + ": CurrentMode = " << tmpIValue;
+    for (int iBand = 0; iBand < NUM_BANDS; iBand++) {
+
+        BandLimit bandLimit = {BPF160_START, BPF07_END, BANDGEN};
+        for (int i = 0; i < bandLimitsCount; i++) {
+            if (bandLimits[i].band == iBand) {
+                bandLimit = bandLimits[i];
+                break;
+            }
+        }
+
+        settings.beginGroup(QString("Band%1").arg(iBand));
+        tmpIValue = settings.value("CurrentMode", LSB).toInt();
+        if (tmpIValue < 0 || tmpIValue > NUM_MODES - 1) {
+            qWarning() << "ExpertSDR: readSettings(): Band" << iBand << ": CurrentMode = " << tmpIValue;
             tmpIValue = 0;
         }
         optBands[iBand].CurrentMode = (SDRMODE) tmpIValue;
 
-        tmpIValue = settings.value("BandFreq", TmpBandFreq).toInt();
-        switch ((BAND_MODE) iBand) {
-            case BAND160M:
-                if (tmpIValue < BPF160_START || tmpIValue > BPF160_END) {
-                    qWarning() << "ExpertSDR: readSettings(): Band160: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF160_START;
-                }
-                break;
-            case BAND80M:
-                if (tmpIValue < BPF80_START || tmpIValue > BPF80_END) {
-                    qWarning() << "ExpertSDR: readSettings(): Band80: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF80_START;
-                }
-                break;
-            case BAND60M:
-                if (tmpIValue < BPF60_START || tmpIValue > BPF60_END) {
-                    qWarning() << "ExpertSDR: readSettings(): Band60: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF60_START;
-                }
-                break;
-            case BAND40M:
-                if (tmpIValue < BPF40_START || tmpIValue > BPF40_END) {
-                    qWarning() << "ExpertSDR: readSettings(): Band40: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF40_START;
-                }
-                break;
-            case BAND30M:
-                if (tmpIValue < BPF30_START || tmpIValue > BPF30_END) {
-                    qWarning() << "ExpertSDR: readSettings(): Band30: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF30_START;
-                }
-                break;
-            case BAND20M:
-                if (tmpIValue < BPF20_START || tmpIValue > BPF20_END) {
-                    qWarning() << "ExpertSDR: readSettings(): Band20: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF20_START;
-                }
-                break;
-            case BAND17M:
-                if (tmpIValue < BPF17_START || tmpIValue > BPF17_END) {
-                    qWarning() << "ExpertSDR: readSettings(): Band17: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF17_START;
-                }
-                break;
-            case BAND15M:
-                if (tmpIValue < BPF15_START || tmpIValue > BPF15_END) {
-                    qWarning() << "ExpertSDR: readSettings(): Band15: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF15_START;
-                }
-                break;
-            case BAND12M:
-                if (tmpIValue < BPF12_START || tmpIValue > BPF12_END) {
-                    qWarning() << "ExpertSDR: readSettings(): Band12: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF12_START;
-                }
-                break;
-            case BAND10M:
-                if (tmpIValue < BPF10_START || tmpIValue > BPF10_END) {
-                    qWarning() << "ExpertSDR: readSettings(): Band10: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF10_START;
-                }
-                break;
-            case BAND6M:
-                if (tmpIValue < BPF6_START || tmpIValue > BPF6_END) {
-                    qWarning() << "ExpertSDR: readSettings(): Band6: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF6_START;
-                }
-                break;
-            case BAND2M:
-                if (tmpIValue < BPF2_START || tmpIValue > BPF2_END) {
-                    qWarning() << "ExpertSDR: readSettings(): Band2: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF2_START;
-                }
-                break;
-            case BAND07M:
-                if (tmpIValue < BPF07_START || tmpIValue > BPF07_END) {
-                    qWarning() << "ExpertSDR: readSettings(): Band07: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF07_START;
-                }
-                break;
-            case BANDGEN:
-                if (tmpIValue < 1000000 || tmpIValue > 440000000) {
-                    qWarning() << "ExpertSDR: readSettings(): Band60: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF160_START;
-                }
-                break;
-            default:
-                if (tmpIValue < 1000000 || tmpIValue > 440000000) {
-                    qWarning() << "ExpertSDR: readSettings(): Band?: BandFreq = " << tmpIValue;
-                    tmpIValue = BPF160_START;
-                }
-                break;
+        tmpIValue = settings.value("BandFreq", bandLimit.start).toInt();
+
+        if (tmpIValue < bandLimit.start || tmpIValue > bandLimit.end) {
+            qWarning() << "ExpertSDR: readSettings(): Band " << bandLimit.band << ": BandFreq = " <<
+            tmpIValue;
+            tmpIValue = bandLimit.start;
         }
-        optBands[iBand].MainFreq = tmpIValue;
+        optBands[iBand].Frequency = tmpIValue;
+
         tmpIValue = settings.value("Pitch", 750).toInt();
         if (tmpIValue < 50 || tmpIValue > 2500) {
             qWarning() << "ExpertSDR: readSettings(): Pitch = " << tmpIValue;
             tmpIValue = 750;
         }
         optBands[iBand].Pitch = tmpIValue;
+
         tmpIValue = settings.value("slVolume", 70).toInt();
         if (tmpIValue < 0 || tmpIValue > 100) {
             qWarning() << "ExpertSDR: readSettings(): slVolume = " << tmpIValue;
             tmpIValue = 70;
         }
         optBands[iBand].Volume = tmpIValue;
+
         tmpIValue = settings.value("slAgc", 80).toInt();
         if (tmpIValue < -20 || tmpIValue > 120) {
             qWarning() << "ExpertSDR: readSettings(): slAgc = " << tmpIValue;
@@ -227,8 +160,7 @@ void BandManager::readSettings(QSettings &settings) {
         optBands[iBand].RfGain = tmpIValue;
 
         for (int iMode = 0; iMode < NUM_MODES; iMode++) {
-            Str.setNum(iMode);
-            settings.beginGroup("Mode" + Str);
+            settings.beginGroup(QString("Mode%1").arg(iMode));
             optBands[iBand].Mode[iMode].readSettings(settings);
             settings.endGroup();
         }
@@ -237,192 +169,24 @@ void BandManager::readSettings(QSettings &settings) {
     settings.endGroup();
 }
 
-void BandManager::setMainFreqExperimental(int Freq, int DdsFreq) {
-    // todo edit this shit!
-    if (DdsFreq <= BPF160_F) {
-        if ((Freq >= BPF160_START) && (Freq <= BPF160_END)) {
-            if (currentBand != BAND160M) {
-                optBands[BAND160M].MainFreq = Freq;
-                setCurrentBand(BAND160M);
-            }
-        }
-        else {
-            if (currentBand != BANDGEN) {
-                optBands[BANDGEN].MainFreq = Freq;
-                setCurrentBand(BANDGEN);
-            }
+BAND_MODE BandManager::getBandByFrequency(int Frequency) {
+    for (int i = 0; i < bandLimitsCount - 1; i++) {
+        if ((Frequency > bandLimits[i].start) && (Frequency <= bandLimits[i].end)) {
+            return bandLimits[i].band;
         }
     }
-    else if ((DdsFreq > BPF160_F) && (DdsFreq <= BPF80_F)) {
-        if ((Freq >= BPF80_START) && (Freq <= BPF80_END)) {
-            if (currentBand != BAND80M) {
-                optBands[BAND80M].MainFreq = Freq;
-                setCurrentBand(BAND80M);
-            }
-        }
-        else {
-            if (currentBand != BANDGEN) {
-                optBands[BANDGEN].MainFreq = Freq;
-                setCurrentBand(BANDGEN);
-            }
-        }
+    return BANDGEN;
+}
+
+void BandManager::setFrequency(int Frequency) {
+    BAND_MODE band = getBandByFrequency(Frequency);
+
+    if (currentBand != band) {
+        optBands[band].Frequency = Frequency;
+        setCurrentBand(band);
     }
-    else if ((DdsFreq > BPF80_F) && (DdsFreq <= BPF60_F)) {
-        if ((Freq >= BPF60_START) && (Freq <= BPF60_END)) {
-            if (currentBand != BAND60M) {
-                optBands[BAND60M].MainFreq = Freq;
-                setCurrentBand(BAND60M);
-            };
-        }
-        else {
-            if (currentBand != BANDGEN) {
-                optBands[BANDGEN].MainFreq = Freq;
-                setCurrentBand(BANDGEN);
-            }
-        }
-    }
-    else if ((DdsFreq > BPF60_F) && (DdsFreq <= BPF40_F)) {
-        if ((Freq >= BPF40_START) && (Freq <= BPF40_END)) {
-            if (currentBand != BAND40M) {
-                optBands[BAND40M].MainFreq = Freq;
-                setCurrentBand(BAND40M);
-            }
-        }
-        else {
-            if (currentBand != BANDGEN) {
-                optBands[BANDGEN].MainFreq = Freq;
-                setCurrentBand(BANDGEN);
-            }
-        }
-    }
-    else if ((DdsFreq > BPF40_F) && (DdsFreq <= BPF30_F)) {
-        if ((Freq >= BPF30_START) && (Freq <= BPF30_END)) {
-            if (currentBand != BAND30M) {
-                optBands[BAND30M].MainFreq = Freq;
-                setCurrentBand(BAND30M);
-            }
-        }
-        else {
-            if (currentBand != BANDGEN) {
-                optBands[BANDGEN].MainFreq = Freq;
-                setCurrentBand(BANDGEN);
-            }
-        }
-    }
-    else if ((DdsFreq > BPF30_F) && (DdsFreq <= BPF20_F)) {
-        if ((Freq >= BPF20_START) && (Freq <= BPF20_END)) {
-            if (currentBand != BAND20M) {
-                optBands[BAND20M].MainFreq = Freq;
-                setCurrentBand(BAND20M);
-            }
-        }
-        else {
-            if (currentBand != BANDGEN) {
-                optBands[BANDGEN].MainFreq = Freq;
-                setCurrentBand(BANDGEN);
-            }
-        }
-    }
-    else if ((DdsFreq > BPF20_F) && (DdsFreq <= BPF17_F)) {
-        if ((Freq >= BPF17_START) && (Freq <= BPF17_END)) {
-            if (currentBand != BAND17M) {
-                optBands[BAND17M].MainFreq = Freq;
-                setCurrentBand(BAND17M);
-            }
-        }
-        else {
-            if (currentBand != BANDGEN) {
-                optBands[BANDGEN].MainFreq = Freq;
-                setCurrentBand(BANDGEN);
-            }
-        }
-    }
-    else if ((DdsFreq > BPF17_F) && (DdsFreq <= BPF15_F)) {
-        if ((Freq >= BPF15_START) && (Freq <= BPF15_END)) {
-            if (currentBand != BAND15M) {
-                optBands[BAND15M].MainFreq = Freq;
-                setCurrentBand(BAND15M);
-            }
-        }
-        else {
-            if (currentBand != BANDGEN) {
-                optBands[BANDGEN].MainFreq = Freq;
-                setCurrentBand(BANDGEN);
-            }
-        }
-    }
-    else if ((DdsFreq > BPF15_F) && (DdsFreq <= BPF12_F)) {
-        if ((Freq >= BPF12_START) && (Freq <= BPF12_END)) {
-            if (currentBand != BAND12M) {
-                optBands[BAND12M].MainFreq = Freq;
-                setCurrentBand(BAND12M);
-            }
-        }
-        else {
-            if (currentBand != BANDGEN) {
-                optBands[BANDGEN].MainFreq = Freq;
-                setCurrentBand(BANDGEN);
-            }
-        }
-    }
-    else if ((DdsFreq > BPF12_F) && (DdsFreq <= BPF10_F)) {
-        if ((Freq >= BPF10_START) && (Freq <= BPF10_END)) {
-            if (currentBand != BAND10M) {
-                optBands[BAND10M].MainFreq = Freq;
-                setCurrentBand(BAND10M);
-            }
-        }
-        else {
-            if (currentBand != BANDGEN) {
-                optBands[BANDGEN].MainFreq = Freq;
-                setCurrentBand(BANDGEN);
-            }
-        }
-    }
-    else if ((DdsFreq > BPF10_F) && (DdsFreq <= BPF6_F)) {
-        if ((Freq >= BPF6_START) && (Freq <= BPF6_END)) {
-            if (currentBand != BAND6M) {
-                optBands[BAND6M].MainFreq = Freq;
-                setCurrentBand(BAND6M);
-            }
-        }
-        else {
-            if (currentBand != BANDGEN) {
-                optBands[BANDGEN].MainFreq = Freq;
-                setCurrentBand(BANDGEN);
-            }
-        }
-    }
-    else if ((Freq >= BPF2_START) && (Freq <= BPF2_END)) {
-        if ((Freq >= BPF2_START) && (Freq <= BPF2_END)) {
-            if (currentBand != BAND2M) {
-                optBands[BAND2M].MainFreq = Freq;
-                setCurrentBand(BAND2M);
-            }
-        }
-        else {
-            // todo: unrechable statement
-            if (currentBand != BANDGEN) {
-                optBands[BANDGEN].MainFreq = Freq;
-                setCurrentBand(BANDGEN);
-            }
-        }
-    }
-    else {
-        if ((Freq >= BPF07_START) && (Freq <= BPF07_END)) {
-            if (currentBand != BAND07M) {
-                optBands[BAND07M].MainFreq = Freq;
-                setCurrentBand(BAND07M);
-            }
-        }
-        else {
-            if (currentBand != BANDGEN) {
-                optBands[BANDGEN].MainFreq = Freq;
-                setCurrentBand(BANDGEN);
-            }
-        }
-    }
-    optBands[currentBand].MainFreq = Freq;
+
+    optBands[currentBand].Frequency = Frequency;
 }
 
 BAND_MODE BandManager::getCurrentBand() {
@@ -475,12 +239,8 @@ void BandManager::setCurrentBandVolume(int value) {
     optBands[currentBand].Volume = value;
 }
 
-int BandManager::getCurrentBandMainFrequency() {
-    return optBands[currentBand].MainFreq;
-}
-
-void BandManager::setCurrentBandMainFrequency(int Freq) {
-    optBands[currentBand].MainFreq = Freq;
+int BandManager::getCurrentBandFrequency() {
+    return optBands[currentBand].Frequency;
 }
 
 double BandManager::getCurrentBandPowerCorrection() {
