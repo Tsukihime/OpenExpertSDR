@@ -313,35 +313,35 @@ void Panarama::paintGL()
 	glLoadIdentity();
 	glDisable(GL_DEPTH_TEST);
 
-	if (height() == 0 || width() == 0)
-		return;
+	bool disableGraphics = height() == 0 || width() == 0 || pPanOpt->ui.cbDisableGraphics->isChecked();
 
-	BeginX = -1.0 / getScaleRuleX() - getPosZoomPan() * (1.0 / getScaleRuleX()) + getPosZoomPan();
-	EndX   =  1.0 / getScaleRuleX() - getPosZoomPan() * (1.0 / getScaleRuleX()) + getPosZoomPan();
+	if (!disableGraphics) {
+		BeginX = -1.0 / getScaleRuleX() - getPosZoomPan() * (1.0 / getScaleRuleX()) + getPosZoomPan();
+		EndX = 1.0 / getScaleRuleX() - getPosZoomPan() * (1.0 / getScaleRuleX()) + getPosZoomPan();
 
-	if (posRule - HeighRule + 1 > GL_WINDOW_HEIGHT / 100.0 * 5) { // hide if waterfall height <= 5% of screen
-		drawWaterfall();
+		if (posRule - HeighRule + 1 > GL_WINDOW_HEIGHT / 100.0 * 5) { // hide if waterfall height <= 5% of screen
+			drawWaterfall();
+		}
+
+		drawSpectrBackground();
+
+		if (IsEnableSp) {
+			drawSpectr();
+		}
+
+		drawBandLimiter();
+		drawBandScaleAndGrid();
+
+		if ((1.0 - posRule) / ScaleWindowY > 50) {
+			drawDbm();
+		}
+
+		drawFilter();
+
+		if (IsWindow) {
+			drawCursor();
+		}
 	}
-
-	drawSpectrBackground();
-
-	if (IsEnableSp) {
-		drawSpectr();
-	}
-
-	drawBandLimiter();
-	drawBandScaleAndGrid();
-
-	if ((1.0 - posRule) / ScaleWindowY > 50) {
-		drawDbm();
-	}
-
-	drawFilter();
-
-	if (IsWindow) {
-		drawCursor();
-	}
-
 	glFlush();
 	swapBuffers();
 }

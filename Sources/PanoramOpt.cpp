@@ -252,6 +252,7 @@ void PanoramOpt::readSettings(QSettings *pSettings)
         ui.comboBox_2->setCurrentIndex(pSettings->value("BackgroundType", 1).toInt());
 		ui.comboBox_3->setCurrentIndex(pSettings->value("ImgBackgroundType", 0).toInt());
 		ui.cbPowerChange->setCurrentIndex(pSettings->value("StatePowerChange", 1).toInt());
+		ui.cbDisableGraphics->setChecked(pSettings->value("DisableGraphics", false).toBool());
 		ui.horizontalSlider->setValue(pSettings->value("TrncpLineGrid", 30).toInt());
 		ui.cbAutoLevel->setCurrentIndex(pSettings->value("AutoSettingType", 0).toInt());
 		ui.chbAverange->setChecked(pSettings->value("AvaregingWhenChangingDDS", true).toBool());
@@ -328,6 +329,7 @@ void PanoramOpt::writeSettings(QSettings *pSettings)
 		pSettings->setValue("BackgroundType", ui.comboBox_2->currentIndex());
 		pSettings->setValue("ImgBackgroundType", ui.comboBox_3->currentIndex());
 		pSettings->setValue("StatePowerChange", ui.cbPowerChange->currentIndex());
+		pSettings->setValue("DisableGraphics", ui.cbDisableGraphics->isChecked());
 		pSettings->setValue("TrncpLineGrid", ui.horizontalSlider->value());
 		pSettings->setValue("AutoSettingType", ui.cbAutoLevel->currentIndex());
 		pSettings->setValue("AvaregingWhenChangingDDS", ui.chbAverange->isChecked());

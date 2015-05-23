@@ -1756,6 +1756,19 @@ p, li { white-space: pre-wrap; }
         <string>Sample averaging:</string>
        </property>
       </widget>
+      <widget class="QCheckBox" name="cbDisableGraphics">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>121</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Disable all graphics</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QWidget" name="tab_8">
       <attribute name="title">
